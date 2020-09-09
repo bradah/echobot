@@ -5,8 +5,9 @@ import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 
 
-
--- * Available types
+-- * This file implements basic Telegram API types.
+--   Note that there is no need to describe entire API type system
+--   for simple bot like this one.
 
 -- ** Update
 
@@ -17,7 +18,7 @@ data Update = Update
     { updateUpdateId      :: UpdateId -- ^ The update's unique identifier
     , updateMessage       :: Maybe Message -- ^ New incoming message of any kind -- text, photo, sticker, etc.
     , updateEditedMessage :: Maybe Message -- ^ New version of a message that is known to the bot and was edited
-    }
+    } deriving (Show)
 
 -- | The update's unique identifier
 
@@ -35,7 +36,7 @@ data Message = Message
     , messageText      :: Maybe Text -- ^ For text messages, the actual UTF-8 text of the message, 0-4096 characters
     , messageEntities  :: Maybe [MessageEntity] -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
  -- , messageSticker   :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
-    }
+    } deriving (Show)
 
 -- | Unique message identifier.
 type MessageId = Int32
@@ -50,7 +51,7 @@ data User = User
     , userFirstName :: Maybe Text -- ^ User's or bot's first name
     , userLastName  :: Maybe Text -- ^ User's or bot's last name
     , userUsername  :: Maybe Text -- ^ User's or bot's username
-    }
+    } deriving (Show)
 
 -- | Unique identifier for this user or bot
 type UserId = Int32
@@ -62,7 +63,7 @@ type UserId = Int32
 data Chat = Chat
     { chatId       :: ChatId -- ^ Unique identifier for this chat.
     , chatUsername :: Maybe Text -- ^ Username, for private chats, supergroups and channels if available
-    }
+    } deriving (Show)
 
 -- | Unique identifier for this chat.
 type ChatId = Integer
@@ -78,7 +79,7 @@ data MessageEntity = MessageEntity
     , messageEntityLength :: Int32 -- ^ Length of the entity in UTF-16 code units
     , messageEntityUrl    :: Maybe Text -- ^ For “text_link” only, url that will be opened after user taps on the text
     , messageEntityUser   :: Maybe User -- ^ For “text_mention” only, the mentioned user
-    }
+    } deriving (Show)
 
 -- ** MessageEntityType
 
@@ -104,7 +105,7 @@ data MessageEntityType
     | MessageEntityTextMention
     | MessageEntityCashtag
     | MessageEntityPhoneNumber
-
+    deriving (Show)
 
 -- To be implemented
 {- -- ** Sticker
