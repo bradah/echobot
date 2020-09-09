@@ -24,7 +24,7 @@ jsonOptions tname = defaultOptions
 --   It essentially removes label prefix and converts it's name
 --   from camelType to snake_type
 snakeFieldModifier
-    :: String -- ^ Prefix, which is capitalized name of datatype
+    :: String -- ^ Prefix, i.e. is name of datatype
     -> String -- ^ Label name
     -> String
 snakeFieldModifier prefix xs = wordsToSnake (deleteCommonPrefixWords prefix xs)
