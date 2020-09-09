@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1cfaf10807fd43c59a6579c78c3b56a13707a9507a592ef206ac04376f353469
+-- hash: 372d891a58748925baa9af1342ecbf6610201d0054a7764a0a764c4c155960b6
 
 name:           echobot
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
     , bytestring
     , req
     , text
+    , time
   default-language: Haskell2010
 
 executable echobot-exe
@@ -55,6 +56,7 @@ executable echobot-exe
     , echobot
     , req
     , text
+    , time
   default-language: Haskell2010
 
 test-suite echobot-test
@@ -72,4 +74,5 @@ test-suite echobot-test
     , echobot
     , req
     , text
+    , time
   default-language: Haskell2010
