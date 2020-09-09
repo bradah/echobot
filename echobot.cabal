@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 408ee8b4e23ea5e9e0143d63e060b8ede114fdb7433be2ec3a0a2b634ee9bd05
+-- hash: 26cfa5b8b9e14c40695abafc0df40f1e2143add1ba6166bca9dbb672d4f04a0a
 
 name:           echobot
 version:        0.1.0.0
@@ -27,13 +27,21 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Telegram.Bot.API.Internal.Derivation
+      Telegram.Bot.API.Request
+      Telegram.Bot.API.Types
   other-modules:
       Paths_echobot
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , req
+    , template-haskell
+    , text
+    , time
   default-language: Haskell2010
 
 executable echobot-exe
@@ -44,8 +52,14 @@ executable echobot-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
     , echobot
+    , req
+    , template-haskell
+    , text
+    , time
   default-language: Haskell2010
 
 test-suite echobot-test
@@ -57,6 +71,12 @@ test-suite echobot-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
     , echobot
+    , req
+    , template-haskell
+    , text
+    , time
   default-language: Haskell2010

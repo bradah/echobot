@@ -25,6 +25,8 @@ dependencies:
 - req
 - text
 - bytestring
+- time
+- template-haskell
 
 library:
   source-dirs: src
