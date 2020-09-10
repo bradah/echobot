@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Telegram.Bot.API.UpdateParser where
+module Telegram.UpdateParser where
 
 import           Control.Applicative
 import           Control.Monad
-import qualified Data.Text              as T
-import           Telegram.Bot.API.Types
+import qualified Data.Text           as T
+import           Telegram.Types
 
 -- * Parse 'Update's
 

@@ -2,14 +2,14 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Telegram.Bot.API.Request where
+module Telegram.Request where
 
 import           Data.Aeson
-import           Data.Text                            (Text)
+import           Data.Text                    (Text)
 import           GHC.Generics
 import           Network.HTTP.Req
-import           Telegram.Bot.API.Internal.Derivation
-import           Telegram.Bot.API.Types
+import           Telegram.Internal.Derivation
+import           Telegram.Types
 
 -- * Types representing Telegram response
 

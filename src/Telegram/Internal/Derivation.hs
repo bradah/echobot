@@ -1,4 +1,4 @@
-module Telegram.Bot.API.Internal.Derivation where
+module Telegram.Internal.Derivation where
 
 import           Data.Aeson.TH       (deriveJSON)
 import           Data.Aeson.Types    (Options (..), defaultOptions)

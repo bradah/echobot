@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Telegram.Bot.API.Methods where
+module Telegram.Methods where
 
 import           Control.Monad.IO.Class
-import qualified Data.ByteString.Char8    as B
+import qualified Data.ByteString.Char8  as B
 import           Network.HTTP.Req
-import           Telegram.Bot.API.Request
-import           Telegram.Bot.API.Types
+import           Telegram.Request
+import           Telegram.Types
 
 -- * This file contains availabe methods
 

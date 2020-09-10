@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Telegram.Bot.API.Types where
+module Telegram.Types where
 
 import           Data.Aeson
 import           Data.Int
@@ -8,7 +8,7 @@ import           Data.Text                            (Text)
 import           Data.Time.Clock.POSIX                (POSIXTime)
 import           GHC.Generics
 import           Language.Haskell.TH
-import           Telegram.Bot.API.Internal.Derivation
+import           Telegram.Internal.Derivation
 
 
 -- * This file implements basic Telegram API types.
