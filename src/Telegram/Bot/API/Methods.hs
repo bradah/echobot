@@ -38,7 +38,7 @@ sendMessage token reqbody = runReq defaultHttpConfig $ do
 
 -- ** getUpdates
 
--- | Use this method to receive incoming updates using long polling (wiki).
+-- | Use this method to receive incoming updates.
 --   An Array of 'Update' objects is returned.
 getUpdates :: Token -> GetUpdatesRequest -> IO (Response [Update])
 getUpdates token reqbody = runReq defaultHttpConfig $ do
