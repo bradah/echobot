@@ -36,7 +36,7 @@ data SendMessageRequest = SendMessageRequest
 
 -- | Request body for 'getUpdates'
 data GetUpdatesRequest = GetUpdatesRequest
-  { getUpdatesOffset         :: UpdateId
+  { getUpdatesOffset         :: Maybe UpdateId
   , getUpdaetsAllowedUpdates :: Maybe [UpdateType]
   } deriving (Generic)
 
