@@ -48,3 +48,18 @@ getUpdates token reqbody = runReq defaultHttpConfig $ do
             jsonResponse
             mempty
   liftIO . return $ (responseBody resp)
+
+-- ** sendSticker
+
+-- | Use this method to send static .WEBP or
+--   animated .TGS stickers. On success, the sent
+--   'Message' is returned.
+
+sendSticker :: Token -> SendStickerRequest -> IO (Response (Message))
+sendSticker token reqbody = runReq defaultHttpConfig $ do
+  resp <- req POST
+            (botBaseUrl token /: "sendSticker")
+            (ReqBodyJson reqbody)
+            jsonResponse
+            mempty
+  liftIO . return $ (responseBody resp)
