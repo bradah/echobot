@@ -11,7 +11,7 @@ import           Telegram.Types
 -- ** UpdateParser
 
 -- | This abstract type represents common record field functions
---   Note that it's essentially the same as 'ReaderT Update Maybe a'
+--   Note that it's essentially the same as 'ReaderT' 'Update' 'Maybe' a
 newtype UpdateParser a = UpdateParser
     { runUpdateParser :: Update -> Maybe a }
 
