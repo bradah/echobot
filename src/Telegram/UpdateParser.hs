@@ -61,3 +61,6 @@ command name = do
 
 updateMessageText :: Update -> Maybe T.Text
 updateMessageText = updateMessage >=> messageText
+
+sticker :: UpdateParser Sticker
+sticker = UpdateParser $ updateMessage >=> messageSticker
