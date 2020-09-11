@@ -4,11 +4,8 @@ module Main where
 import           Control.Concurrent
 import           Control.Monad
 import           Data.Maybe
-import qualified Data.Text.IO          as TIO
-import           Telegram.Methods
-import           Telegram.Request
-import           Telegram.Types
-import           Telegram.UpdateParser
+import qualified Data.Text.IO       as TIO
+import           Telegram.Bot
 
 main :: IO ()
 main = do
@@ -36,4 +33,3 @@ main = do
 
 initialGetUpdateRequest :: GetUpdatesRequest
 initialGetUpdateRequest = GetUpdatesRequest Nothing (Just [UpdateMessage])
-
