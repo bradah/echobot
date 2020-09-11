@@ -41,7 +41,7 @@ data Message = Message
     , messageChat      :: Chat -- ^ Conversation the message belongs to
     , messageText      :: Maybe Text -- ^ For text messages, the actual UTF-8 text of the message, 0-4096 characters
     , messageEntities  :: Maybe [MessageEntity] -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
- -- , messageSticker   :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
+    , messageSticker   :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
     } deriving (Show, Generic)
 
 -- | Unique message identifier.
