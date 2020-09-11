@@ -7,7 +7,7 @@ import           Network.HTTP.Req
 import           Telegram.Request
 import           Telegram.Types
 
--- * This file contains availabe methods
+-- * Availabe methods
 
 -- ** getMe
 
