@@ -40,6 +40,12 @@ data GetUpdatesRequest = GetUpdatesRequest
   , getUpdaetsAllowedUpdates :: Maybe [UpdateType]
   } deriving (Generic)
 
+-- | Request body for 'sendSticker'
+data SendStickerRequest = SendStickerRequest
+  { sendStickerChatId  :: ChatId
+  , sendStickerSticker :: Text
+  } deriving (Generic)
+
 -- | Types of updates allowed to receive
 data UpdateType =
   UpdateMessage
@@ -49,3 +55,4 @@ deriveJSON' ''SendMessageRequest
 deriveJSON' ''UpdateType
 deriveJSON' ''GetUpdatesRequest
 deriveJSON' ''Response
+deriveJSON' ''SendStickerRequest
