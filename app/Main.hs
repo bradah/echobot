@@ -35,5 +35,5 @@ main = do
 
 
 initialGetUpdateRequest :: GetUpdatesRequest
-initialGetUpdateRequest = GetUpdatesRequest Nothing Nothing
+initialGetUpdateRequest = GetUpdatesRequest Nothing (Just [UpdateMessage])
 
