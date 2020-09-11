@@ -4,8 +4,8 @@ module Telegram.Types where
 
 import           Data.Aeson
 import           Data.Int
-import           Data.Text                            (Text)
-import           Data.Time.Clock.POSIX                (POSIXTime)
+import           Data.Text                    (Text)
+import           Data.Time.Clock.POSIX        (POSIXTime)
 import           GHC.Generics
 import           Language.Haskell.TH
 import           Telegram.Internal.Derivation
@@ -113,27 +113,19 @@ data MessageEntityType
     | MessageEntityPhoneNumber
     deriving (Show)
 
+-- ** Sticker
+
+-- | This object represents a sticker.
+data Sticker = Sticker
+    { stickerFileId :: Text -- ^ Identifier for this file, which can be used to download or reuse the file
+    } deriving (Show, Generic)
+
+
+-- | Instances of toJSON and fromJSON
 deriveJSON' ''User
 deriveJSON' ''Chat
 deriveJSON' ''MessageEntityType
 deriveJSON' ''MessageEntity
 deriveJSON' ''Message
 deriveJSON' ''Update
-
-
--- To be implemented
-{- -- ** Sticker
-
--- | This object represents a sticker.
-data Sticker = Sticker
-    { stickerFileId :: Text -- ^ Identifier for this file, which can be used to download or reuse the file
-    , stickerFileUniqueId :: Text -- ^ Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
-    , stickerWidth :: Int32 -- ^ Sticker width
-    , stickerHeight :: Int32 -- ^ Sticker height
-    , stickerIsAnimated :: Bool -- ^ True, if the sticker is animated
-    , stickerThumb :: Maybe PhotoSize -- ^ Sticker thumbnail in the .WEBP or .JPG format
-    , stickerEmoji :: Maybe Text -- ^ Emoji associated with the sticker
-    , stickerSetName :: Maybe Text -- ^ Name of the sticker set to which the sticker belongs
-    , stickerMaskPosition :: Maybe MaskPosition -- ^ For mask stickers, the position where the mask should be placed
-    , stickerFileSize :: Int32 -- ^ File size
-    } -}
+deriveJSON' ''Sticker
