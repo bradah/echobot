@@ -29,14 +29,14 @@ runMethod = runReaderT
 
 getMe :: Method a User
 getMe = do
-  token <- asks payloadToken
-  runReq defaultHttpConfig $ do
-    resp <- req GET
-              (botBaseUrl token /: "getMe")
-              NoReqBody
-              jsonResponse
-              mempty
-    liftIO . return $ (responseBody resp)
+    token <- asks payloadToken
+    runReq defaultHttpConfig $ do
+        resp <- req GET
+                (botBaseUrl token /: "getMe")
+                NoReqBody
+                jsonResponse
+                mempty
+        liftIO . return $ (responseBody resp)
 
 -- ** sendMessage
 
@@ -44,31 +44,31 @@ getMe = do
 --   On success, the sent 'Message' is returned.
 sendMessage :: Method SendMessageRequest Message
 sendMessage = do
-  token <- asks payloadToken
-  reqbody <- asks payloadRequestBody
-  runReq defaultHttpConfig $ do
-    json <- req POST
-              (botBaseUrl token /: "sendMessage")
-              (ReqBodyJson reqbody)
-              jsonResponse
-              mempty
-    liftIO . return $ (responseBody json)
+    token <- asks payloadToken
+    reqbody <- asks payloadRequestBody
+    runReq defaultHttpConfig $ do
+        json <- req POST
+                (botBaseUrl token /: "sendMessage")
+                (ReqBodyJson reqbody)
+                jsonResponse
+                mempty
+        liftIO . return $ (responseBody json)
 
 -- ** getUpdates
 
 -- | Use this method to receive incoming updates.
 --   An Array of 'Update' objects is returned.
 getUpdates :: Method GetUpdatesRequest [Update]
-getUpdates = do 
-  token <- asks payloadToken
-  reqbody <- asks payloadRequestBody
-  runReq defaultHttpConfig $ do
-    resp <- req POST
-              (botBaseUrl token /: "getUpdates")
-              (ReqBodyJson reqbody)
-              jsonResponse
-              mempty
-    liftIO . return $ (responseBody resp)
+getUpdates = do
+    token <- asks payloadToken
+    reqbody <- asks payloadRequestBody
+    runReq defaultHttpConfig $ do
+        resp <- req POST
+                (botBaseUrl token /: "getUpdates")
+                (ReqBodyJson reqbody)
+                jsonResponse
+                mempty
+        liftIO . return $ (responseBody resp)
 
 -- ** sendSticker
 
@@ -76,14 +76,14 @@ getUpdates = do
 --   animated .TGS stickers. On success, the sent
 --   'Message' is returned.
 
-sendSticker :: Method SendMessageRequest [Message] 
+sendSticker :: Method SendMessageRequest [Message]
 sendSticker = do
-  token <- asks payloadToken
-  reqbody <- asks payloadRequestBody
-  runReq defaultHttpConfig $ do
-  resp <- req POST
-            (botBaseUrl token /: "sendSticker")
-            (ReqBodyJson reqbody)
-            jsonResponse
-            mempty
-  liftIO . return $ (responseBody resp)
+    token <- asks payloadToken
+    reqbody <- asks payloadRequestBody
+    runReq defaultHttpConfig $ do
+        resp <- req POST
+                    (botBaseUrl token /: "sendSticker")
+                    (ReqBodyJson reqbody)
+                    jsonResponse
+                    mempty
+        liftIO . return $ (responseBody resp)
