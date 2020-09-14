@@ -25,7 +25,7 @@ data Response a = Response
   } deriving (Show, Generic)
 
 
-botBaseUrl :: Text -> Url Https
+botBaseUrl :: Token -> Url Https
 botBaseUrl token = https "api.telegram.org" /: "bot" <> token
 
 -- | Request body for 'sendMessage'
