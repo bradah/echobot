@@ -10,10 +10,15 @@ import           Telegram.Types
 
 -- ** UpdateParser
 
--- | This abstract type represents common record field functions
---   Note that it's essentially the same as 'ReaderT' 'Update' 'Maybe' a
+-- | Generalized type of record field selectors
 newtype UpdateParser a = UpdateParser
     { runUpdateParser :: Update -> Maybe a }
+
+
+-- | Infix version of 'runUpdateParser'
+infixl 4 <?>
+(<?>) :: UpdateParser a -> Update -> Maybe a
+(<?>) = runUpdateParser
 
 instance Functor UpdateParser where
     fmap f (UpdateParser p) =
@@ -61,9 +66,13 @@ command name = do
 updateMessageText :: Update -> Maybe T.Text
 updateMessageText = updateMessage >=> messageText
 
-sticker :: UpdateParser Sticker
-sticker = UpdateParser $ updateMessage >=> messageSticker
+sticker :: UpdateParser FileId
+sticker = UpdateParser $
+    updateMessage >=> messageSticker >=> return . stickerFileId
 
 updateChatId :: UpdateParser ChatId
 updateChatId = UpdateParser $
     updateMessage >=> return . messageChat >=> return . chatId
+
+updateId :: UpdateParser UpdateId
+updateId = UpdateParser (return . updateUpdateId)
