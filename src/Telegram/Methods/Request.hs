@@ -30,6 +30,7 @@ data SendStickerBody = SendStickerBody
 data GetUpdatesBody = GetUpdatesBody
     { getUpdatesOffset     :: Maybe UpdateId
     , getUpdatesUpdateType :: Maybe UpdateType
+    , getUpdatesTimeout    :: Maybe Int
     } deriving (Generic)
 
 -- | Types of updates allowed to receive

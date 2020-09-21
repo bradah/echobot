@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import           Control.Concurrent       (threadDelay)
 import           Control.Monad.Reader
 import           Data.Foldable            (asum)
 import qualified Data.Text                as T (Text, unlines)
@@ -24,12 +23,11 @@ main = do
         go mUid env = do
             ups <- responseResult
                 <$> runReaderT
-                    (getUpdates (GetUpdatesBody mUid (Just UpdateMessage)))
+                    (getUpdates (GetUpdatesBody mUid (Just UpdateMessage) (Just 60)))
                     env
             forM_ ups (handleUpdate env)
             let offset | null ups = Nothing
                        | otherwise = (1+) <$> updateId <?> last ups
-            threadDelay 1000000
             go offset env
 
 data Action
