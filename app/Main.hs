@@ -23,7 +23,7 @@ main = do
         go mUid env = do
             ups <- responseResult
                 <$> runReaderT
-                    (getUpdates (GetUpdatesBody mUid (Just UpdateMessage) (Just 60)))
+                    (getUpdates (GetUpdatesBody mUid (Just UpdateMessage) (Just 25)))
                     env
             forM_ ups (handleUpdate env)
             let offset | null ups = Nothing
