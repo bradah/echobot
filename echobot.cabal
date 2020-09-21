@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e1d80dcdf1c61c177267bf12ba2801ea69606de81205b30a8e78e527d6bc261e
+-- hash: 5296d71b95644357bab83faf6b16cea03fa274ca963bd64a36af15878dabe9d2
 
 name:           echobot
 version:        0.1.0.0
@@ -27,9 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Telegram.Bot
       Telegram.Env
-      Telegram.Internal.Derivation
       Telegram.Methods
       Telegram.Methods.Request
       Telegram.Types
@@ -42,7 +40,6 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
-    , bytestring
     , mtl
     , req
     , template-haskell
@@ -56,11 +53,10 @@ executable echobot-exe
       Paths_echobot
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       aeson
     , base >=4.7 && <5
-    , bytestring
     , echobot
     , mtl
     , req
@@ -80,7 +76,6 @@ test-suite echobot-test
   build-depends:
       aeson
     , base >=4.7 && <5
-    , bytestring
     , echobot
     , mtl
     , req
