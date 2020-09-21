@@ -7,8 +7,8 @@ import           Test.QuickCheck
 
 spec :: Spec
 spec = do
-    describe "DeriveSpec" $
-        it "Shoud test code" $
-            pendingWith "Not yet implemented"
+  describe "DeriveSpec" $
+    it "Shoud test code" $
+      pendingWith "Not yet implemented"
 
 

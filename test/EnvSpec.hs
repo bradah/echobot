@@ -7,8 +7,8 @@ import           Test.QuickCheck
 
 spec :: Spec
 spec = do
-    describe "EnvSpec" $
-        it "Shoud test code" $
-            pendingWith "Not yet implemented"
+  describe "EnvSpec" $
+    it "Shoud test code" $
+      pendingWith "Not yet implemented"
 
 

@@ -10,19 +10,19 @@ import           Network.HTTP.Req
 
 -- ** Env
 
--- | Environment in which bot runs
+-- | Environment in which bot runs.
 data Env = Env
-    { envBaseUrl :: Url 'Https
-    -- ^ Base URL for API 'Methods'.
-    -- This includes 'Token'
-    }
+  { envBaseUrl :: Url 'Https
+  -- ^ Base URL for API 'Methods'.
+  -- This includes 'Token'.
+  }
 
--- | Bot token
+-- | Bot token.
 type Token = Text
 
--- | Smart constructor for 'Env'
+-- | Smart constructor for 'Env'.
 mkEnv :: Token -> Env
 mkEnv t = Env
-    { envBaseUrl = https "api.telegram.org" /: "bot" <> t
-    }
+  { envBaseUrl = https "api.telegram.org" /: "bot" <> t
+  }
 
