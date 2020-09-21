@@ -1,57 +1,68 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import           Control.Concurrent
-import           Control.Monad
-import           Data.Foldable
-import           Data.Maybe
-import           Data.Text          (Text)
-import qualified Data.Text.IO       as TIO
-import           Telegram.Bot
+import           Control.Concurrent       (threadDelay)
+import           Control.Monad.Reader
+import           Data.Foldable            (asum)
+import qualified Data.Text                as T (Text, unlines)
+import qualified Data.Text.IO             as TIO
+import           Telegram.Env
+import           Telegram.Methods
+import           Telegram.Methods.Request
+import           Telegram.Types
+import           Telegram.UpdateParser
 
 main :: IO ()
 main = do
-    token <- TIO.putStrLn "Enter your bot token" >> TIO.getLine
-    go token Nothing
+    putStrLn "Please enter your bot token"
+    token <- TIO.getLine
+    let env = mkEnv token
+    go Nothing env
+
     where
-        processUpdates :: Token -> [Update] -> [IO (Response (Message))]
-        processUpdates _ []     = []
-        processUpdates token (u:us) = 
-            let u' = do
-                case (handleUpdate >=> handleAction token >=> (\r -> return $ threadDelay 500000 >> r)) u of
-                    Just ioact -> ioact
-                    Nothing    -> fail "processUpdates: failed"
-            in u' : processUpdates token us
-
-        go :: Token -> Maybe UpdateId -> IO ()
-        go token uid = do
-            resp <- getUpdates token $ GetUpdatesRequest uid (Just [UpdateMessage])
-            ups <- return $ responseResult resp
-            mapM_ id (processUpdates token ups)
-            let nextUid = case ups of
-                    [] -> (+1) <$> uid
-                    _  -> return . (+1) . updateUpdateId . last $ ups
-            go token nextUid
-
-
-initialGetUpdateRequest :: GetUpdatesRequest
-initialGetUpdateRequest = GetUpdatesRequest Nothing (Just [UpdateMessage])
+        go :: Maybe UpdateId -> Env -> IO ()
+        go mUid env = do
+            ups <- responseResult
+                <$> runReaderT
+                    (getUpdates (GetUpdatesBody mUid (Just UpdateMessage)))
+                    env
+            forM_ ups (handleUpdate env)
+            let offset | null ups = Nothing
+                       | otherwise = (1+) <$> updateId <?> last ups
+            threadDelay 1000000
+            go offset env
 
 data Action
-    = NoAction
-    | Start ChatId
-    | EchoText ChatId Text
-    | EchoSticker ChatId Sticker
+    = Start ChatId
+    | EchoText ChatId T.Text
+    | EchoSticker ChatId FileId
 
-handleUpdate :: Update -> Maybe Action
-handleUpdate = runUpdateParser $ asum
+updateToAction :: Update -> Maybe Action
+updateToAction = runUpdateParser $ asum
     [ Start <$ command "start" <*> updateChatId
     , EchoText <$> updateChatId <*> text
     , EchoSticker <$> updateChatId <*> sticker
     ]
 
-handleAction :: Token -> Action -> Maybe (IO (Response (Message)))
-handleAction token action = case action of
-    Start cid         -> return $ replyText token cid "Don't support this command yet :("
-    EchoText cid t    -> return $ replyText token cid t
-    EchoSticker cid s -> return $ replySticker token cid s
+handleUpdate :: Env -> Update -> IO ()
+handleUpdate env up = do
+    case updateToAction up of
+        Just (Start cid) ->
+            void $ runReaderT (sendMessage (SendMessageBody cid startMessage)) env
+        Just (EchoText cid t) ->
+            void $ runReaderT (sendMessage (SendMessageBody cid t)) env
+        Just (EchoSticker cid s) ->
+            void $ runReaderT (sendSticker (SendStickerBody cid s)) env
+        Nothing -> return ()
+
+startMessage :: T.Text
+startMessage = T.unlines
+    [ "Hi! This bot merely echoes your messages c:"
+    , ""
+    , "Supported messages:"
+    , "- plain text"
+    , "- stickers"
+    , ""
+    , "Supported commands:"
+    , "- /start"
+    ]
