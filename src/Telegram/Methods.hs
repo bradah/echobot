@@ -19,14 +19,14 @@ import           Telegram.Types
 
 getMe :: ReaderT Env IO (Response User)
 getMe = do
-    baseUrl <- asks envBaseUrl
-    runReq defaultHttpConfig $ do
-        resp <- req GET
-                    (baseUrl /: "getMe")
-                    NoReqBody
-                    jsonResponse
-                    mempty
-        liftIO . return $ (responseBody resp)
+  baseUrl <- asks envBaseUrl
+  runReq defaultHttpConfig $ do
+    resp <- req GET
+                (baseUrl /: "getMe")
+                NoReqBody
+                jsonResponse
+                mempty
+    liftIO . return $ (responseBody resp)
 
 -- ** sendMessage
 
@@ -35,14 +35,14 @@ getMe = do
 
 sendMessage :: SendMessageBody -> ReaderT Env IO (Response Message)
 sendMessage body = do
-    baseUrl <- asks envBaseUrl
-    runReq defaultHttpConfig $ do
-        resp <- req POST
-                    (baseUrl /: "sendMessage")
-                    (ReqBodyJson body)
-                    jsonResponse
-                    mempty
-        liftIO . return $ (responseBody resp)
+  baseUrl <- asks envBaseUrl
+  runReq defaultHttpConfig $ do
+    resp <- req POST
+                (baseUrl /: "sendMessage")
+                (ReqBodyJson body)
+                jsonResponse
+                mempty
+    liftIO . return $ (responseBody resp)
 
 -- ** sendSticker
 
@@ -51,14 +51,14 @@ sendMessage body = do
 
 sendSticker :: SendStickerBody -> ReaderT Env IO (Response Message)
 sendSticker body = do
-    baseUrl <- asks envBaseUrl
-    runReq defaultHttpConfig $ do
-        resp <- req POST
-                    (baseUrl /: "sendSticker")
-                    (ReqBodyJson body)
-                    jsonResponse
-                    mempty
-        liftIO . return $ (responseBody resp)
+  baseUrl <- asks envBaseUrl
+  runReq defaultHttpConfig $ do
+    resp <- req POST
+                (baseUrl /: "sendSticker")
+                (ReqBodyJson body)
+                jsonResponse
+                mempty
+    liftIO . return $ (responseBody resp)
 
 -- ** getUpdates
 
@@ -67,11 +67,11 @@ sendSticker body = do
 
 getUpdates :: GetUpdatesBody -> ReaderT Env IO (Response [Update])
 getUpdates body = do
-    baseUrl <- asks envBaseUrl
-    runReq defaultHttpConfig $ do
-        resp <- req POST
-                    (baseUrl /: "getUpdates")
-                    (ReqBodyJson body)
-                    jsonResponse
-                    mempty
-        liftIO . return $ (responseBody resp)
+  baseUrl <- asks envBaseUrl
+  runReq defaultHttpConfig $ do
+    resp <- req POST
+                (baseUrl /: "getUpdates")
+                (ReqBodyJson body)
+                jsonResponse
+                mempty
+    liftIO . return $ (responseBody resp)

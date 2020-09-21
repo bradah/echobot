@@ -10,29 +10,29 @@ import           Telegram.Types
 
 -- ** UpdateParser
 
--- | Generalized type of record field selectors
+-- | Generalized type of record field selectors.
 newtype UpdateParser a = UpdateParser
-    { runUpdateParser :: Update -> Maybe a }
+  { runUpdateParser :: Update -> Maybe a }
 
 
--- | Infix version of 'runUpdateParser'
+-- | Infix version of 'runUpdateParser'.
 infixl 4 <?>
 (<?>) :: UpdateParser a -> Update -> Maybe a
 (<?>) = runUpdateParser
 
 instance Functor UpdateParser where
-    fmap f (UpdateParser p) =
-        UpdateParser $ \upd -> f <$> p upd
+  fmap f (UpdateParser p) =
+    UpdateParser $ \upd -> f <$> p upd
 
 instance Applicative UpdateParser where
-    pure = UpdateParser . pure . pure
-    UpdateParser f <*> UpdateParser x =
-        UpdateParser $ \upd -> f upd <*> x upd
+  pure = UpdateParser . pure . pure
+  UpdateParser f <*> UpdateParser x =
+    UpdateParser $ \upd -> f upd <*> x upd
 
 instance Monad UpdateParser where
-    return = pure
-    UpdateParser x >>= f =
-        UpdateParser $ \upd -> x upd >>= flip runUpdateParser upd . f
+  return = pure
+  UpdateParser x >>= f =
+    UpdateParser $ \upd -> x upd >>= flip runUpdateParser upd . f
 
 instance Alternative UpdateParser where
   empty = UpdateParser (const Nothing)
@@ -41,22 +41,23 @@ instance Alternative UpdateParser where
 
 -- ** Some useful parsers
 
--- | Extract text from 'Update'
+-- | Extract text from 'Update'.
 text :: UpdateParser T.Text
 text = UpdateParser $ updateMessage >=> messageText
 
--- | Same as 'text' but fails if there wasn't plain text (e.g. command)
+-- | Same as 'text' but fails if there wasn't
+-- plain text (e.g. command).
 plainText :: UpdateParser T.Text
 plainText = do
-    t <- text
-    if "/" `T.isPrefixOf` t
-        then empty
-        else return t
+  t <- text
+  if "/" `T.isPrefixOf` t
+    then empty
+    else return t
 
--- | Check if bot received specific command
+-- | Check if bot received specific command.
 command
-    :: T.Text -- ^ Expected command (without "/")
-    -> UpdateParser T.Text
+  :: T.Text -- ^ Expected command (without "/").
+  -> UpdateParser T.Text
 command name = do
   t <- text
   case T.words t of
@@ -68,11 +69,11 @@ updateMessageText = updateMessage >=> messageText
 
 sticker :: UpdateParser FileId
 sticker = UpdateParser $
-    updateMessage >=> messageSticker >=> return . stickerFileId
+  updateMessage >=> messageSticker >=> return . stickerFileId
 
 updateChatId :: UpdateParser ChatId
 updateChatId = UpdateParser $
-    updateMessage >=> return . messageChat >=> return . chatId
+  updateMessage >=> return . messageChat >=> return . chatId
 
 updateId :: UpdateParser UpdateId
 updateId = UpdateParser (return . updateUpdateId)

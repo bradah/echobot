@@ -27,6 +27,9 @@ dependencies:
 - text
 - time
 - template-haskell
+- hspec
+- hspec-discover
+- QuickCheck
 
 library:
   source-dirs: src
