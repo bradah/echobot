@@ -25,7 +25,6 @@ dependencies:
 - req
 - mtl
 - text
-- bytestring
 - time
 - template-haskell
 
@@ -40,6 +39,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     dependencies:
     - echobot
 
