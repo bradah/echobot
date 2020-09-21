@@ -2,14 +2,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Telegram.Types where
 
-import           Data.Aeson
 import           Data.Int
-import           Data.Text                    (Text)
-import           Data.Time.Clock.POSIX        (POSIXTime)
+import           Data.Text             (Text)
+import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
-import           Language.Haskell.TH
-import           Telegram.Internal.Derivation
-
+import           Telegram.Types.Derive
 
 -- * Available types
 
@@ -144,19 +141,21 @@ data MessageEntityType
     | MessageEntityTextMention
     | MessageEntityCashtag
     | MessageEntityPhoneNumber
-    deriving (Show)
+    deriving (Show, Generic)
 
 -- ** Sticker
 
 -- | This object represents a sticker.
 data Sticker = Sticker
-    { stickerFileId :: Text
+    { stickerFileId :: FileId
     -- ^ Identifier for this file, which can
     -- be used to download or reuse the file
     } deriving (Show, Generic)
 
+-- | Identifier for this file, which can
+-- be used to download or reuse the file
+type FileId = Text
 
--- | Instances of toJSON and fromJSON
 deriveJSON' ''User
 deriveJSON' ''Chat
 deriveJSON' ''MessageEntityType
