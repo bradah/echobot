@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3bf6ac653888834d0cb4a919fa52486a04a535cccfeb7d1f3364153f4823ab49
+-- hash: 200b9c80205b51ae1db16313d67b4ef65c2f5be73c5d74b378bd763536544106
 
 name:           echobot
 version:        0.1.0.0
@@ -44,6 +44,7 @@ library
     , hspec
     , hspec-discover
     , mtl
+    , quickcheck-instances
     , req
     , template-haskell
     , text
@@ -65,6 +66,7 @@ executable echobot-exe
     , hspec
     , hspec-discover
     , mtl
+    , quickcheck-instances
     , req
     , template-haskell
     , text
@@ -75,12 +77,8 @@ test-suite echobot-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      EnvSpec
-      Methods.RequestSpec
-      MethodsSpec
-      Types.DeriveSpec
-      TypesSpec
-      UpdateParserSpec
+      Telegram.Types.Arbitrary
+      Telegram.UpdateParserSpec
       Paths_echobot
   hs-source-dirs:
       test
@@ -93,6 +91,7 @@ test-suite echobot-test
     , hspec
     , hspec-discover
     , mtl
+    , quickcheck-instances
     , req
     , template-haskell
     , text

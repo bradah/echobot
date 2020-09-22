@@ -30,6 +30,7 @@ dependencies:
 - hspec
 - hspec-discover
 - QuickCheck
+- quickcheck-instances
 
 library:
   source-dirs: src

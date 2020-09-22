@@ -55,17 +55,12 @@ plainText = do
     else return t
 
 -- | Check if bot received specific command.
-command
-  :: T.Text -- ^ Expected command (without "/").
-  -> UpdateParser T.Text
+command :: T.Text -> UpdateParser T.Text
 command name = do
   t <- text
   case T.words t of
     (w:ws) | w == "/" <> name -> return (T.unwords ws)
     _                         -> empty
-
-updateMessageText :: Update -> Maybe T.Text
-updateMessageText = updateMessage >=> messageText
 
 sticker :: UpdateParser FileId
 sticker = UpdateParser $
