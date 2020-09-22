@@ -18,9 +18,8 @@ instance Arbitrary Message where
     <*> arbitrary
     <*> arbitrary
     <*> oneof
-      [
-        arbitrary
-      , fmap (fmap ("/" <>)) arbitrary
+      [ arbitrary
+      , (fmap ("/" <>)) <$> arbitrary
       ]
     <*> arbitrary
     <*> arbitrary

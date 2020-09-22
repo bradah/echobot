@@ -12,14 +12,15 @@ import           Test.Hspec.QuickCheck
 
 textSpec :: Spec
 textSpec =
-  prop "extracts text from Update" $
-    \arbU -> case updateMessage arbU >>= messageText of
-      Nothing -> (text <?> arbU) == Nothing
-      Just t  -> (text <?> arbU) == Just t
+  context "when given an Update with text" $
+    prop "extracts text from Update" $
+      \arbU -> case updateMessage arbU >>= messageText of
+        Nothing -> (text <?> arbU) == Nothing
+        Just t  -> (text <?> arbU) == Just t
 
 plainTextSpec :: Spec
 plainTextSpec =
-  context "when given an Update without command" $
+  context "when given an Update with text which is not a command" $
     prop "extracts text from Update" $
       \arbU -> case updateMessage arbU >>= messageText of
         Nothing -> (plainText <?> arbU) == Nothing
@@ -67,7 +68,7 @@ updateIdSpec =
       \arbU -> (updateId <?> arbU) == Just (updateUpdateId arbU)
 
 spec :: Spec
-spec = modifyMaxSuccess (const 1000) $ do
+spec = do
   describe "text" textSpec
   describe "plainText" plainTextSpec
   describe "command" commandSpec
