@@ -39,8 +39,6 @@ commandSpec =
             case T.words t of
             (w:ws) ->
               (command (T.tail w) <?> arbU) == Just (T.unwords ws)
-            _      ->
-              (command arbT <?> arbU) == Nothing
           else
             (command arbT <?> arbU) == Nothing
 
