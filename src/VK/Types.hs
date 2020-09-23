@@ -25,7 +25,7 @@ data UpdateType
   deriving (Show, Generic)
 
 data Object = Object
-  { objectMessage    :: Message
+  { objectMessage    :: Maybe Message
   } deriving (Show, Generic)
 
 data Message = Message
@@ -35,37 +35,37 @@ data Message = Message
   , messageFromId       :: UserId
   , messageText         :: Text
   , messageRandomId     :: RandomId
-  , messageRef          :: Text
-  , messageRefSource    :: Text
   , messageAttachments  :: [Attachment]
   , messageImportant    :: Bool
-  , messagePayload      :: Text
-  , messageKeyboard     :: Keyboard
-  , messageFwdMessages  :: [Message]
-  , messageReplyMessage :: Message
+  , messagePayload      :: Maybe Text
+  , messageKeyboard     :: Maybe Keyboard
+  , messageFwdMessages  :: Maybe [Message]
+  , messageReplyMessage :: Maybe Message
   } deriving (Show, Generic)
 
 type RandomId = Int32
 type MessageId = Int32
 
 data Attachment = Attachment
-  { attachmentType        :: AttachmentType
-  , attachmentPhoto       :: Maybe Photo
-  , attachmentVideo       :: Maybe Video
-  , attachmentAudio       :: Maybe Audio
-  , attachmentDoc         :: Maybe Doc
-  , attachmentLink        :: Maybe Link
-  , attachmentMarket      :: Maybe Market
-  , attachmentMarketAlbum :: Maybe MarketAlbum
-  , attachmentWall        :: Maybe Wall
-  , attachmentWallReply   :: Maybe WallReply
-  , attachmentSticker     :: Maybe Sticker
+  { attachmentType         :: AttachmentType
+  , attachmentPhoto        :: Maybe Photo
+  , attachmentVideo        :: Maybe Video
+  , attachmentAudio        :: Maybe Audio
+  , attachmentAudioMessage :: Maybe AudioMessage
+  , attachmentDoc          :: Maybe Doc
+  , attachmentLink         :: Maybe Link
+  , attachmentMarket       :: Maybe Market
+  , attachmentMarketAlbum  :: Maybe MarketAlbum
+  , attachmentWall         :: Maybe Wall
+  , attachmentWallReply    :: Maybe WallReply
+  , attachmentSticker      :: Maybe Sticker
   } deriving (Show, Generic)
 
 data AttachmentType
   = AttachmentPhoto
   | AttachmentVideo
   | AttachmentAudio
+  | AttachmentAudioMessage
   | AttachmentDoc
   | AttachmentLink
   | AttachmentMarket
@@ -94,6 +94,12 @@ data Audio = Audio
 
 type AudioId = Int32
 
+data AudioMessage = AudioMessage
+  { audioMessageId :: AudioMessageId
+  } deriving (Show, Generic)
+
+type AudioMessageId = Int32
+
 data Doc = Doc
   { docId :: DocId
   } deriving (Show, Generic)
@@ -101,11 +107,11 @@ data Doc = Doc
 type DocId = Int32
 
 data Link = Link
-  { linkUrl        :: Text
-  , linkTitle      :: Text
-  , linkCaption    :: Maybe Text
-  , linkDecription :: Text
-  , linkPhoto      :: Maybe Photo
+  { linkUrl         :: Text
+  , linkTitle       :: Text
+  , linkCaption     :: Maybe Text
+  , linkDescription :: Text
+  , linkPhoto       :: Maybe Photo
   } deriving (Show, Generic)
 
 data Market = Market
@@ -185,6 +191,7 @@ deriveJSON' ''Photo
 deriveJSON' ''Link
 deriveJSON' ''Doc
 deriveJSON' ''Audio
+deriveJSON' ''AudioMessage
 deriveJSON' ''Video
 deriveJSON' ''AttachmentType
 deriveJSON' ''Attachment

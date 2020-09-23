@@ -9,9 +9,9 @@ import           VK.Types
 import           VK.Types.Derive
 
 data Response = Response
-  { reponseTs      :: Maybe Ts
-  , reponseUpdates :: [Update]
-  , responseFailed :: Int32
+  { responseTs      :: Maybe Ts
+  , responseUpdates :: [Update]
+  , responseFailed  :: Maybe Int32
   } deriving (Show, Generic)
 
 type Ts = Text
