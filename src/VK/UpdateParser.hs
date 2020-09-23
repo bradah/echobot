@@ -1,0 +1,1 @@
+module VK.UpdateParser where

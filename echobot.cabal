@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c5c03fc24618b585fd5c14a8c58411b3f9e511b19d8c5a5b980765b09c358dfe
+-- hash: b18b392c86a25660700e9cb21fccc0d565fa2dcf271d0a0bae777c1b1fc36d06
 
 name:           echobot
 version:        0.1.0.0
@@ -35,6 +35,14 @@ library
       Telegram.Types
       Telegram.Types.Derive
       Telegram.UpdateParser
+      VK.Bot
+      VK.Bot.Action
+      VK.Env
+      VK.Methods
+      VK.Methods.Request
+      VK.Types
+      VK.Types.Derive
+      VK.UpdateParser
   other-modules:
       Paths_echobot
   hs-source-dirs:
