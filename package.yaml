@@ -31,6 +31,7 @@ dependencies:
 - hspec-discover
 - QuickCheck
 - quickcheck-instances
+- configurator
 
 library:
   source-dirs: src

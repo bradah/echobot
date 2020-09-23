@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 12442a2e69b8930628e8bc0880533c91a0431a7bca1b4bcd99a4b0c01b3aef9f
+-- hash: c5c03fc24618b585fd5c14a8c58411b3f9e511b19d8c5a5b980765b09c358dfe
 
 name:           echobot
 version:        0.1.0.0
@@ -43,6 +43,7 @@ library
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , configurator
     , hspec
     , hspec-discover
     , mtl
@@ -64,6 +65,7 @@ executable echobot-exe
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , configurator
     , echobot
     , hspec
     , hspec-discover
@@ -90,6 +92,7 @@ test-suite echobot-test
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , configurator
     , echobot
     , hspec
     , hspec-discover
