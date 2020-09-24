@@ -63,6 +63,17 @@ executables:
     dependencies:
     - echobot
 
+  echobot-vk-exe:
+    main : examples/VKMain.hs
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -fno-warn-orphans
+    dependencies:
+    - echobot
+
 tests:
   echobot-test:
     main:                Spec.hs
