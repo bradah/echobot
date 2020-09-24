@@ -32,14 +32,28 @@ dependencies:
 - QuickCheck
 - quickcheck-instances
 - configurator
+- aeson-pretty
+- bytestring
 
 library:
   source-dirs: src
 
 executables:
-  echobot-exe:
-    main:                Main.hs
-    source-dirs:         app
+  # echobot-exe:
+  #   main:                Main.hs
+  #   source-dirs:         app
+  #   ghc-options:
+  #   - -threaded
+  #   - -rtsopts
+  #   - -with-rtsopts=-N
+  #   - -Wall
+  #   - -fno-warn-orphans
+  #   dependencies:
+  #   - echobot
+
+
+  echobot-telegram-exe:
+    main:                examples/TelegramMain.hs
     ghc-options:
     - -threaded
     - -rtsopts
