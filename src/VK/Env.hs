@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
@@ -20,7 +21,7 @@ data Env = Env
   } deriving (Show)
 
 type GroupId = Text
-type LPSServer = Text
+type LPSServer = Url 'Https
 type LPSKey = Text
 type Token = Text
 
@@ -42,7 +43,7 @@ mkEnv token gId = do
     Just response -> return $ Env
       { envToken = token
       , envGroupId = gId
-      , envLPSServer = getLPSResponseServer response
+      , envLPSServer = https $ getLPSResponseServer response
       , envLPSKey = getLPSResponseKey response
       , envTs = getLPSResponseTs response
       }
@@ -54,7 +55,7 @@ data GetLPSResult =
 
 data GetLPSResponse = GetLPSResponse
   { getLPSResponseKey    :: LPSKey
-  , getLPSResponseServer :: LPSServer
+  , getLPSResponseServer :: Text
   , getLPSResponseTs     :: Ts
   } deriving (Generic)
 

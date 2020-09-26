@@ -4,6 +4,7 @@ module Main where
 import qualified Data.Configurator as Conf
 import           VK.Bot
 import           VK.Env
+import           VK.Methods
 
 main :: IO ()
 main = do
@@ -17,3 +18,5 @@ main = do
       Just gId -> do
         env <- mkEnv token gId
         print env
+        ups <- getUpdates env
+        print ups
