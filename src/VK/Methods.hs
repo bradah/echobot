@@ -3,21 +3,21 @@
 module VK.Methods where
 
 import           Control.Monad.IO.Class
-import           Data.ByteString        (ByteString)
 import           Data.Text              (Text)
 import           Network.HTTP.Req
 import           VK.Env
+import           VK.Methods.Request
 
 
-getUpdates :: Env -> IO ByteString
+getUpdates :: Env -> IO GetUpdatesResponse
 getUpdates Env{..} = runReq defaultHttpConfig $ do
   let params = "act" =: ("a_check" :: Text)
-                <>"key" =: envLPSKey
+                <> "key" =: envLPSKey
                 <> "ts" =: envTs
-                <> "wait" =: (0 :: Int)
+                <> "wait" =: (25 :: Int)
   resp <- req POST
-              envLPSServer
+              (https "lp.vk.com" /: envLPSServer)
               (ReqBodyUrlEnc params)
-              bsResponse
+              jsonResponse
               mempty
   liftIO . return $ responseBody resp

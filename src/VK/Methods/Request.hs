@@ -8,12 +8,12 @@ import           GHC.Generics
 import           VK.Types
 import           VK.Types.Derive
 
-data Response = Response
-  { responseTs      :: Maybe Ts
-  , responseUpdates :: [Update]
-  , responseFailed  :: Maybe Int32
-  } deriving (Show, Generic)
+data GetUpdatesResponse = GetUpdatesResponse
+  { getUpdatesResponseTs      :: Maybe Ts
+  , getUpdatesResponseUpdates :: [Update]
+  , getUpdatesResponseFailed  :: Maybe Int32
+  } deriving (Show)
 
 type Ts = Text
 
-deriveJSON' ''Response
+deriveJSON' ''GetUpdatesResponse
