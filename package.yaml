@@ -52,16 +52,16 @@ executables:
   #   - echobot
 
 
-  # echobot-telegram-exe:
-  #   main:                examples/TelegramMain.hs
-  #   ghc-options:
-  #   - -threaded
-  #   - -rtsopts
-  #   - -with-rtsopts=-N
-  #   - -Wall
-  #   - -fno-warn-orphans
-  #   dependencies:
-  #   - echobot
+  echobot-telegram-exe:
+    main:                examples/TelegramMain.hs
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -fno-warn-orphans
+    dependencies:
+    - echobot
 
   echobot-vk-exe:
     main : examples/VKMain.hs

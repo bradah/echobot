@@ -1,0 +1,19 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "echobot:lib"
+
+    - path: "././examples/TelegramMain.hs"
+      component: "echobot:exe:echobot-telegram-exe"
+
+    - path: "././Paths_echobot.hs"
+      component: "echobot:exe:echobot-telegram-exe"
+
+    - path: "././examples/VKMain.hs"
+      component: "echobot:exe:echobot-vk-exe"
+
+    - path: "././Paths_echobot.hs"
+      component: "echobot:exe:echobot-vk-exe"
+
+    - path: "./test"
+      component: "echobot:test:echobot-test"
