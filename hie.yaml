@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "echobot:lib"
+
+    - path: "./app/Main.hs"
+      component: "echobot:exe:echobot-exe"
+
+    - path: "./app/Paths_echobot.hs"
+      component: "echobot:exe:echobot-exe"
+
+    - path: "./test"
+      component: "echobot:test:echobot-test"
