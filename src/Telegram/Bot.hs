@@ -16,7 +16,7 @@ import           Telegram.UpdateParser
 -- | Start bot with long polling.
 
 runBot :: Env -> IO ()
-runBot e = startBotPolling Nothing e
+runBot = startBotPolling Nothing
   where
     startBotPolling :: Maybe UpdateId -> Env -> IO ()
     startBotPolling mUid env = do
