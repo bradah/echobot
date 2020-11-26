@@ -2,7 +2,6 @@
 module Main where
 
 import qualified Data.Configurator as Conf
-import qualified Data.Text.IO      as TIO
 import           Telegram.Bot
 import           Telegram.Env
 

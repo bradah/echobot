@@ -4,18 +4,18 @@
 module VK.Env where
 
 import           Control.Monad.IO.Class
-import           Data.Text              (Text)
 import qualified Data.Text              as T (splitOn)
 import           Network.HTTP.Req
 import           VK.Config
 import           VK.Methods.Request
 
 data Env = Env
-  { envToken     :: Token
-  , envGroupId   :: GroupId
-  , envLPSServer :: LPSServer
-  , envLPSKey    :: LPSKey
-  , envTs        :: Ts
+  { envToken      :: Token
+  , envGroupId    :: GroupId
+  , envLPSServer  :: LPSServer
+  , envLPSKey     :: LPSKey
+  , envTs         :: Ts
+  , envApiVersion :: Double
   } deriving (Show)
 
 mkEnv :: Config -> IO Env
@@ -29,6 +29,7 @@ mkEnv Config{..} = do
       , envLPSServer = extractUrl response
       , envLPSKey = getLPSResponseKey response
       , envTs = getLPSResponseTs response
+      , envApiVersion = apiVersion
       }
   where
     getLPS :: IO GetLPSResult

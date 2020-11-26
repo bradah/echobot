@@ -34,6 +34,7 @@ dependencies:
 - configurator
 - aeson-pretty
 - bytestring
+- random
 
 library:
   source-dirs: src
