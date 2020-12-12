@@ -35,6 +35,8 @@ dependencies:
 - aeson-pretty
 - bytestring
 - random
+- servant
+- servant-client
 
 library:
   source-dirs: src

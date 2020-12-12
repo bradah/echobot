@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d66b35154b61bd5ed5a9f798a4eeb1610b2ce0673ccb005263d87d76f6d1dc01
+-- hash: 022f47c813f040b3d3a1fc2164d85b0679ae3997f068cb5e47209248d1fa4db8
 
 name:           echobot
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Telegram.Env
       Telegram.Methods
       Telegram.Methods.Request
+      Telegram.ServMethods
       Telegram.Types
       Telegram.Types.Derive
       Telegram.UpdateParser
@@ -61,6 +62,8 @@ library
     , quickcheck-instances
     , random
     , req
+    , servant
+    , servant-client
     , template-haskell
     , text
     , time
@@ -85,6 +88,8 @@ executable echobot-telegram-exe
     , quickcheck-instances
     , random
     , req
+    , servant
+    , servant-client
     , template-haskell
     , text
     , time
@@ -109,6 +114,8 @@ executable echobot-vk-exe
     , quickcheck-instances
     , random
     , req
+    , servant
+    , servant-client
     , template-haskell
     , text
     , time
@@ -139,6 +146,8 @@ test-suite echobot-test
     , quickcheck-instances
     , random
     , req
+    , servant
+    , servant-client
     , template-haskell
     , text
     , time
