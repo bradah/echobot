@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 022f47c813f040b3d3a1fc2164d85b0679ae3997f068cb5e47209248d1fa4db8
+-- hash: c9d01c4b0a428dd6cf41ce1d87d813d86e8144cc9f3021fc2f79cc3b037c4caa
 
 name:           echobot
 version:        0.1.0.0
@@ -58,6 +58,8 @@ library
     , configurator
     , hspec
     , hspec-discover
+    , http-client
+    , http-client-tls
     , mtl
     , quickcheck-instances
     , random
@@ -84,6 +86,8 @@ executable echobot-telegram-exe
     , echobot
     , hspec
     , hspec-discover
+    , http-client
+    , http-client-tls
     , mtl
     , quickcheck-instances
     , random
@@ -110,6 +114,8 @@ executable echobot-vk-exe
     , echobot
     , hspec
     , hspec-discover
+    , http-client
+    , http-client-tls
     , mtl
     , quickcheck-instances
     , random
@@ -142,6 +148,8 @@ test-suite echobot-test
     , echobot
     , hspec
     , hspec-discover
+    , http-client
+    , http-client-tls
     , mtl
     , quickcheck-instances
     , random
