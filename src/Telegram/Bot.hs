@@ -1,114 +1,100 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE RecordWildCards            #-}
-
+{-# LANGUAGE TypeFamilies               #-}
 
 module Telegram.Bot where
 
-import           Control.Monad.IO.Class
+import           API.Bot.Class
 import           Control.Monad.Reader
-import           Data.Configurator        as Conf
-import           Data.Maybe               (fromMaybe)
-import           Data.Text                (Text, unpack)
+import           Data.Configurator
+import           Data.Foldable            (asum)
+import           Data.Text                (Text, unlines, unpack)
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Servant.Client
-
-import           Telegram.Bot.Action
-import           Telegram.Env
-import qualified Telegram.Methods         as Methods
-import           Telegram.Methods.Request
-import           Telegram.ServMethods
-import           Telegram.Types
+import qualified Telegram.Methods         as Tg
+import qualified Telegram.Methods.Request as Tg
+import qualified Telegram.Types           as Tg
 import           Telegram.UpdateParser
 
--- * Bot logic
+newtype TgBot a = TgBot
+  { runTgBot :: ReaderT (Env TgBot) ClientM a
+  } deriving (Functor, Applicative, Monad, MonadReader (Env TgBot), MonadIO)
 
--- ** runBot
+type Token = Text
 
--- | Start bot with long polling.
+instance Bot TgBot where
+    data Env TgBot = Env
+        {envToken :: Token
+        }
 
+    type Update TgBot = Tg.Update
+    type UpdateId TgBot = Tg.UpdateId
 
-runBot :: Env -> IO ()
-runBot = startBotPolling Nothing
-  where
-    startBotPolling :: Maybe UpdateId -> Env -> IO ()
-    startBotPolling mUid env = do
-      ups <- responseResult
-        <$> runReaderT
-          (Methods.getUpdates (GetUpdatesBody mUid (Just UpdateMessage) (Just 25)))
-          env
-      forM_ ups (handleUpdate env)
-      let offset | null ups = Nothing
-                 | otherwise = (1+) <$> updateId <?> last ups
-      startBotPolling offset env
+    getUpdates mUid = liftClient $ Tg.responseResult <$> Tg.getUpdates body
+      where
+        body :: Tg.GetUpdatesBody
+        body = Tg.GetUpdatesBody mUid (Just Tg.UpdateMessage) (Just 25)
 
-newtype BotM a = BotM
-  { unBotM :: ReaderT BotSettings ClientM a
-  } deriving (Functor, Applicative, Monad, MonadReader BotSettings, MonadIO)
+    getUpdateId ups
+        | null ups = Nothing
+        | otherwise = (1+) <$> updateId <?> last ups
 
-runBotM :: BotSettings -> IO ()
-runBotM sets = do
-  clientEnv <- defaultClientEnv sets
-  void $ unwrap mainLoop clientEnv
+    mkEnv = Env <$> getToken
 
-  where
-    unwrap :: BotM () -> ClientEnv -> IO (Either ClientError ())
-    unwrap bot = runClientM (runReaderT (unBotM bot) sets)
+    handleUpdate up =
+        case updateToAction up of
+            Just (Start cId) -> void . liftClient
+                $ Tg.sendMessage (Tg.SendMessageBody cId startMessage)
+            Just (EchoText cId t) -> void . liftClient
+                $ Tg.sendMessage (Tg.SendMessageBody cId t)
+            Just (EchoSticker cId s) -> void . liftClient
+                $ Tg.sendSticker (Tg.SendStickerBody cId s)
+            Nothing -> return ()
 
-mainLoop :: BotM ()
-mainLoop = startBotPolling Nothing
-  where
-    startBotPolling :: Maybe UpdateId -> BotM ()
-    startBotPolling mUid = do
-      BotSettings{..} <- ask
-      let upBody = GetUpdatesBody
-            mUid
-            (Just UpdateMessage)
-            (Just 25)
-          processUpdate up = fromMaybe
-            (pure ())
-            (botHandleUpdate up >>= botHandleAction)
-      ups <- responseResult <$> liftClient (getUpdates upBody)
-      forM_ ups processUpdate
-      let newMUid | null ups = Nothing
-                  | otherwise = (1+) <$> updateId <?> last ups
-      startBotPolling newMUid
+    unwrap env bot = do
+        clientEnv <- defaultClientEnv env
+        void $ runClientM (runReaderT (runTgBot bot) env) clientEnv
+      where
+        defaultClientEnv botEnv = mkClientEnv
+            <$> newManager tlsManagerSettings
+            <*> pure (botBaseUrl $ envToken botEnv)
 
-liftClient :: ClientM a -> BotM a
-liftClient = BotM . lift
+data Action
+    = Start Tg.ChatId
+    | EchoText Tg.ChatId Text
+    | EchoSticker Tg.ChatId Tg.FileId
 
-data BotSettings = BotSettings
-  { botHandleUpdate :: Update -> Maybe Action
-  , botHandleAction :: Action -> Maybe (BotM ())
-  , botToken        :: Token
-  }
+updateToAction :: Update TgBot -> Maybe Action
+updateToAction = runUpdateParser $ asum
+    [ Start <$ command "start" <*> updateChatId
+    , EchoText <$> updateChatId <*> text
+    , EchoSticker <$> updateChatId <*> sticker
+    ]
 
-mkBotSettings
-  :: (Update -> Maybe Action)
-  -> (Action -> Maybe (BotM ()))
-  -> IO BotSettings
-mkBotSettings upHandler actHandler =
-  BotSettings upHandler actHandler <$> getToken
-
-defaultClientEnv :: BotSettings -> IO ClientEnv
-defaultClientEnv BotSettings{..} = mkClientEnv
-  <$> newManager tlsManagerSettings
-  <*> pure (botBaseUrl botToken)
-
+liftClient :: ClientM a -> TgBot a
+liftClient = TgBot . lift
 
 getToken :: IO Token
 getToken = do
-  conf <- Conf.load [Conf.Required "echobot.conf.local"]
-  Conf.require conf "telegram.token"
-
-{- runBot :: BotSettings -> IO ()
-runBot sets = do
-  let token = botToken sets -}
+    conf <- load [Required "echobot.conf.local"]
+    require conf "telegram.token"
 
 botBaseUrl :: Token -> BaseUrl
 botBaseUrl token = BaseUrl
-  Https
-  "api.telegram.org"
-  443
-  (unpack $ "/bot" <> token)
+    Https
+    "api.telegram.org"
+    443
+    (unpack $ "/bot" <> token)
+
+startMessage :: Text
+startMessage = Data.Text.unlines
+    [ "Hi! This bot merely echoes your messages c:"
+    , ""
+    , "Supported messages:"
+    , "- plain text"
+    , "- stickers"
+    , ""
+    , "Supported commands:"
+    , "- /start"
+    ]
