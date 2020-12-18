@@ -1,4 +1,4 @@
-module VK.Types.Derive where
+module Vk.Types.Derive where
 
 import           Data.Aeson.TH       (deriveJSON)
 import           Data.Aeson.Types    (Options (..), defaultOptions)

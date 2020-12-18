@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-module VK.Config where
+module Vk.Config where
 
 
 import qualified Data.Configurator as Conf
 import           Data.Text         (Text)
+import           Vk.Types          (Token)
 
-type Token = Text
 type GroupId = Int
 
 data Config = Config

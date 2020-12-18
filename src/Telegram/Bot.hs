@@ -18,8 +18,8 @@ import qualified Telegram.Types           as Tg
 import           Telegram.UpdateParser
 
 newtype TgBot a = TgBot
-  { runTgBot :: ReaderT (Env TgBot) ClientM a
-  } deriving (Functor, Applicative, Monad, MonadReader (Env TgBot), MonadIO)
+    { runTgBot :: ReaderT (Env TgBot) ClientM a
+    } deriving (Functor, Applicative, Monad, MonadReader (Env TgBot), MonadIO)
 
 type Token = Text
 

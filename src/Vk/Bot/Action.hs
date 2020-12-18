@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
-module VK.Bot.Action where
+module Vk.Bot.Action where
 
 import           Control.Monad.Reader
 import           Data.Foldable        (asum)
 import qualified Data.Text            as T (Text, unlines)
-import           VK.Env
-import           VK.Methods
-import           VK.Methods.Request
-import           VK.Types
-import           VK.UpdateParser
+import           Vk.Env
+import           Vk.Methods
+import           Vk.Methods.Request
+import           Vk.Types
+import           Vk.UpdateParser
 
 -- * Bot actions
 
@@ -39,7 +39,7 @@ updateToAction = runUpdateParser $ asum
 
 -- | Map proper method to given 'Update'.
 
-handleUpdate :: Env -> Update -> IO ()
+{- handleUpdate :: Env -> Update -> IO ()
 handleUpdate env up = do
   case updateToAction up of
     Just (Start uid) ->
@@ -49,7 +49,7 @@ handleUpdate env up = do
     -- Just (EchoSticker cid s) ->
     --   void $ runReaderT (sendSticker (SendStickerBody cid s)) env
     Nothing -> return ()
-
+ -}
 startMessage :: T.Text
 startMessage = T.unlines
   [ "Hi! This bot merely echoes your messages c:"

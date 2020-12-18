@@ -1,13 +1,14 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module VK.Types where
+module Vk.Types where
 
 import           Data.Int              (Int32)
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
-import           VK.Types.Derive
+import           Vk.Types.Derive
 
+type Token = Text
 
 data Update = Update
   { updateType   :: UpdateType

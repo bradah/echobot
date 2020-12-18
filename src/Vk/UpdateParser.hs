@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module VK.UpdateParser where
+module Vk.UpdateParser where
 
 import           Control.Applicative
 import           Control.Monad
 import qualified Data.Text           as T
-import           VK.Types
+import           Vk.Types
 
 -- * Parse 'Update's
 

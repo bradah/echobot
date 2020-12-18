@@ -1,38 +1,39 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module VK.Env where
+module Vk.Env where
 
 import           Control.Monad.IO.Class
 import qualified Data.Text              as T (splitOn)
 import           Network.HTTP.Req
-import           VK.Config
-import           VK.Methods.Request
+import           Vk.Config
+import           Vk.Methods.Request
+import           Vk.Types               (Token)
 
 data Env = Env
   { envToken      :: Token
   , envGroupId    :: GroupId
-  , envLPSServer  :: LPSServer
-  , envLPSKey     :: LPSKey
+  , envLPSServer  :: LpsServer
+  , envLPSKey     :: LpsKey
   , envTs         :: Ts
   , envApiVersion :: Double
   } deriving (Show)
 
-mkEnv :: Config -> IO Env
+{- mkEnv :: Config -> IO Env
 mkEnv Config{..} = do
   lpsResult <- getLPS
-  case getLPSResultResponse lpsResult of
+  case getLpsResultResponse lpsResult of
     Nothing -> error "mkEnv: no Response"
     Just response -> return $ Env
       { envToken = token
       , envGroupId = groupId
       , envLPSServer = extractUrl response
-      , envLPSKey = getLPSResponseKey response
-      , envTs = getLPSResponseTs response
+      , envLPSKey = getLpsResponseKey response
+      , envTs = getLpsResponseTs response
       , envApiVersion = apiVersion
       }
   where
-    getLPS :: IO GetLPSResult
+    getLPS :: IO GetLpsResult
     getLPS = runReq defaultHttpConfig $ do
       let params = "group_id" =: groupId
                   <> "access_token" =: token
@@ -42,9 +43,11 @@ mkEnv Config{..} = do
                   (ReqBodyUrlEnc params)
                   jsonResponse
                   mempty
-      liftIO . return $ (responseBody resp :: GetLPSResult)
+      liftIO . return $ (responseBody resp :: GetLpsResult)
 
-    extractUrl :: GetLPSResponse -> LPSServer
-    extractUrl resp = foldl (/:) (https . head $ chunks) (tail chunks)
-      where
-        chunks = drop 2 . T.splitOn "/" . getLPSResponseServer $ resp
+extractUrl :: GetLpsResponse -> LpsServer
+extractUrl resp = foldl (/:) (https . head $ chunks) (tail chunks)
+  where
+    chunks = drop 2 . T.splitOn "/" . getLpsResponseServer $ resp
+
+-}
