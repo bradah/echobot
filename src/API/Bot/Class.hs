@@ -3,9 +3,7 @@
 
 module API.Bot.Class where
 
-import           Control.Monad.Reader
-
-class (MonadIO b) => Bot (b :: * -> *) where
+class Monad b => Bot (b :: * -> *) where
     data Env b
     type Update b = u | u -> b
     type UpdateId b = uid | uid -> b
