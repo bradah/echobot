@@ -14,4 +14,5 @@ runBot = do
     startBotPolling mUid = do
         ups <- getUpdates mUid
         forM_ ups handleUpdate
-        startBotPolling $ getUpdateId ups
+        nextUid <- getUpdateId ups
+        startBotPolling nextUid

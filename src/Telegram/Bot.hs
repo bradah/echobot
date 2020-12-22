@@ -37,8 +37,8 @@ instance Bot TgBot where
         body = Tg.GetUpdatesBody mUid (Just Tg.UpdateMessage) (Just 25)
 
     getUpdateId ups
-        | null ups = Nothing
-        | otherwise = (1+) <$> updateId <?> last ups
+        | null ups = pure Nothing
+        | otherwise = pure $ (1+) <$> updateId <?> last ups
 
     mkEnv = Env <$> getToken
 
