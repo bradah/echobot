@@ -1,77 +1,43 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds        #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators    #-}
+
+
 module Telegram.Methods where
 
-import           Control.Monad.IO.Class
-import           Control.Monad.Reader
-import           Network.HTTP.Req
-import           Telegram.Env
+
+import           Data.Proxy
+import           Servant.API
+import           Servant.Client           hiding (Response)
+
 import           Telegram.Methods.Request
 import           Telegram.Types
 
--- * Available 'Method's
+type GetMe = "getMe" :> Get '[JSON] (Response User)
 
--- ** getMe
+getMe :: ClientM (Response User)
+getMe = client $ Proxy @GetMe
 
--- | A simple method for testing your bot's
--- auth token. Requires no parameters. Returns
--- basic information about the bot in form of
--- a 'User' object.
 
-getMe :: ReaderT Env IO (Response User)
-getMe = do
-  baseUrl <- asks envBaseUrl
-  runReq defaultHttpConfig $ do
-    resp <- req GET
-                (baseUrl /: "getMe")
-                NoReqBody
-                jsonResponse
-                mempty
-    liftIO . return $ (responseBody resp)
+type SendMessage = "sendMessage"
+    :> ReqBody '[JSON] SendMessageBody
+    :> Post '[JSON] (Response Message)
 
--- ** sendMessage
+sendMessage :: SendMessageBody -> ClientM (Response Message)
+sendMessage = client $ Proxy @SendMessage
 
--- | Use this method to send text messages.
--- On success, the sent 'Message' is returned.
 
-sendMessage :: SendMessageBody -> ReaderT Env IO (Response Message)
-sendMessage body = do
-  baseUrl <- asks envBaseUrl
-  runReq defaultHttpConfig $ do
-    resp <- req POST
-                (baseUrl /: "sendMessage")
-                (ReqBodyJson body)
-                jsonResponse
-                mempty
-    liftIO . return $ (responseBody resp)
+type SendSticker = "sendSticker"
+    :> ReqBody '[JSON] SendStickerBody
+    :> Post '[JSON] (Response Message)
 
--- ** sendSticker
+sendSticker :: SendStickerBody -> ClientM (Response Message)
+sendSticker = client $ Proxy @SendSticker
 
--- | Use this method to send static .WEBP or animated
--- .TGS stickers. On success, the sent 'Message' is returned.
 
-sendSticker :: SendStickerBody -> ReaderT Env IO (Response Message)
-sendSticker body = do
-  baseUrl <- asks envBaseUrl
-  runReq defaultHttpConfig $ do
-    resp <- req POST
-                (baseUrl /: "sendSticker")
-                (ReqBodyJson body)
-                jsonResponse
-                mempty
-    liftIO . return $ (responseBody resp)
+type GetUpdates = "getUpdates"
+    :> ReqBody '[JSON] GetUpdatesBody
+    :> Post '[JSON] (Response [Update])
 
--- ** getUpdates
-
--- | Use this method to receive incoming updates.
--- An Array of 'Update' objects is returned.
-
-getUpdates :: GetUpdatesBody -> ReaderT Env IO (Response [Update])
-getUpdates body = do
-  baseUrl <- asks envBaseUrl
-  runReq defaultHttpConfig $ do
-    resp <- req POST
-                (baseUrl /: "getUpdates")
-                (ReqBodyJson body)
-                jsonResponse
-                mempty
-    liftIO . return $ (responseBody resp)
+getUpdates :: GetUpdatesBody -> ClientM (Response [Update])
+getUpdates = client $ Proxy @GetUpdates

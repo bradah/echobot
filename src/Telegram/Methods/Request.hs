@@ -2,10 +2,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Telegram.Methods.Request where
 
-import           Data.Text             (Text)
+import           API.Derive
+import           Data.Text      (Text)
 import           GHC.Generics
 import           Telegram.Types
-import           Telegram.Types.Derive
 
 -- * Request bodies
 
