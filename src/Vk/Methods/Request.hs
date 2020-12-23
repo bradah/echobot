@@ -5,12 +5,12 @@
 
 module Vk.Methods.Request where
 
-import           Data.Text       (Text)
+import           API.Derive
+import           Data.Text    (Text)
 import           GHC.Generics
 import           Vk.Types
-import           Vk.Types.Derive
 
-import           Servant.API     (ToHttpApiData (..))
+import           Servant.API  (ToHttpApiData (..))
 
 type LpsServer = Text
 type LpsKey = Text

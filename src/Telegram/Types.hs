@@ -2,11 +2,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Telegram.Types where
 
+import           API.Derive
 import           Data.Int
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
-import           Telegram.Types.Derive
 
 -- * Available types
 

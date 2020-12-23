@@ -2,11 +2,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Vk.Types where
 
+import           API.Derive
 import           Data.Int              (Int32)
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
-import           Vk.Types.Derive
 
 type Token = Text
 
