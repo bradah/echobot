@@ -1,56 +1,70 @@
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TypeFamilies               #-}
 
 module Telegram.Bot where
 
-import           API.Bot.Class
+import           Colog
 import           Control.Monad.Reader
 import           Data.Configurator
-import           Data.Foldable            (asum)
-import           Data.Text                (Text, unlines, unpack)
-import           Network.HTTP.Client      (newManager)
-import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Data.Foldable             (asum)
+import           Data.Text                 (Text, pack, unlines, unpack)
+import           Network.HTTP.Client       (newManager)
+import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Servant.Client
-import qualified Telegram.Methods         as Tg
-import qualified Telegram.Methods.Request as Tg
-import qualified Telegram.Types           as Tg
+
+import           API.Bot.Class
+import qualified Telegram.Internal.Methods as Internal
+import           Telegram.Internal.Request
+import qualified Telegram.Internal.Types   as Internal
 import           Telegram.UpdateParser
 
 newtype TgBot a = TgBot
     { runTgBot :: ReaderT (Env TgBot) ClientM a
     } deriving (Functor, Applicative, Monad, MonadReader (Env TgBot), MonadIO)
 
-type Token = Text
+instance HasLog (Env TgBot) Message TgBot where
+    getLogAction = envLogAction
+    setLogAction act e = e { envLogAction = act }
+
+instance Show (Env TgBot) where
+    show (Env token _) = "Env { token = " <> unpack token <> " }"
 
 instance Bot TgBot where
     data Env TgBot = Env
-        {envToken :: Token
+        { envToken :: Internal.Token
+        , envLogAction :: LogAction TgBot Message
         }
 
-    type Update TgBot = Tg.Update
-    type UpdateId TgBot = Tg.UpdateId
+    type Update TgBot = Internal.Update
+    type UpdateId TgBot = Internal.UpdateId
 
-    getUpdates mUid = liftClient $ Tg.responseResult <$> Tg.getUpdates body
+    getUpdates mUid = do
+        logInfo "Waiting for updates..."
+        ups <- liftClient $ responseResult <$> Internal.getUpdates body
+        logInfo $ "Updates received: " <> showT (length ups)
+        unless (null ups) $
+            logDebug $ "Updates: " <> showT ups
+        return ups
       where
-        body :: Tg.GetUpdatesBody
-        body = Tg.GetUpdatesBody mUid (Just Tg.UpdateMessage) (Just 25)
+        body :: GetUpdatesBody
+        body = GetUpdatesBody mUid (Just UpdateMessage) (Just 25)
 
     getUpdateId ups
         | null ups = pure Nothing
         | otherwise = pure $ (1+) <$> updateId <?> last ups
 
-    mkEnv = Env <$> getToken
+    mkEnv = do
+        Env <$> getToken <*> pure richMessageAction
 
     handleUpdate up =
         case updateToAction up of
-            Just (Start cId) -> void . liftClient
-                $ Tg.sendMessage (Tg.SendMessageBody cId startMessage)
-            Just (EchoText cId t) -> void . liftClient
-                $ Tg.sendMessage (Tg.SendMessageBody cId t)
-            Just (EchoSticker cId s) -> void . liftClient
-                $ Tg.sendSticker (Tg.SendStickerBody cId s)
-            Nothing -> return ()
+            Just (Start cid)         -> sendText cid startMessage
+            Just (EchoText cid t)    -> sendText cid t
+            Just (EchoSticker cid s) -> sendSticker cid s
+            Nothing                  -> return ()
 
     unwrap env bot = do
         clientEnv <- defaultClientEnv env
@@ -61,9 +75,9 @@ instance Bot TgBot where
             <*> pure (botBaseUrl $ envToken botEnv)
 
 data Action
-    = Start Tg.ChatId
-    | EchoText Tg.ChatId Text
-    | EchoSticker Tg.ChatId Tg.FileId
+    = Start Internal.ChatId
+    | EchoText Internal.ChatId Text
+    | EchoSticker Internal.ChatId Internal.FileId
 
 updateToAction :: Update TgBot -> Maybe Action
 updateToAction = runUpdateParser $ asum
@@ -75,12 +89,12 @@ updateToAction = runUpdateParser $ asum
 liftClient :: ClientM a -> TgBot a
 liftClient = TgBot . lift
 
-getToken :: IO Token
+getToken :: IO Internal.Token
 getToken = do
     conf <- load [Required "echobot.conf.local"]
     require conf "telegram.token"
 
-botBaseUrl :: Token -> BaseUrl
+botBaseUrl :: Internal.Token -> BaseUrl
 botBaseUrl token = BaseUrl
     Https
     "api.telegram.org"
@@ -98,3 +112,22 @@ startMessage = Data.Text.unlines
     , "Supported commands:"
     , "- /start"
     ]
+
+showT :: Show a => a -> Text
+showT = pack . show
+
+sendText :: Internal.ChatId -> Text -> TgBot ()
+sendText cid t = do
+    logInfo $ "Sending text \"" <> t <> "\" to chat " <> showT cid
+    resp <- liftClient $ Internal.sendMessage body
+    logDebug $ "Response: " <> showT resp
+  where
+    body = SendMessageBody cid t
+
+sendSticker :: Internal.ChatId -> Internal.FileId -> TgBot ()
+sendSticker cid fid = do
+    logInfo $ "Sending sticker " <> showT fid <> " to chat " <> showT cid
+    resp <- liftClient $ Internal.sendSticker body
+    logDebug $ "Response: " <> showT resp
+  where
+    body = SendStickerBody cid fid

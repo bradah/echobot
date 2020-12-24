@@ -3,8 +3,8 @@ module Telegram.UpdateParser where
 
 import           Control.Applicative
 import           Control.Monad
-import qualified Data.Text           as T
-import           Telegram.Types
+import qualified Data.Text               as T
+import           Telegram.Internal.Types
 
 -- * Parse 'Update's
 

@@ -4,7 +4,7 @@ module Main where
 
 import           API.Bot
 import           Telegram.Bot
-import           Vk.Bot
+-- import           Vk.Bot
 
 main :: IO ()
 main = do
@@ -16,5 +16,5 @@ main = do
     arg <- getLine
     case arg of
         "1" -> runBot @TgBot
-        "2" -> runBot @VkBot
+        -- "2" -> runBot @VkBot
         _   -> main
