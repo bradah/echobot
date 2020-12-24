@@ -3,7 +3,12 @@
 
 module API.Bot.Class where
 
-class Monad b => Bot (b :: * -> *) where
+import           Colog                (HasLog, Message)
+import           Control.Monad.Reader (MonadReader)
+
+class (Show (Env b), MonadReader (Env b) b, HasLog (Env b) Message b)
+    => Bot (b :: * -> *) where
+
     data Env b
     type Update b = u | u -> b
     type UpdateId b = uid | uid -> b

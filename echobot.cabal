@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0105ea50351e71a025e99c71e00e9031d46a350fd3066a9eace5937dc7c26298
+-- hash: 4c51c0fc7222ea4e57a0401545a53f1e124aa5318902245175c93551ce4f54d2
 
 name:           echobot
 version:        0.1.0.0
@@ -31,14 +31,14 @@ library
       API.Bot.Class
       API.Derive
       Telegram.Bot
-      Telegram.Methods
-      Telegram.Methods.Request
-      Telegram.Types
+      Telegram.Internal.Methods
+      Telegram.Internal.Request
+      Telegram.Internal.Types
       Telegram.UpdateParser
       Vk.Bot
-      Vk.Methods
-      Vk.Methods.Request
-      Vk.Types
+      Vk.Internal.Methods
+      Vk.Internal.Request
+      Vk.Internal.Types
       Vk.UpdateParser
   other-modules:
       Paths_echobot
@@ -47,9 +47,8 @@ library
   build-depends:
       QuickCheck
     , aeson
-    , aeson-pretty
     , base >=4.7 && <5
-    , bytestring
+    , co-log
     , configurator
     , hspec
     , hspec-discover
@@ -58,7 +57,6 @@ library
     , mtl
     , quickcheck-instances
     , random
-    , req
     , servant
     , servant-client
     , template-haskell
@@ -76,9 +74,8 @@ executable echobot-exe
   build-depends:
       QuickCheck
     , aeson
-    , aeson-pretty
     , base >=4.7 && <5
-    , bytestring
+    , co-log
     , configurator
     , echobot
     , hspec
@@ -88,7 +85,6 @@ executable echobot-exe
     , mtl
     , quickcheck-instances
     , random
-    , req
     , servant
     , servant-client
     , template-haskell
@@ -110,9 +106,8 @@ test-suite echobot-test
   build-depends:
       QuickCheck
     , aeson
-    , aeson-pretty
     , base >=4.7 && <5
-    , bytestring
+    , co-log
     , configurator
     , echobot
     , hspec
@@ -122,7 +117,6 @@ test-suite echobot-test
     , mtl
     , quickcheck-instances
     , random
-    , req
     , servant
     , servant-client
     , template-haskell

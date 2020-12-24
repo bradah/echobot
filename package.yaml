@@ -22,7 +22,6 @@ description:         Please see the README on GitHub at <https://github.com/wspb
 dependencies:
 - base >= 4.7 && < 5
 - aeson
-- req
 - mtl
 - text
 - time
@@ -32,13 +31,12 @@ dependencies:
 - QuickCheck
 - quickcheck-instances
 - configurator
-- aeson-pretty
-- bytestring
 - random
 - servant
 - servant-client
 - http-client
 - http-client-tls
+- co-log
 
 library:
   source-dirs: src

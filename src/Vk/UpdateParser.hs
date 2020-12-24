@@ -4,7 +4,7 @@ module Vk.UpdateParser where
 import           Control.Applicative
 import           Control.Monad
 import qualified Data.Text           as T
-import           Vk.Types
+import           Vk.Internal.Types
 
 -- * Parse 'Update's
 

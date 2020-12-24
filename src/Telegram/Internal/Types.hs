@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Telegram.Types where
+module Telegram.Internal.Types where
 
 import           API.Derive
 import           Data.Int
@@ -9,6 +9,8 @@ import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
 
 -- * Available types
+
+type Token = Text
 
 -- ** Update
 

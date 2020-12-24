@@ -3,15 +3,15 @@
 {-# LANGUAGE TypeOperators    #-}
 
 
-module Telegram.Methods where
+module Telegram.Internal.Methods where
 
 
 import           Data.Proxy
 import           Servant.API
-import           Servant.Client           hiding (Response)
+import           Servant.Client            hiding (Response)
 
-import           Telegram.Methods.Request
-import           Telegram.Types
+import           Telegram.Internal.Request
+import           Telegram.Internal.Types
 
 type GetMe = "getMe" :> Get '[JSON] (Response User)
 
