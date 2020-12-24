@@ -5,7 +5,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeOperators     #-}
-module Vk.Methods where
+module Vk.Internal.Methods where
 
 import           Control.Monad.IO.Class
 import           Control.Monad.Reader   (local)
@@ -15,8 +15,8 @@ import           Servant.API
 import           Servant.Client         hiding (Response)
 import           System.Random          (randomIO)
 
-import           Vk.Methods.Request
-import           Vk.Types
+import           Vk.Internal.Request
+import           Vk.Internal.Types
 
 
 type RequiredParam = QueryParam' '[Required, Strict]

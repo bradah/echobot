@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Vk.Types where
+module Vk.Internal.Types where
 
 import           API.Derive
 import           Data.Int              (Int32)

@@ -5,7 +5,6 @@ module API.Bot.Class where
 
 import           Colog                (HasLog, Message)
 import           Control.Monad.Reader (MonadReader)
-import           Data.Text            (Text)
 
 class (Show (Env b), MonadReader (Env b) b, HasLog (Env b) Message b)
     => Bot (b :: * -> *) where

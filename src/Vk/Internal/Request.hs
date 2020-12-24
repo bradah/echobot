@@ -3,14 +3,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Vk.Methods.Request where
+module Vk.Internal.Request where
 
 import           API.Derive
-import           Data.Text    (Text)
+import           Data.Text         (Text)
 import           GHC.Generics
-import           Vk.Types
+import           Vk.Internal.Types
 
-import           Servant.API  (ToHttpApiData (..))
+import           Servant.API       (ToHttpApiData (..))
 
 type LpsServer = Text
 type LpsKey = Text
