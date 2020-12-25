@@ -41,3 +41,19 @@ type GetUpdates = "getUpdates"
 
 getUpdates :: GetUpdatesBody -> ClientM (Response [Update])
 getUpdates = client $ Proxy @GetUpdates
+
+
+type AnswerCallbackQuery = "answerCallbackQuery"
+    :> ReqBody '[JSON] AnswerCallbackBody
+    :> Post '[JSON] (Response Bool)
+
+answerCallbackQuery :: AnswerCallbackBody -> ClientM (Response Bool)
+answerCallbackQuery = client $ Proxy @AnswerCallbackQuery
+
+
+type EditMessageText = "editMessageText"
+    :> ReqBody '[JSON] EditMessageTextBody
+    :> Post '[JSON] (Response Message)
+
+editMessageText :: EditMessageTextBody -> ClientM (Response Message)
+editMessageText = client $ Proxy @EditMessageText

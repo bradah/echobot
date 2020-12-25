@@ -26,6 +26,7 @@ data Update = Update
   , updateEditedMessage :: Maybe Message
   -- ^ New version of a message that is known to the bot
   -- and was edited.
+  , updateCallbackQuery :: Maybe CallbackQuery
   } deriving (Show, Generic)
 
 -- | The update's unique identifier.
@@ -37,22 +38,24 @@ type UpdateId = Int32
 
 -- | This object represents a message.
 data Message = Message
-  { messageMessageId :: MessageId
+  { messageMessageId   :: MessageId
   -- ^ Unique message identifier inside this chat.
-  , messageFrom      :: Maybe User
+  , messageFrom        :: Maybe User
   -- ^ Sender, empty for messages sent to channels.
-  , messageDate      :: POSIXTime
+  , messageDate        :: POSIXTime
   -- ^ Date the message was sent in Unix time.
-  , messageChat      :: Chat
+  , messageChat        :: Chat
   -- ^ Conversation the message belongs to.
-  , messageText      :: Maybe Text
+  , messageText        :: Maybe Text
   -- ^ For text messages, the actual UTF-8 text
   -- of the message, 0-4096 characters.
-  , messageEntities  :: Maybe [MessageEntity]
+  , messageEntities    :: Maybe [MessageEntity]
   -- ^ For text messages, special entities like usernames,
   -- URLs, bot commands, etc. that appear in the text.
-  , messageSticker   :: Maybe Sticker
+  , messageSticker     :: Maybe Sticker
   -- ^ Message is a sticker, information about the sticker.
+  , messageReplyMarkup :: Maybe InlineKeyboardMarkup
+  -- ^ Inline keyboard attached to the message.
   } deriving (Show, Generic)
 
 -- | Unique message identifier.
@@ -158,6 +161,46 @@ data Sticker = Sticker
 -- be used to download or reuse the file.
 type FileId = Text
 
+-- | This object represents an inline keyboard
+-- that appears right next to the message it belongs to.
+newtype InlineKeyboardMarkup = InlineKeyboardMarkup
+    { inlineKeyboardMarkupInlineKeyboard :: [[InlineKeyboardButton]]
+    -- ^ Array of button rows, each represented
+    -- by an Array of 'InlineKeyboardButton' objects
+    } deriving (Show, Generic)
+
+-- | This object represents one button of an inline
+-- keyboard. You must use exactly one of the optional fields.
+data InlineKeyboardButton = InlineKeyboardButton
+    { inlineKeyboardButtonText         :: Text
+    -- ^ Label text on the button
+    , inlineKeyboardButtonCallbackData :: Maybe Text
+    -- ^ Data to be sent in a callback
+    -- query to the bot when button is pressed,
+    -- 1-64 bytes
+    } deriving (Show, Generic)
+
+-- | This object represents an incoming callback query
+-- from a callback button in an inline keyboard.
+-- If the button that originated the query was attached
+-- to a message sent by the bot, the field message will
+-- be present. If the button was attached to a message
+-- sent via the bot (in inline mode), the field
+-- inline_message_id will be present. Exactly one of the
+-- fields data or game_short_name will be present.
+data CallbackQuery = CallbackQuery
+    { callbackQueryId              :: CallbackId
+    , callbackQueryFrom            :: User
+    , callbackQueryMessage         :: Maybe Message
+    , callbackQueryInlineMessageId :: Maybe MessageId
+    , callbackQueryData            :: Maybe Text
+    } deriving (Show, Generic)
+
+type CallbackId = Text
+
+deriveJSON' ''CallbackQuery
+deriveJSON' ''InlineKeyboardButton
+deriveJSON' ''InlineKeyboardMarkup
 deriveJSON' ''User
 deriveJSON' ''Chat
 deriveJSON' ''MessageEntityType

@@ -37,6 +37,9 @@ dependencies:
 - http-client
 - http-client-tls
 - co-log
+- unordered-containers
+- directory
+- pretty-simple
 
 library:
   source-dirs: src

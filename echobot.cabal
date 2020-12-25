@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4c51c0fc7222ea4e57a0401545a53f1e124aa5318902245175c93551ce4f54d2
+-- hash: 2e26df349ab259322c0c4512ca0a074b2a1b2ee55a1ef29a387f361a53b95e6f
 
 name:           echobot
 version:        0.1.0.0
@@ -34,6 +34,9 @@ library
       Telegram.Internal.Methods
       Telegram.Internal.Request
       Telegram.Internal.Types
+      Telegram.New.Bot
+      Telegram.New.BotUtils
+      Telegram.New.Methods
       Telegram.UpdateParser
       Vk.Bot
       Vk.Internal.Methods
@@ -50,11 +53,13 @@ library
     , base >=4.7 && <5
     , co-log
     , configurator
+    , directory
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
     , mtl
+    , pretty-simple
     , quickcheck-instances
     , random
     , servant
@@ -62,6 +67,7 @@ library
     , template-haskell
     , text
     , time
+    , unordered-containers
   default-language: Haskell2010
 
 executable echobot-exe
@@ -77,12 +83,14 @@ executable echobot-exe
     , base >=4.7 && <5
     , co-log
     , configurator
+    , directory
     , echobot
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
     , mtl
+    , pretty-simple
     , quickcheck-instances
     , random
     , servant
@@ -90,6 +98,7 @@ executable echobot-exe
     , template-haskell
     , text
     , time
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite echobot-test
@@ -109,12 +118,14 @@ test-suite echobot-test
     , base >=4.7 && <5
     , co-log
     , configurator
+    , directory
     , echobot
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
     , mtl
+    , pretty-simple
     , quickcheck-instances
     , random
     , servant
@@ -122,4 +133,5 @@ test-suite echobot-test
     , template-haskell
     , text
     , time
+    , unordered-containers
   default-language: Haskell2010

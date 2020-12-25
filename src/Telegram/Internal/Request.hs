@@ -19,8 +19,9 @@ data Response a = Response
 
 -- | Request body for 'sendMessage'.
 data SendMessageBody = SendMessageBody
-  { sendMessageChatId :: ChatId
-  , sendMessageText   :: Text
+  { sendMessageChatId      :: ChatId
+  , sendMessageText        :: Text
+  , sendMessageReplyMarkup :: Maybe InlineKeyboardMarkup
   } deriving (Generic)
 
 -- | Request body for 'sendSticker'.
@@ -31,7 +32,7 @@ data SendStickerBody = SendStickerBody
 
 data GetUpdatesBody = GetUpdatesBody
     { getUpdatesOffset     :: Maybe UpdateId
-    , getUpdatesUpdateType :: Maybe UpdateType
+    , getUpdatesUpdateType :: [UpdateType]
     , getUpdatesTimeout    :: Maybe Int
     } deriving (Generic)
 
@@ -40,6 +41,21 @@ data UpdateType =
   UpdateMessage
   deriving (Generic)
 
+data AnswerCallbackBody = AnswerCallbackBody
+    { answerCallbackCallbackQueryId :: CallbackId
+    , answerCallbackText            :: Maybe Text
+    , answerCallbackShowAlert       :: Maybe Bool
+    } deriving (Generic)
+
+data EditMessageTextBody = EditMessageTextBody
+    { editMessageTextBodyChatId      :: ChatId
+    , editMessageTextBodyMessageId   :: MessageId
+    , editMessageTextBodyText        :: Text
+    , editMessageTextBodyReplyMarkup :: Maybe InlineKeyboardMarkup
+    } deriving (Generic)
+
+deriveJSON' ''EditMessageTextBody
+deriveJSON' ''AnswerCallbackBody
 deriveJSON' ''Response
 deriveJSON' ''SendMessageBody
 deriveJSON' ''SendStickerBody

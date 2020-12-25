@@ -30,7 +30,7 @@ newtype VkBot a = VkBot
 
 instance HasLog (Env VkBot) Message VkBot where
     getLogAction = envLogAction
-    setLogAction act e = e { envLogAction = act}
+    setLogAction act e = e { envLogAction = act }
 
 instance Show (LogAction a b) where
     show _ = "LogAction"

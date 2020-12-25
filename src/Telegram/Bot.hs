@@ -50,7 +50,7 @@ instance Bot TgBot where
         return ups
       where
         body :: GetUpdatesBody
-        body = GetUpdatesBody mUid (Just UpdateMessage) (Just 25)
+        body = GetUpdatesBody mUid [UpdateMessage] (Just 25)
 
     getUpdateId ups
         | null ups = pure Nothing
@@ -122,7 +122,7 @@ sendText cid t = do
     resp <- liftClient $ Internal.sendMessage body
     logDebug $ "Response: " <> showT resp
   where
-    body = SendMessageBody cid t
+    body = SendMessageBody cid t Nothing
 
 sendSticker :: Internal.ChatId -> Internal.FileId -> TgBot ()
 sendSticker cid fid = do

@@ -54,13 +54,14 @@ plainText = do
     then empty
     else return t
 
--- | Check if bot received specific command.
-command :: T.Text -> UpdateParser T.Text
+-- | Check if bot received specific command
+command :: T.Text -> UpdateParser ()
 command name = do
   t <- text
+
   case T.words t of
-    (w:ws) | w == "/" <> name -> return (T.unwords ws)
-    _                         -> empty
+    (w:_) | w == "/" <> name -> pure ()
+    _                        -> empty
 
 sticker :: UpdateParser FileId
 sticker = UpdateParser $
@@ -72,3 +73,43 @@ updateChatId = UpdateParser $
 
 updateId :: UpdateParser UpdateId
 updateId = UpdateParser (return . updateUpdateId)
+
+callbackQuery :: UpdateParser CallbackQuery
+callbackQuery = UpdateParser updateCallbackQuery
+
+callbackId :: UpdateParser CallbackId
+callbackId = UpdateParser $
+    updateCallbackQuery >=> pure . callbackQueryId
+
+callbackData :: UpdateParser T.Text
+callbackData = UpdateParser $
+    updateCallbackQuery >=> callbackQueryData
+
+callbackMessageId :: UpdateParser MessageId
+callbackMessageId = UpdateParser $
+    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageMessageId
+
+callbackChatId :: UpdateParser ChatId
+callbackChatId = UpdateParser $
+    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
+        >=> pure . chatId
+
+updateExample :: Update
+updateExample = Update
+    { updateUpdateId = 3
+    , updateMessage = Just Message
+        { messageMessageId = 3
+        , messageFrom = Nothing
+        , messageDate = 3
+        , messageChat = Chat
+            { chatId = 3
+            , chatUsername = Nothing
+            }
+        , messageText = Just "/repeat"
+        , messageEntities = Nothing
+        , messageSticker = Nothing
+        , messageReplyMarkup = Nothing
+        }
+    , updateEditedMessage = Nothing
+    , updateCallbackQuery = Nothing
+    }
