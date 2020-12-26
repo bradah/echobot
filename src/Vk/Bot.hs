@@ -18,6 +18,7 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client          hiding (Response)
 
 import           API.Bot.Class
+import           API.Utils
 import qualified Vk.Internal.Methods     as Internal
 import           Vk.Internal.Request
 import qualified Vk.Internal.Types       as Internal
@@ -31,10 +32,6 @@ newtype VkBot a = VkBot
 instance HasLog (Env VkBot) Message VkBot where
     getLogAction = envLogAction
     setLogAction act e = e { envLogAction = act }
-
-instance Show (LogAction a b) where
-    show _ = "LogAction"
-
 
 instance Bot VkBot where
     data Env VkBot = Env
@@ -164,6 +161,3 @@ startMessage = Data.Text.unlines
     , "Supported commands:"
     , "- /start"
     ]
-
-showT :: Show a => a -> Text
-showT = pack . show

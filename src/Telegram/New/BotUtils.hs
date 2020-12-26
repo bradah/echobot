@@ -13,6 +13,7 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client
 import           System.Directory        (doesFileExist)
 
+import           API.Utils
 import           Telegram.Internal.Types
 import           Telegram.New.Bot
 import           Telegram.New.Methods

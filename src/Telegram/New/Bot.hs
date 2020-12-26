@@ -7,9 +7,9 @@ import           Colog
 import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.HashMap.Lazy
-import qualified Data.List               as L (delete)
 import           Servant.Client
 
+import           API.Utils
 import           Telegram.Internal.Types
 
 newtype Bot a = Bot
@@ -54,9 +54,3 @@ defaultRepeatNumber = 1
 instance HasLog Env Colog.Message Bot where
     getLogAction = envLogAction
     setLogAction a e = e { envLogAction = a }
-
-instance Show (LogAction m a) where
-    show _ = "LogAction"
-
-instance Show ClientEnv where
-    show (ClientEnv _ base _) = show base

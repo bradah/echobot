@@ -5,11 +5,10 @@ module Telegram.New.Methods where
 import           Colog
 import           Control.Monad.State
 import qualified Data.HashMap.Lazy         as Map
-import           Data.Text                 (Text, pack, unpack)
-import           Data.Text.Lazy            (toStrict)
+import           Data.Text                 (Text, unpack)
 import           Servant.Client
-import           Text.Pretty.Simple
 
+import           API.Utils
 import qualified Telegram.Internal.Methods as Int
 import           Telegram.Internal.Request
 import           Telegram.Internal.Types
@@ -18,12 +17,6 @@ import           Telegram.UpdateParser
 
 liftClient :: ClientM a -> Bot a
 liftClient = Bot . lift . lift
-
-showP :: Show a => a -> Text
-showP = toStrict . pShow
-
-showT :: Show a => a -> Text
-showT = pack . show
 
 getUpdates :: Bot [Update]
 getUpdates = do
@@ -73,6 +66,7 @@ getUpdates = do
         extractChatId (u:us) = case updateChatId <?> u of
             Just cid -> cid : extractChatId us
             Nothing  -> extractChatId us
+
 
 sendText :: ChatId -> Text -> Maybe InlineKeyboardMarkup -> Bot ()
 sendText cid t markup = do
