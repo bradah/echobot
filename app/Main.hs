@@ -2,8 +2,8 @@ module Main where
 
 import           Colog
 import           System.Environment
-import qualified Telegram.New.BotUtils as Tg
-import qualified Vk.New.BotUtils       as Vk
+import qualified Telegram.Bot       as Tg
+import qualified Vk.Bot             as Vk
 
 main :: IO ()
 main = do
