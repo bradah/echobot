@@ -16,7 +16,7 @@ instance Show (LogAction a b) where
     show _ = "LogAction"
 
 showP :: Show a => a -> Text
-showP = toStrict . pShow
+showP = toStrict . pShowNoColor
 
 showT :: Show a => a -> Text
 showT = pack . show
