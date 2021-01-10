@@ -56,6 +56,8 @@ data Message = Message
   -- ^ Message is a sticker, information about the sticker.
   , messageReplyMarkup :: Maybe InlineKeyboardMarkup
   -- ^ Inline keyboard attached to the message.
+  , messagePhoto       :: Maybe [PhotoSize]
+  , messageCaption     :: Maybe Text
   } deriving (Show, Generic)
 
 -- | Unique message identifier.
@@ -198,6 +200,11 @@ data CallbackQuery = CallbackQuery
 
 type CallbackId = Text
 
+data PhotoSize = PhotoSize
+    { photoFileId :: FileId
+    } deriving (Show, Generic)
+
+deriveJSON' ''PhotoSize
 deriveJSON' ''CallbackQuery
 deriveJSON' ''InlineKeyboardButton
 deriveJSON' ''InlineKeyboardMarkup

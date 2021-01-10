@@ -66,6 +66,7 @@ data Action
     | Repeat ChatId
     | EchoText ChatId Text
     | EchoSticker ChatId FileId
+    | EchoPhoto ChatId FileId (Maybe Text)
     | AnswerRepeatCallback ChatId MessageId CallbackId Text
 
 updateToAction :: Update -> Maybe Action
@@ -74,6 +75,7 @@ updateToAction = runUpdateParser $ asum
     , Repeat <$ command "repeat" <*> updateChatId
     , EchoText <$> updateChatId <*> text
     , EchoSticker <$> updateChatId <*> sticker
+    , EchoPhoto <$> updateChatId <*> photo <*> caption
     , AnswerRepeatCallback <$> callbackChatId <*> callbackMessageId <*> callbackId <*> callbackData
     ]
 
@@ -84,6 +86,7 @@ handleUpdate up =
         Just (Repeat cid)        -> repeatCommand cid
         Just (EchoText cid t)    -> sendText cid t Nothing
         Just (EchoSticker cid s) -> sendSticker cid s
+        Just (EchoPhoto cid p cap) -> sendPhoto cid p cap
         Just (AnswerRepeatCallback cid mid cbid cbData) ->
             answerRepeatCallback cid mid cbid cbData
         Nothing                  -> return ()

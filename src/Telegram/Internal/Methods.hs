@@ -57,3 +57,10 @@ type EditMessageText = "editMessageText"
 
 editMessageText :: EditMessageTextBody -> ClientM (Response Message)
 editMessageText = client $ Proxy @EditMessageText
+
+
+type SendPhoto = "sendPhoto"
+    :> ReqBody '[JSON] SendPhotoBody
+    :> Post '[JSON] (Response Message)
+
+sendPhoto = client $ Proxy @SendPhoto

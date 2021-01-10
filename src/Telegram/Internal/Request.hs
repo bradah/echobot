@@ -54,6 +54,13 @@ data EditMessageTextBody = EditMessageTextBody
     , editMessageTextBodyReplyMarkup :: Maybe InlineKeyboardMarkup
     } deriving (Generic)
 
+data SendPhotoBody = SendPhotoBody
+    { sendPhotoBodyChatId  :: ChatId
+    , sendPhotoBodyPhoto   :: FileId
+    , sendPhotoBodyCaption :: Maybe Text
+    } deriving (Generic)
+
+deriveJSON' ''SendPhotoBody
 deriveJSON' ''EditMessageTextBody
 deriveJSON' ''AnswerCallbackBody
 deriveJSON' ''Response

@@ -94,7 +94,15 @@ callbackChatId = UpdateParser $
     updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
         >=> pure . chatId
 
-updateExample :: Update
+photo :: UpdateParser FileId
+photo = UpdateParser $
+    updateMessage >=> messagePhoto >=> pure . photoFileId . head
+
+caption :: UpdateParser (Maybe T.Text)
+caption = UpdateParser $
+    updateMessage >=> pure . messageCaption
+
+{- updateExample :: Update
 updateExample = Update
     { updateUpdateId = 3
     , updateMessage = Just Message
@@ -113,3 +121,4 @@ updateExample = Update
     , updateEditedMessage = Nothing
     , updateCallbackQuery = Nothing
     }
+ -}

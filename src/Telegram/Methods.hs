@@ -172,3 +172,20 @@ repeatNewText n
         <> " time"
         <> if n == 1 then "" else "s"
         <> "👌🏾"
+
+sendPhoto :: ChatId -> FileId -> Maybe Text -> Bot ()
+sendPhoto cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending photo "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendPhoto body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendPhotoBody cid fid cap
