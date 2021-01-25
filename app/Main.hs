@@ -2,7 +2,7 @@ module Main where
 
 import           Colog
 import           Control.Monad.IO.Class (MonadIO)
-import           System.Environment
+-- import           System.Environment
 import           System.IO
 import qualified Telegram.Bot           as Tg
 import qualified Vk.Bot                 as Vk
@@ -19,18 +19,21 @@ main = do
         ]
     arg <- getLine
     case arg of
-        "1" -> Tg.run $ logAction Debug handle
-        "2" -> Vk.run $ logAction Debug handle
+        "1" -> Tg.run $ logStdOut Debug
+        "2" -> Vk.run $ logStdOut Debug
         "q" -> pure ()
         _   -> main
     hClose handle
 
-logAction :: MonadIO m => Severity -> Handle -> LogAction m Message
-logAction sev handle = cfilter ((>= sev) . msgSeverity) (richMessageAction <> richMessageToFileAction)
+logStdOutAndFile :: MonadIO m => Severity -> Handle -> LogAction m Message
+logStdOutAndFile sev handle = cfilter ((>= sev) . msgSeverity) (richMessageAction <> richMessageToFileAction)
   where
     richMessageToFileAction :: MonadIO m => LogAction m Message
     richMessageToFileAction = upgradeMessageAction defaultFieldMap $
         cmapM fmtRichMessageDefault (logTextHandle handle)
+
+logStdOut :: MonadIO m => Severity -> LogAction m Message
+logStdOut sev = cfilter ((>= sev) . msgSeverity) richMessageAction
 
 -- | Release version
 

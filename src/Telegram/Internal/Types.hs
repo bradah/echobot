@@ -38,27 +38,33 @@ type UpdateId = Int32
 
 -- | This object represents a message.
 data Message = Message
-  { messageMessageId   :: MessageId
-  -- ^ Unique message identifier inside this chat.
-  , messageFrom        :: Maybe User
-  -- ^ Sender, empty for messages sent to channels.
-  , messageDate        :: POSIXTime
-  -- ^ Date the message was sent in Unix time.
-  , messageChat        :: Chat
-  -- ^ Conversation the message belongs to.
-  , messageText        :: Maybe Text
-  -- ^ For text messages, the actual UTF-8 text
-  -- of the message, 0-4096 characters.
-  , messageEntities    :: Maybe [MessageEntity]
-  -- ^ For text messages, special entities like usernames,
-  -- URLs, bot commands, etc. that appear in the text.
-  , messageSticker     :: Maybe Sticker
-  -- ^ Message is a sticker, information about the sticker.
-  , messageReplyMarkup :: Maybe InlineKeyboardMarkup
-  -- ^ Inline keyboard attached to the message.
-  , messagePhoto       :: Maybe [PhotoSize]
-  , messageCaption     :: Maybe Text
-  } deriving (Show, Generic)
+    { messageMessageId   :: MessageId
+    -- ^ Unique message identifier inside this chat.
+    , messageFrom        :: Maybe User
+    -- ^ Sender, empty for messages sent to channels.
+    , messageDate        :: POSIXTime
+    -- ^ Date the message was sent in Unix time.
+    , messageChat        :: Chat
+    -- ^ Conversation the message belongs to.
+    , messageText        :: Maybe Text
+    -- ^ For text messages, the actual UTF-8 text
+    -- of the message, 0-4096 characters.
+    , messageEntities    :: Maybe [MessageEntity]
+    -- ^ For text messages, special entities like usernames,
+    -- URLs, bot commands, etc. that appear in the text.
+    , messageSticker     :: Maybe Sticker
+    -- ^ Message is a sticker, information about the sticker.
+    , messageReplyMarkup :: Maybe InlineKeyboardMarkup
+    -- ^ Inline keyboard attached to the message.
+    , messagePhoto       :: Maybe [PhotoSize]
+    , messageCaption     :: Maybe Text
+    , messageAnimation   :: Animation
+    , messageAudio       :: Audio
+    , messageDocument    :: Document
+    , messageVideo       :: Video
+    , messageVideoNote   :: VideoNote
+    , messageVoice       :: Voice
+    } deriving (Show, Generic)
 
 -- | Unique message identifier.
 type MessageId = Int32
@@ -204,6 +210,42 @@ data PhotoSize = PhotoSize
     { photoFileId :: FileId
     } deriving (Show, Generic)
 
+
+data Animation = Animation
+    { animationFileId :: FileId
+    } deriving (Show, Generic)
+
+
+data Audio = Audio
+    { audioFileId :: FileId
+    } deriving (Show, Generic)
+
+
+data Document = Document
+    { documentFileId :: FileId
+    } deriving (Show, Generic)
+
+
+data Video = Video
+    { videoFileId :: FileId
+    } deriving (Show, Generic)
+
+
+data VideoNote = VideoNote
+    { videoNoteFileId :: FileId
+    } deriving (Show, Generic)
+
+
+data Voice = Voice
+    { voiceFileId :: FileId
+    } deriving (Show, Generic)
+
+deriveJSON' ''Animation
+deriveJSON' ''Audio
+deriveJSON' ''Document
+deriveJSON' ''Video
+deriveJSON' ''VideoNote
+deriveJSON' ''Voice
 deriveJSON' ''PhotoSize
 deriveJSON' ''CallbackQuery
 deriveJSON' ''InlineKeyboardButton

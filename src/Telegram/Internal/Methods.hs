@@ -63,4 +63,5 @@ type SendPhoto = "sendPhoto"
     :> ReqBody '[JSON] SendPhotoBody
     :> Post '[JSON] (Response Message)
 
+sendPhoto :: SendPhotoBody -> ClientM (Response Message)
 sendPhoto = client $ Proxy @SendPhoto
