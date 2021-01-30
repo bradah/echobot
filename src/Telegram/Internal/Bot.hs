@@ -14,12 +14,8 @@ import           Telegram.Internal.Types
 
 newtype Bot a = Bot
     { runBot :: ReaderT Env (StateT BotState ClientM) a
-    } deriving ( Functor
-               , Applicative
-               , Monad
-               , MonadReader Env
-               , MonadState BotState
-               , MonadIO
+    } deriving ( Functor, Applicative, Monad
+               , MonadReader Env, MonadState BotState, MonadIO
                )
 
 data Env = Env

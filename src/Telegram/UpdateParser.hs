@@ -98,7 +98,7 @@ photo :: UpdateParser FileId
 photo = UpdateParser $
     updateMessage >=> messagePhoto >=> pure . photoFileId . head
 
-caption :: UpdateParser (Maybe T.Text)
+caption :: UpdateParser Caption
 caption = UpdateParser $
     updateMessage >=> pure . messageCaption
 

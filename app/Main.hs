@@ -2,15 +2,15 @@ module Main where
 
 import           Colog
 import           Control.Monad.IO.Class (MonadIO)
--- import           System.Environment
+import           System.Environment
 import           System.IO
 import qualified Telegram.Bot           as Tg
 import qualified Vk.Bot                 as Vk
 
 main :: IO ()
 main = do
-    handle <- openFile "echobot.log" AppendMode
-    hSetBuffering handle NoBuffering
+    -- handle <- openFile "echobot.log" AppendMode
+    -- hSetBuffering handle NoBuffering
     putStr $ unlines
         [ "To start, specify a number of bot you want to run"
         , "1: Telegram bot"
@@ -19,11 +19,11 @@ main = do
         ]
     arg <- getLine
     case arg of
-        "1" -> Tg.run $ logStdOut Debug
-        "2" -> Vk.run $ logStdOut Debug
+        "1" -> Tg.run richMessageAction
+        "2" -> Vk.run richMessageAction
         "q" -> pure ()
         _   -> main
-    hClose handle
+    -- hClose handle
 
 logStdOutAndFile :: MonadIO m => Severity -> Handle -> LogAction m Message
 logStdOutAndFile sev handle = cfilter ((>= sev) . msgSeverity) (richMessageAction <> richMessageToFileAction)

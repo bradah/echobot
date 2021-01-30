@@ -48,16 +48,57 @@ data AnswerCallbackBody = AnswerCallbackBody
     } deriving (Generic)
 
 data EditMessageTextBody = EditMessageTextBody
-    { editMessageTextBodyChatId      :: ChatId
-    , editMessageTextBodyMessageId   :: MessageId
-    , editMessageTextBodyText        :: Text
-    , editMessageTextBodyReplyMarkup :: Maybe InlineKeyboardMarkup
+    { editMessageTextChatId      :: ChatId
+    , editMessageTextMessageId   :: MessageId
+    , editMessageTextText        :: Text
+    , editMessageTextReplyMarkup :: Maybe InlineKeyboardMarkup
     } deriving (Generic)
 
 data SendPhotoBody = SendPhotoBody
-    { sendPhotoBodyChatId  :: ChatId
-    , sendPhotoBodyPhoto   :: FileId
-    , sendPhotoBodyCaption :: Maybe Text
+    { sendPhotoChatId  :: ChatId
+    , sendPhotoPhoto   :: FileId
+    , sendPhotoCaption :: Maybe Text
+    } deriving (Generic)
+
+
+data SendAnimationBody = SendAnimationBody
+    { sendAnimationChatId    :: ChatId
+    , sendAnimationAnimation :: FileId
+    , sendAnimationCaption   :: Caption
+    } deriving (Generic)
+
+
+data SendAudioBody = SendAudioBody
+    { sendAudioChatId  :: ChatId
+    , sendAudioAudio   :: FileId
+    , sendAudioCaption :: Caption
+    } deriving (Generic)
+
+
+data SendDocumentBody = SendDocumentBody
+    { sendDocumentChatId   :: ChatId
+    , sendDocumentDocument :: FileId
+    , sendDocumentCaption  :: Caption
+    } deriving (Generic)
+
+
+data SendVideoBody = SendVideoBody
+    { sendVideoChatId  :: ChatId
+    , sendVideoVideo   :: FileId
+    , sendVideoCaption :: Caption
+    } deriving (Generic)
+
+
+data SendVideoNoteBody = SendVideoNoteBody
+    { sendVideoNoteChatId    :: ChatId
+    , sendVideoNoteVideoNote :: FileId
+    } deriving (Generic)
+
+
+data SendVoiceBody = SendVoiceBody
+    { sendVoiceChatId  :: ChatId
+    , sendVoiceVoice   :: Voice
+    , sendVoiceCaption :: Caption
     } deriving (Generic)
 
 deriveJSON' ''SendPhotoBody
@@ -68,3 +109,9 @@ deriveJSON' ''SendMessageBody
 deriveJSON' ''SendStickerBody
 deriveJSON' ''UpdateType
 deriveJSON' ''GetUpdatesBody
+deriveJSON' ''SendAnimationBody
+deriveJSON' ''SendAudioBody
+deriveJSON' ''SendDocumentBody
+deriveJSON' ''SendVideoBody
+deriveJSON' ''SendVideoNoteBody
+deriveJSON' ''SendVoiceBody

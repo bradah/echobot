@@ -169,9 +169,7 @@ repeatNewText n
     | n == 1     = "Okay, I won't piss you off...😒"
     | otherwise  = "From now on I will repeat your messages "
         <> showT n
-        <> " time"
-        <> if n == 1 then "" else "s"
-        <> "👌🏾"
+        <> " times 👌🏾"
 
 sendPhoto :: ChatId -> FileId -> Maybe Text -> Bot ()
 sendPhoto cid fid cap = do

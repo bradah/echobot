@@ -57,19 +57,19 @@ data Message = Message
     , messageReplyMarkup :: Maybe InlineKeyboardMarkup
     -- ^ Inline keyboard attached to the message.
     , messagePhoto       :: Maybe [PhotoSize]
-    , messageCaption     :: Maybe Text
-    , messageAnimation   :: Animation
-    , messageAudio       :: Audio
-    , messageDocument    :: Document
-    , messageVideo       :: Video
-    , messageVideoNote   :: VideoNote
-    , messageVoice       :: Voice
+    , messageCaption     :: Caption
+    , messageAnimation   :: Maybe Animation
+    , messageAudio       :: Maybe Audio
+    , messageDocument    :: Maybe Document
+    , messageVideo       :: Maybe Video
+    , messageVideoNote   :: Maybe VideoNote
+    , messageVoice       :: Maybe Voice
     } deriving (Show, Generic)
 
 -- | Unique message identifier.
 type MessageId = Int32
 
-
+type Caption = Maybe Text
 -- ** User
 
 -- | This object represents a Telegram user or bot.
