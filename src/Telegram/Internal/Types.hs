@@ -56,8 +56,8 @@ data Message = Message
     -- ^ Message is a sticker, information about the sticker.
     , messageReplyMarkup :: Maybe InlineKeyboardMarkup
     -- ^ Inline keyboard attached to the message.
-    , messagePhoto       :: Maybe [PhotoSize]
     , messageCaption     :: Caption
+    , messagePhoto       :: Maybe [PhotoSize]
     , messageAnimation   :: Maybe Animation
     , messageAudio       :: Maybe Audio
     , messageDocument    :: Maybe Document

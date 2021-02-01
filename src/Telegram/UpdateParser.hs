@@ -94,13 +94,37 @@ callbackChatId = UpdateParser $
     updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
         >=> pure . chatId
 
+caption :: UpdateParser Caption
+caption = UpdateParser $
+    updateMessage >=> pure . messageCaption
+
 photo :: UpdateParser FileId
 photo = UpdateParser $
     updateMessage >=> messagePhoto >=> pure . photoFileId . head
 
-caption :: UpdateParser Caption
-caption = UpdateParser $
-    updateMessage >=> pure . messageCaption
+animation :: UpdateParser FileId
+animation = UpdateParser $
+    updateMessage >=> messageAnimation >=> pure . animationFileId
+
+audio :: UpdateParser FileId
+audio = UpdateParser $
+    updateMessage >=> messageAudio >=> pure . audioFileId
+
+document :: UpdateParser FileId
+document = UpdateParser $
+    updateMessage >=> messageDocument >=> pure . documentFileId
+
+video :: UpdateParser FileId
+video = UpdateParser $
+    updateMessage >=> messageVideo >=> pure . videoFileId
+
+videoNote :: UpdateParser FileId
+videoNote = UpdateParser $
+    updateMessage >=> messageVideoNote >=> pure . videoNoteFileId
+
+voice :: UpdateParser FileId
+voice = UpdateParser $
+    updateMessage >=> messageVoice >=> pure . voiceFileId
 
 {- updateExample :: Update
 updateExample = Update

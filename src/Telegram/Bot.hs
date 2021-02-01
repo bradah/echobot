@@ -66,7 +66,13 @@ data Action
     | Repeat ChatId
     | EchoText ChatId Text
     | EchoSticker ChatId FileId
-    | EchoPhoto ChatId FileId (Maybe Text)
+    | EchoPhoto ChatId FileId Caption
+    | EchoAnimation ChatId FileId Caption
+    | EchoAudio ChatId FileId Caption
+    | EchoDocument ChatId FileId Caption
+    | EchoVideo ChatId FileId Caption
+    | EchoVideoNote ChatId FileId
+    | EchoVoice ChatId FileId Caption
     | AnswerRepeatCallback ChatId MessageId CallbackId Text
 
 updateToAction :: Update -> Maybe Action
@@ -76,6 +82,12 @@ updateToAction = runUpdateParser $ asum
     , EchoText <$> updateChatId <*> text
     , EchoSticker <$> updateChatId <*> sticker
     , EchoPhoto <$> updateChatId <*> photo <*> caption
+    , EchoAnimation <$> updateChatId <*> animation <*> caption
+    , EchoAudio <$> updateChatId <*> audio <*> caption
+    , EchoDocument <$> updateChatId <*> document <*> caption
+    , EchoVideo <$> updateChatId <*> video <*> caption
+    , EchoVideoNote <$> updateChatId <*> videoNote
+    , EchoVoice <$> updateChatId <*> voice <*> caption
     , AnswerRepeatCallback <$> callbackChatId <*> callbackMessageId <*> callbackId <*> callbackData
     ]
 
@@ -86,7 +98,13 @@ handleUpdate up =
         Just (Repeat cid)        -> repeatCommand cid
         Just (EchoText cid t)    -> sendText cid t Nothing
         Just (EchoSticker cid s) -> sendSticker cid s
-        Just (EchoPhoto cid p cap) -> sendPhoto cid p cap
+        Just (EchoPhoto cid ph cap) -> sendPhoto cid ph cap
+        Just (EchoAnimation cid anim cap) -> sendAnimation cid anim cap
+        Just (EchoAudio cid aud cap) -> sendAudio cid aud cap
+        Just (EchoDocument cid doc cap) -> sendDocument cid doc cap
+        Just (EchoVideo cid vid cap) -> sendVideo cid vid cap
+        Just (EchoVideoNote cid vidnote) -> sendVideoNote cid vidnote
+        Just (EchoVoice cid voi cap) -> sendVoice cid voi cap
         Just (AnswerRepeatCallback cid mid cbid cbData) ->
             answerRepeatCallback cid mid cbid cbData
         Nothing                  -> return ()

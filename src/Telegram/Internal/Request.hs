@@ -97,7 +97,7 @@ data SendVideoNoteBody = SendVideoNoteBody
 
 data SendVoiceBody = SendVoiceBody
     { sendVoiceChatId  :: ChatId
-    , sendVoiceVoice   :: Voice
+    , sendVoiceVoice   :: FileId
     , sendVoiceCaption :: Caption
     } deriving (Generic)
 

@@ -171,7 +171,7 @@ repeatNewText n
         <> showT n
         <> " times 👌🏾"
 
-sendPhoto :: ChatId -> FileId -> Maybe Text -> Bot ()
+sendPhoto :: ChatId -> FileId -> Caption -> Bot ()
 sendPhoto cid fid cap = do
     repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
     logInfo $ "Sending photo "
@@ -187,3 +187,103 @@ sendPhoto cid fid cap = do
     logDebug $ "Response " <> showP resp
   where
     body = SendPhotoBody cid fid cap
+
+sendAnimation :: ChatId -> FileId -> Caption -> Bot ()
+sendAnimation cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending animation "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendAnimation body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendAnimationBody cid fid cap
+
+sendAudio :: ChatId -> FileId -> Caption -> Bot ()
+sendAudio cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending audio "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendAudio body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendAudioBody cid fid cap
+
+sendDocument :: ChatId -> FileId -> Caption -> Bot ()
+sendDocument cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending document "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendDocument body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendDocumentBody cid fid cap
+
+sendVideo :: ChatId -> FileId -> Caption -> Bot ()
+sendVideo cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending video "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendVideo body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendVideoBody cid fid cap
+
+sendVideoNote :: ChatId -> FileId -> Bot ()
+sendVideoNote cid fid = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending videonote "
+        <> showP fid
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendVideoNote body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendVideoNoteBody cid fid
+
+sendVoice :: ChatId -> FileId -> Caption -> Bot ()
+sendVoice cid fid cap = do
+    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    logInfo $ "Sending voice message "
+        <> showP fid
+        <> " with caption "
+        <> showP cap
+        <> " to chat "
+        <> showP cid
+        <> " (repeat number: "
+        <> showP repeatNum
+        <> ")"
+    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendVoice body)
+    logDebug $ "Response " <> showP resp
+  where
+    body = SendVoiceBody cid fid cap
