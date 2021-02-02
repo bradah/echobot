@@ -111,12 +111,18 @@ handleUpdate up =
 
 helpMessage :: Text
 helpMessage = Data.Text.unlines
-    [ "Hi! This bot merely echoes your messages 🙂"
+    [ "Hi! I will simply repeat your messages!"
     , "Just imagine talking to a mirror..."
     , ""
     , "Supported messages:"
     , "- plain text"
     , "- stickers"
+    , "- voice messages"
+    , "- video"
+    , "- videonotes (round videos)"
+    , "- music"
+    , "- documents"
+    , "- animation"
     , ""
     , "Supported commands:"
     , "- /help"
