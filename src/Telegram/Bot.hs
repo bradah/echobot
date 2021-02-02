@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Telegram.Bot where
 
-import           Colog
 import           Control.Applicative     ((<|>))
 import           Control.Monad.Reader
 import           Control.Monad.State
@@ -13,13 +12,15 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client
 import           System.Directory        (doesFileExist)
 
+import           API.Logging
+import qualified API.Logging             as Log (Message)
 import           API.Utils
 import           Telegram.Internal.Bot
 import           Telegram.Internal.Types
 import           Telegram.Methods
 import           Telegram.UpdateParser
 
-mkEnv :: LogAction Bot Colog.Message -> IO Env
+mkEnv :: LogAction Bot Log.Message -> IO Env
 mkEnv act = do
     token <- getToken
     clientEnv <- defaultClientEnv token
@@ -47,7 +48,7 @@ mkEnv act = do
         (unpack $ "/bot" <> token)
 
 
-run :: LogAction Bot Colog.Message -> IO ()
+run :: LogAction Bot Log.Message -> IO ()
 run act = do
     env <- mkEnv act
     void $ runClientM (runStateT (runReaderT (runBot initBot) env) initState) (envCleintEnv env)

@@ -2,12 +2,12 @@
 
 module Telegram.Methods where
 
-import           Colog
 import           Control.Monad.State
 import qualified Data.HashMap.Lazy         as Map
 import           Data.Text                 (Text, unpack)
 import           Servant.Client
 
+import           API.Logging
 import           API.Utils
 import           Telegram.Internal.Bot
 import qualified Telegram.Internal.Methods as Int
@@ -151,13 +151,13 @@ repeatCommand cid = do
 defaultRepeatInlineKeyboard :: InlineKeyboardMarkup
 defaultRepeatInlineKeyboard = InlineKeyboardMarkup
     [
-        [ InlineKeyboardButton "1️⃣" (Just "1")
-        , InlineKeyboardButton "2️⃣" (Just "2")
-        , InlineKeyboardButton "3️⃣" (Just "3")
+        [ InlineKeyboardButton "1" (Just "1")
+        , InlineKeyboardButton "2" (Just "2")
+        , InlineKeyboardButton "3" (Just "3")
         ]
     ,
-        [ InlineKeyboardButton "4️⃣" (Just "4")
-        , InlineKeyboardButton "5️⃣" (Just "5")
+        [ InlineKeyboardButton "4" (Just "4")
+        , InlineKeyboardButton "5" (Just "5")
         ]
     ]
 
@@ -165,13 +165,19 @@ repeatGreeting :: Text
 repeatGreeting = "Choose how many times you want me to repeat your messages"
 
 repeatNewText :: Int -> Text
-repeatNewText n
-    | n == 1     = "Okay, I won't piss you off...😒"
-    | otherwise  = "From now on I will repeat your messages "
-        <> showT n
-        <> " times 👌🏾"
+repeatNewText n =
+       "From now on I will repeat your messages "
+    <> showT n
+    <> " time"
+    <> if n > 1 then "s" else ""
 
-sendMediaWithCaption :: Show response => (body -> ClientM response) -> body -> Text -> ChatId -> Bot ()
+sendMediaWithCaption
+    :: (Show response)
+    => (body -> ClientM response) -- ^ Bot method
+    -> body -- ^ Request body
+    -> Text -- ^ Name of method (for logging)
+    -> ChatId -- ^ Destination 'ChatId'
+    -> Bot ()
 sendMediaWithCaption method body name cid = do
     repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
     logInfo $ "Sending "

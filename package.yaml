@@ -40,6 +40,8 @@ dependencies:
 - unordered-containers
 - directory
 - pretty-simple
+- chronos
+- vector
 
 library:
   source-dirs: src
