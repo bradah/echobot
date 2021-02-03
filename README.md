@@ -15,8 +15,8 @@ This bot supports following message types:
 - animation
 
 And couple of commands:
-- /start or /help
-- /repeat
+- `/start` or `/help`
+- `/repeat`
 
 ## Getting started
 To run this bot, write your bot token to `echobot.conf`. Compile this project using `stack build`, hit `stack exec echobot-exe` and enjoy :)
