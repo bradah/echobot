@@ -3,5 +3,6 @@
 .vscode
 .history
 *~
+echobot.conf
 echobot.conf.local
 echobot.log
