@@ -7,5 +7,6 @@ import           Telegram.Bot
 main :: IO ()
 main = do
     handle <- openFile "echobot.log" AppendMode
-    run $ logStdOutAndFile Info handle
+    hSetBuffering handle NoBuffering
+    run $ logStdOutAndFile Debug handle
     hClose handle
