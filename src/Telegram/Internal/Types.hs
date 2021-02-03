@@ -124,7 +124,7 @@ type MessageId = Int32
 type Caption = Maybe Text
 -- ** User
 
--- | This object represents a Telegram user or bot.
+-- | This object represents a Telegram 'User' or bot.
 data User = User
   { userId        :: UserId
   -- ^ Unique identifier for this user or bot.

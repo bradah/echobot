@@ -16,13 +16,13 @@ module Telegram.UpdateParser
       -- ** Parse updates
     , updateChatId
     , updateId
-      -- Parse callback queries
+      -- ** Parse callback queries
     , callbackQuery
     , callbackId
     , callbackData
     , callbackMessageId
     , callbackChatId
-      -- Parse messages
+      -- ** Parse messages
     , plainText
     , command
     , caption
@@ -92,12 +92,12 @@ callbackData :: UpdateParser T.Text
 callbackData = UpdateParser $
     updateCallbackQuery >=> callbackQueryData
 
--- | Get callback identifier of an 'Update'.
+-- | Get 'MessageId' from 'CallbackQuery' of an 'Update'.
 callbackMessageId :: UpdateParser MessageId
 callbackMessageId = UpdateParser $
     updateCallbackQuery >=> callbackQueryMessage >=> pure . messageMessageId
 
--- | Get 'ChatId' of 'Chat', in which 'CallbackQuery' was issued.
+-- | Get 'ChatId' of 'Chat' in which 'CallbackQuery' was issued.
 callbackChatId :: UpdateParser ChatId
 callbackChatId = UpdateParser $
     updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
