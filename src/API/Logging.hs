@@ -2,16 +2,27 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE ViewPatterns      #-}
 
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module contains logging utilities.
+-}
 
 module API.Logging
-    ( logStdOut
-    , logStdOutAndFile
-    , Severity(..)
-    , logDebug
+    ( -- * Logging
+      -- ** Logging functions
+      logDebug
     , logInfo
     , logWarning
     , logError
+    , logStdOut
+    , logStdOutAndFile
+    -- ** Severity
+    , Severity(..)
+    -- ** LogAction
     , LogAction(..)
+    -- ** Message
     , Message
     ) where
 
@@ -29,23 +40,35 @@ import qualified Data.Text.Lazy.Builder.Int as TB
 import qualified Data.Vector                as Vector
 import           System.IO
 
-logStdOutAndFile :: MonadIO m => Severity -> Handle -> LogAction m Message
+-- | Log 'Message' to stdout and file.
+logStdOutAndFile
+    :: MonadIO m
+    => Severity -- ^ Minimal severity of logging messages.
+    -> Handle -- ^ Handle for the log file.
+    -> LogAction m Message
 logStdOutAndFile sev handle = cfilter
     ((>= sev) . msgSeverity)
     (richMessageAction <> richMessageHandleNoColor handle)
 
-logStdOut :: MonadIO m => Severity -> LogAction m Message
+-- | Log 'Message' to stdout.
+logStdOut
+    :: MonadIO m
+    => Severity -- ^ Minimal severity of logging messages.
+    -> LogAction m Message
 logStdOut sev = cfilter ((>= sev) . msgSeverity) richMessageAction
 
+-- | Log 'Message' with some additional information
+-- e.g. ThreadId, Time.
 richMessageAction :: MonadIO m => LogAction m Message
 richMessageAction = upgradeMessageAction defaultFieldMap $
     cmapM fmtRichMessageDefault logTextStdout
 
-
+-- | Same as 'richMessageAction', doesn't add colors.
 richMessageHandleNoColor :: MonadIO m => Handle -> LogAction m Message
 richMessageHandleNoColor handle = upgradeMessageAction defaultFieldMap $
     cmapM fmtRichMessageDefaultNoColor (logTextHandle handle)
 
+-- | Show 'Severity' with indentation.
 showSeverity :: Severity -> Text
 showSeverity sev = case sev of
     Debug   -> "[Debug]   "
@@ -53,6 +76,7 @@ showSeverity sev = case sev of
     Warning -> "[Warning] "
     Error   -> "[Error]   "
 
+-- | Construct formatted 'Text' for 'RichMessage'.
 fmtRichMessageDefaultNoColor :: MonadIO m => RichMessage m -> m Text
 fmtRichMessageDefaultNoColor msg = fmtRichMessageCustomDefault msg formatRichMessage
   where
@@ -63,7 +87,6 @@ fmtRichMessageDefaultNoColor msg = fmtRichMessageCustomDefault msg formatRichMes
         <> showSourceLoc msgStack
         <> thread
         <> msgText
-
 
 square :: Text -> Text
 square t = "[" <> t <> "] "
@@ -84,10 +107,8 @@ showTime t =
     $ TB.toLazyText
     $ builderDmyHMSz (C.timeToDatetime t)
 
-
-
-{- | Given a 'Datetime', constructs a 'Text' 'TB.Builder' corresponding to a
-Day\/Month\/Year,Hour\/Minute\/Second\/Offset encoding of the given 'Datetime'.
+{- | Given a Datetime, constructs a 'Text' 'TB.Builder' corresponding to a
+Day\/Month\/Year,Hour\/Minute\/Second\/Offset encoding of the given Datetime.
 
 Example: @29 Dec 2019 22:00:00.000 +00:00@
 -}

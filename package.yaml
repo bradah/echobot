@@ -31,7 +31,6 @@ dependencies:
 - QuickCheck
 - quickcheck-instances
 - configurator
-- random
 - servant
 - servant-client
 - http-client

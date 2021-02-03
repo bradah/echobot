@@ -1,31 +1,55 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Telegram.Bot where
 
-import           Control.Applicative     ((<|>))
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines basic Telegram API types.
+-}
+
+module Telegram.Bot
+    ( -- * Bot
+      -- ** Starting bot
+      run
+    , mkEnv
+      -- ** Actions
+    , Action(..)
+    , updateToAction
+    , handleUpdate
+    ) where
+
+
+import           Control.Applicative       ((<|>))
 import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.Configurator
-import           Data.Foldable           (asum)
-import           Data.Text               (Text, unlines, unpack)
-import           Network.HTTP.Client     (newManager)
-import           Network.HTTP.Client.TLS (tlsManagerSettings)
+import           Data.Foldable             (asum)
+import           Data.Text                 (Text, unlines, unpack)
+import           Network.HTTP.Client       (newManager)
+import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Servant.Client
-import           System.Directory        (doesFileExist)
+import           System.Directory          (doesFileExist)
 
 import           API.Logging
-import qualified API.Logging             as Log (Message)
+import qualified API.Logging               as Log (Message)
 import           API.Utils
 import           Telegram.Internal.Bot
+import           Telegram.Internal.Methods (getMe)
 import           Telegram.Internal.Types
 import           Telegram.Methods
 import           Telegram.UpdateParser
 
-mkEnv :: LogAction Bot Log.Message -> IO Env
+
+-- | Make new bot environment.
+mkEnv
+    :: LogAction Bot Log.Message -- ^ Logging action.
+    -> IO Env
 mkEnv act = do
     token <- getToken
     clientEnv <- defaultClientEnv token
     return $ Env token act clientEnv
   where
+    -- | Get token from config file.
     getToken :: IO Token
     getToken = do
         localExists <- doesFileExist "echobot.conf.local"
@@ -35,11 +59,13 @@ mkEnv act = do
         conf <- load [Required path]
         require conf "telegram.token"
 
+    -- | Make new servant client environment.
     defaultClientEnv :: Token -> IO ClientEnv
     defaultClientEnv token = mkClientEnv
         <$> newManager tlsManagerSettings
         <*> pure (botBaseUrl token)
 
+    -- | Construct base URL.
     botBaseUrl :: Token -> BaseUrl
     botBaseUrl token = BaseUrl
         Https
@@ -47,40 +73,60 @@ mkEnv act = do
         443
         (unpack $ "/bot" <> token)
 
-
-run :: LogAction Bot Log.Message -> IO ()
+-- | Run bot using long polling. By default timeout is 25 seconds.
+run
+    :: LogAction Bot Log.Message -- ^ Logging action.
+    -> IO ()
 run act = do
     env <- mkEnv act
     void $ runClientM (runStateT (runReaderT (runBot initBot) env) initState) (envCleintEnv env)
+  where
+    -- | Initial bot action.
+    initBot :: Bot ()
+    initBot = do
+        env <- ask
+        bot <- liftClient getMe
+        logInfo $ "Starting bot:"
+            <!> showP bot
+        logDebug $ "Created environment:\n" <> showP env
+        loop
+    -- | Main loop in which bot runs.
+    loop :: Bot ()
+    loop = forever $ getUpdates >>= mapM_ handleUpdate
 
-initBot :: Bot ()
-initBot = do
-    env <- ask
-    logDebug $ "Created environment: " <> showP env
-    loop
-
-loop :: Bot ()
-loop = forever $ getUpdates >>= mapM_ handleUpdate
-
+-- | Available actions.
 data Action
     = Help ChatId
+    -- ^ Answer "\/start" or "\/help" commands.
     | Repeat ChatId
+    -- ^ Answer "\/repeat" command.
     | EchoText ChatId Text
+    -- ^ Echo plain text.
     | EchoSticker ChatId FileId
+    -- ^ Echo 'Sticker'.
     | EchoPhoto ChatId FileId Caption
+    -- ^ Echo photos, see 'PhotoSize'.
     | EchoAnimation ChatId FileId Caption
+    -- ^ Echo 'Animation'.
     | EchoAudio ChatId FileId Caption
+    -- ^ Echo 'Audio'.
     | EchoDocument ChatId FileId Caption
+    -- ^ Echo 'Document'.
     | EchoVideo ChatId FileId Caption
+    -- ^ Echo 'Video'.
     | EchoVideoNote ChatId FileId
+    -- ^ Echo 'VideoNote'.
     | EchoVoice ChatId FileId Caption
+    -- ^ Echo 'Voice'.
     | AnswerRepeatCallback ChatId MessageId CallbackId Text
+    -- ^ Answer 'CallbackQuery', issued by pressing 'InlineKeyboardButton'.
 
+-- | Map proper 'Action' to an 'Update'.
 updateToAction :: Update -> Maybe Action
 updateToAction = runUpdateParser $ asum
     [ Help <$ (command "help" <|> command "start") <*> updateChatId
     , Repeat <$ command "repeat" <*> updateChatId
-    , EchoText <$> updateChatId <*> text
+    , EchoText <$> updateChatId <*> plainText
     , EchoSticker <$> updateChatId <*> sticker
     , EchoPhoto <$> updateChatId <*> photo <*> caption
     , EchoAnimation <$> updateChatId <*> animation <*> caption
@@ -92,6 +138,7 @@ updateToAction = runUpdateParser $ asum
     , AnswerRepeatCallback <$> callbackChatId <*> callbackMessageId <*> callbackId <*> callbackData
     ]
 
+-- | Map proper Telegram method to an 'Update'.
 handleUpdate :: Update -> Bot ()
 handleUpdate up =
     case updateToAction up of
@@ -110,6 +157,7 @@ handleUpdate up =
             answerRepeatCallback cid mid cbid cbData
         Nothing                  -> return ()
 
+-- | Greeting message
 helpMessage :: Text
 helpMessage = Data.Text.unlines
     [ "Hi! I will simply repeat your messages!"

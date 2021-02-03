@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 28fed4e61585e159ecf7b1bb57cee19130def2e4dcfbf18d6550633a99547e84
+-- hash: 2aa7abf1bf7925342d884042c028051a8ae595e03a82697b5c4457d9ae8017cc
 
 name:           echobot
 version:        0.1.0.0
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      API.Derive
       API.Logging
+      API.TH
       API.Utils
       Telegram.Bot
       Telegram.Internal.Bot
@@ -56,7 +56,6 @@ library
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , random
     , servant
     , servant-client
     , template-haskell
@@ -89,7 +88,6 @@ executable echobot-exe
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , random
     , servant
     , servant-client
     , template-haskell
@@ -126,7 +124,6 @@ test-suite echobot-test
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , random
     , servant
     , servant-client
     , template-haskell
