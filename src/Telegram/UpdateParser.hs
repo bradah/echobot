@@ -1,19 +1,50 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Telegram.UpdateParser where
+
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module contains lens-like functions to extract fields from
+Telegram API ADTs such as 'Update' or 'Message'.
+-}
+
+module Telegram.UpdateParser
+    ( -- * Parsing updates
+      -- ** UpdateParser
+      UpdateParser(..)
+    , (<?>)
+      -- ** Parse updates
+    , updateChatId
+    , updateId
+      -- ** Parse callback queries
+    , callbackQuery
+    , callbackId
+    , callbackData
+    , callbackMessageId
+    , callbackChatId
+      -- ** Parse messages
+    , plainText
+    , command
+    , caption
+    , photo
+    , audio
+    , animation
+    , sticker
+    , document
+    , video
+    , videoNote
+    , voice
+    ) where
 
 import           Control.Applicative
 import           Control.Monad
 import qualified Data.Text               as T
+
 import           Telegram.Internal.Types
-
--- * Parse 'Update's
-
--- ** UpdateParser
 
 -- | Generalized type of record field selectors.
 newtype UpdateParser a = UpdateParser
   { runUpdateParser :: Update -> Maybe a }
-
 
 -- | Infix version of 'runUpdateParser'.
 infixl 4 <?>
@@ -38,8 +69,44 @@ instance Alternative UpdateParser where
   empty = UpdateParser (const Nothing)
   UpdateParser f <|> UpdateParser g = UpdateParser (\u -> f u <|> g u)
 
+-- | Get 'ChatId' of an 'Update'.
+updateChatId :: UpdateParser ChatId
+updateChatId = UpdateParser $
+  updateMessage >=> return . messageChat >=> return . chatId
 
--- ** Some useful parsers
+-- | Get 'UpdateId' of an 'Update'.
+updateId :: UpdateParser UpdateId
+updateId = UpdateParser (return . updateUpdateId)
+
+-- | Get 'CallbackQuery' of an 'Update'.
+callbackQuery :: UpdateParser CallbackQuery
+callbackQuery = UpdateParser updateCallbackQuery
+
+-- | Get 'CallbackId' of an 'Update'.
+callbackId :: UpdateParser CallbackId
+callbackId = UpdateParser $
+    updateCallbackQuery >=> pure . callbackQueryId
+
+-- | Get callback data of an 'Update'.
+callbackData :: UpdateParser T.Text
+callbackData = UpdateParser $
+    updateCallbackQuery >=> callbackQueryData
+
+-- | Get 'MessageId' from 'CallbackQuery' of an 'Update'.
+callbackMessageId :: UpdateParser MessageId
+callbackMessageId = UpdateParser $
+    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageMessageId
+
+-- | Get 'ChatId' of 'Chat' in which 'CallbackQuery' was issued.
+callbackChatId :: UpdateParser ChatId
+callbackChatId = UpdateParser $
+    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
+        >=> pure . chatId
+
+-- | Get 'Caption' of an 'Update'.
+caption :: UpdateParser Caption
+caption = UpdateParser $
+    updateMessage >=> pure . messageCaption
 
 -- | Extract text from 'Update'.
 text :: UpdateParser T.Text
@@ -63,86 +130,42 @@ command name = do
     (w:_) | w == "/" <> name -> pure ()
     _                        -> empty
 
+-- | Get 'Sticker' from an 'Update'.
 sticker :: UpdateParser FileId
 sticker = UpdateParser $
   updateMessage >=> messageSticker >=> return . stickerFileId
 
-updateChatId :: UpdateParser ChatId
-updateChatId = UpdateParser $
-  updateMessage >=> return . messageChat >=> return . chatId
-
-updateId :: UpdateParser UpdateId
-updateId = UpdateParser (return . updateUpdateId)
-
-callbackQuery :: UpdateParser CallbackQuery
-callbackQuery = UpdateParser updateCallbackQuery
-
-callbackId :: UpdateParser CallbackId
-callbackId = UpdateParser $
-    updateCallbackQuery >=> pure . callbackQueryId
-
-callbackData :: UpdateParser T.Text
-callbackData = UpdateParser $
-    updateCallbackQuery >=> callbackQueryData
-
-callbackMessageId :: UpdateParser MessageId
-callbackMessageId = UpdateParser $
-    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageMessageId
-
-callbackChatId :: UpdateParser ChatId
-callbackChatId = UpdateParser $
-    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
-        >=> pure . chatId
-
-caption :: UpdateParser Caption
-caption = UpdateParser $
-    updateMessage >=> pure . messageCaption
-
+-- | Get 'FileId' of a photo from an 'Update'.
 photo :: UpdateParser FileId
 photo = UpdateParser $
     updateMessage >=> messagePhoto >=> pure . photoFileId . head
 
+-- | Get 'FileId' of an animation from an 'Update'.
 animation :: UpdateParser FileId
 animation = UpdateParser $
     updateMessage >=> messageAnimation >=> pure . animationFileId
 
+-- | Get 'FileId' of an audio from an 'Update'.
 audio :: UpdateParser FileId
 audio = UpdateParser $
     updateMessage >=> messageAudio >=> pure . audioFileId
 
+-- | Get 'FileId' of a document from an 'Update'.
 document :: UpdateParser FileId
 document = UpdateParser $
     updateMessage >=> messageDocument >=> pure . documentFileId
 
+-- | Get 'FileId' of a video from an 'Update'.
 video :: UpdateParser FileId
 video = UpdateParser $
     updateMessage >=> messageVideo >=> pure . videoFileId
 
+-- | Get 'FileId' of a video note from an 'Update'.
 videoNote :: UpdateParser FileId
 videoNote = UpdateParser $
     updateMessage >=> messageVideoNote >=> pure . videoNoteFileId
 
+-- | Get 'FileId' of a voice message from an 'Update'.
 voice :: UpdateParser FileId
 voice = UpdateParser $
     updateMessage >=> messageVoice >=> pure . voiceFileId
-
-{- updateExample :: Update
-updateExample = Update
-    { updateUpdateId = 3
-    , updateMessage = Just Message
-        { messageMessageId = 3
-        , messageFrom = Nothing
-        , messageDate = 3
-        , messageChat = Chat
-            { chatId = 3
-            , chatUsername = Nothing
-            }
-        , messageText = Just "/repeat"
-        , messageEntities = Nothing
-        , messageSticker = Nothing
-        , messageReplyMarkup = Nothing
-        }
-    , updateEditedMessage = Nothing
-    , updateCallbackQuery = Nothing
-    }
- -}

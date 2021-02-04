@@ -2,7 +2,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Vk.Internal.Types where
 
-import           API.Derive
+import           API.TH
 import           Data.Int              (Int32)
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)

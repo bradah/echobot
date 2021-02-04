@@ -1,14 +1,13 @@
 module Main where
 
 import           API.Logging
-import           Colog
 import           System.IO
 import qualified Telegram.Bot as Tg
 import qualified Vk.Bot       as Vk
 
 main :: IO ()
 main = do
-    handle <- openFile "echobot.log" AppendMode
+    handle <- openFile "echobot.log" WriteMode
     hSetBuffering handle NoBuffering
     putStr $ unlines
         [ "To start, specify a number of bot you want to run"
@@ -18,8 +17,8 @@ main = do
         ]
     arg <- getLine
     case arg of
-        "1" -> Tg.run mempty
-        "2" -> Vk.run richMessageAction
+        "1" -> Tg.run $ logStdOutAndFile Debug handle
+        "2" -> Vk.run $ logStdOutAndFile Debug handle
         "q" -> pure ()
         _   -> main
     hClose handle

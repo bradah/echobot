@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d4a50914e072447a38f82c4c6953fbba6cd79a3635055c9a22db7196ce1b7f42
+-- hash: 559d34cb74e72238e7d1a6a2c918294cf5287ba9abac9087ae7d23d97d25ccda
 
 name:           echobot
 version:        0.1.0.0
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      API.Derive
       API.Logging
+      API.TH
       API.Utils
       Telegram.Bot
       Telegram.Internal.Bot
@@ -52,6 +52,7 @@ library
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , chronos
     , co-log
     , configurator
     , directory
@@ -69,6 +70,7 @@ library
     , text
     , time
     , unordered-containers
+    , vector
   default-language: Haskell2010
 
 executable echobot-exe
@@ -82,6 +84,7 @@ executable echobot-exe
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , chronos
     , co-log
     , configurator
     , directory
@@ -100,6 +103,7 @@ executable echobot-exe
     , text
     , time
     , unordered-containers
+    , vector
   default-language: Haskell2010
 
 test-suite echobot-test
@@ -117,6 +121,7 @@ test-suite echobot-test
       QuickCheck
     , aeson
     , base >=4.7 && <5
+    , chronos
     , co-log
     , configurator
     , directory
@@ -135,4 +140,5 @@ test-suite echobot-test
     , text
     , time
     , unordered-containers
+    , vector
   default-language: Haskell2010

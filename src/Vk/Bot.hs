@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Vk.Bot where
 
-import           Colog
 import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.Configurator
@@ -12,6 +11,8 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client
 import           System.Directory        (doesFileExist)
 
+import           API.Logging
+import qualified API.Logging             as Log (Message)
 import           API.Utils
 import           Vk.Internal.Bot
 import qualified Vk.Internal.Methods     as Int
@@ -20,7 +21,7 @@ import           Vk.Internal.Types
 import           Vk.Methods
 import           Vk.UpdateParser
 
-mkEnv :: LogAction Bot Colog.Message -> IO Env
+mkEnv :: LogAction Bot Log.Message -> IO Env
 mkEnv act = do
     localExists <- doesFileExist "echobot.conf.local"
     let path = if localExists
@@ -59,7 +60,7 @@ mkEnv act = do
         <$> newManager tlsManagerSettings
         <*> pure (BaseUrl Https "api.vk.com" 443 "/method")
 
-run :: LogAction Bot Colog.Message -> IO ()
+run :: LogAction Bot Log.Message -> IO ()
 run act = do
     env <- mkEnv act
     let botState = initState env

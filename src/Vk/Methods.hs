@@ -2,12 +2,12 @@
 {-# LANGUAGE RecordWildCards   #-}
 module Vk.Methods where
 
-import           Colog
 import           Control.Monad.Reader
 import           Control.Monad.State
 import qualified Data.HashMap.Lazy    as Map
 import           Data.Text            (Text)
 
+import           API.Logging
 import           API.Utils
 import           Vk.Internal.Bot
 import qualified Vk.Internal.Methods  as Int

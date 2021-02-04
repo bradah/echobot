@@ -1,13 +1,41 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Telegram.Internal.Request where
 
-import           API.Derive
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines basic Telegram API types for request bodies
+and responses.
+-}
+
+module Telegram.Internal.Request
+    ( -- * Requests and responses
+      -- ** Response
+      Response(..)
+      -- ** Request bodies
+    , GetUpdatesBody(..)
+    , UpdateType(..)
+    , AnswerCallbackBody(..)
+    , EditMessageTextBody(..)
+    , SendMessageBody(..)
+    , SendStickerBody(..)
+    , SendPhotoBody(..)
+    , SendAnimationBody(..)
+    , SendAudioBody(..)
+    , SendDocumentBody(..)
+    , SendVideoBody(..)
+    , SendVideoNoteBody(..)
+    , SendVoiceBody(..)
+    ) where
+
+
 import           Data.Text               (Text)
 import           GHC.Generics
+
+import           API.TH
 import           Telegram.Internal.Types
 
--- * Request bodies
 
 -- | Telegram response.
 data Response a = Response
@@ -17,19 +45,7 @@ data Response a = Response
   , responseErrorCode   :: Maybe Int
   } deriving (Show, Generic)
 
--- | Request body for 'sendMessage'.
-data SendMessageBody = SendMessageBody
-  { sendMessageChatId      :: ChatId
-  , sendMessageText        :: Text
-  , sendMessageReplyMarkup :: Maybe InlineKeyboardMarkup
-  } deriving (Generic)
-
--- | Request body for 'sendSticker'.
-data SendStickerBody = SendStickerBody
-  { sendStickerChatId  :: ChatId
-  , sendStickerSticker :: FileId
-  } deriving (Generic)
-
+-- | Request body for 'Telegram.Internal.Methods.getUpdates'.
 data GetUpdatesBody = GetUpdatesBody
     { getUpdatesOffset     :: Maybe UpdateId
     , getUpdatesUpdateType :: [UpdateType]
@@ -41,12 +57,14 @@ data UpdateType =
   UpdateMessage
   deriving (Generic)
 
+-- | Request body for 'Telegram.Internal.Methods.answerCallbackQuery'.
 data AnswerCallbackBody = AnswerCallbackBody
     { answerCallbackCallbackQueryId :: CallbackId
     , answerCallbackText            :: Maybe Text
     , answerCallbackShowAlert       :: Maybe Bool
     } deriving (Generic)
 
+-- | Request body for 'Telegram.Internal.Methods.editMessageText'.
 data EditMessageTextBody = EditMessageTextBody
     { editMessageTextChatId      :: ChatId
     , editMessageTextMessageId   :: MessageId
@@ -54,6 +72,21 @@ data EditMessageTextBody = EditMessageTextBody
     , editMessageTextReplyMarkup :: Maybe InlineKeyboardMarkup
     } deriving (Generic)
 
+-- | Request body for 'Telegram.Internal.Methods.sendMessage'.
+data SendMessageBody = SendMessageBody
+  { sendMessageChatId      :: ChatId
+  , sendMessageText        :: Text
+  , sendMessageReplyMarkup :: Maybe InlineKeyboardMarkup
+  } deriving (Generic)
+
+-- | Request body for 'Telegram.Internal.Methods.sendSticker'.
+data SendStickerBody = SendStickerBody
+  { sendStickerChatId  :: ChatId
+  , sendStickerSticker :: FileId
+  } deriving (Generic)
+
+
+-- | Request body for 'Telegram.Internal.Methods.sendPhoto'.
 data SendPhotoBody = SendPhotoBody
     { sendPhotoChatId  :: ChatId
     , sendPhotoPhoto   :: FileId
@@ -61,6 +94,7 @@ data SendPhotoBody = SendPhotoBody
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendAnimation'.
 data SendAnimationBody = SendAnimationBody
     { sendAnimationChatId    :: ChatId
     , sendAnimationAnimation :: FileId
@@ -68,6 +102,7 @@ data SendAnimationBody = SendAnimationBody
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendAudio'.
 data SendAudioBody = SendAudioBody
     { sendAudioChatId  :: ChatId
     , sendAudioAudio   :: FileId
@@ -75,6 +110,7 @@ data SendAudioBody = SendAudioBody
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendDocument'.
 data SendDocumentBody = SendDocumentBody
     { sendDocumentChatId   :: ChatId
     , sendDocumentDocument :: FileId
@@ -82,6 +118,7 @@ data SendDocumentBody = SendDocumentBody
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendVideo'.
 data SendVideoBody = SendVideoBody
     { sendVideoChatId  :: ChatId
     , sendVideoVideo   :: FileId
@@ -89,12 +126,14 @@ data SendVideoBody = SendVideoBody
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendVideoNote'.
 data SendVideoNoteBody = SendVideoNoteBody
     { sendVideoNoteChatId    :: ChatId
     , sendVideoNoteVideoNote :: FileId
     } deriving (Generic)
 
 
+-- | Request body for 'Telegram.Internal.Methods.sendVoice'.
 data SendVoiceBody = SendVoiceBody
     { sendVoiceChatId  :: ChatId
     , sendVoiceVoice   :: FileId

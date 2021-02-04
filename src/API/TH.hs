@@ -1,4 +1,15 @@
-module API.Derive where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module contains useful functions providing simple derivation of
+ToJSON and FromJSON typeclasses for ADTs via Template Haskell.
+-}
+
+module API.TH
+    ( -- * Derivation
+      deriveJSON'
+    ) where
 
 import           Data.Aeson.TH       (deriveJSON)
 import           Data.Aeson.Types    (Options (..), defaultOptions)
@@ -6,9 +17,9 @@ import           Data.Char           (isUpper, toLower, toUpper)
 import           Data.List           (intercalate)
 import           Language.Haskell.TH
 
--- * Derive ToJSON and FromJSON
-
--- | Convinient version of deriveJSON.
+-- | Convinient version of deriveJSON. This function ignores
+-- common prefixes in record field names and converts camelType
+-- to snake_style.
 deriveJSON' :: Name -> Q [Dec]
 deriveJSON' name = deriveJSON (jsonOptions (nameBase name)) name
 
@@ -29,8 +40,6 @@ snakeFieldModifier
   -> String
 snakeFieldModifier prefix xs =
   wordsToSnake (deleteCommonPrefixWords prefix xs)
-
--- ** Some utility functions
 
 camelWords :: String -> [String]
 camelWords "" = []

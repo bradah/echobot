@@ -1,18 +1,61 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Telegram.Internal.Types where
 
-import           API.Derive
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines basic Telegram API types.
+-}
+
+module Telegram.Internal.Types
+    ( -- * Available types
+      -- ** Token
+      Token
+      -- ** Update
+    , Update(..)
+    , UpdateId
+      -- ** Message
+    , Message(..)
+    , MessageId
+    , Caption
+      -- ** User
+    , User(..)
+    , UserId
+      -- ** Chat
+    , Chat(..)
+    , ChatId
+      -- ** Message entities
+    , MessageEntity(..)
+    , MessageEntityType(..)
+      -- ** Inline keyboards
+    , InlineKeyboardMarkup(..)
+    , InlineKeyboardButton(..)
+      -- ** Callbacks
+    , CallbackQuery(..)
+    , CallbackId
+      -- ** Media
+    , FileId
+    , Sticker(..)
+    , PhotoSize(..)
+    , Animation(..)
+    , Audio(..)
+    , Document(..)
+    , Video(..)
+    , VideoNote(..)
+    , Voice(..)
+    ) where
+
+
+import           API.TH
 import           Data.Int
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
 
--- * Available types
 
+-- | Bot token.
 type Token = Text
-
--- ** Update
 
 -- | This object represents an incoming update.
 --   At most one of the optional parameters can be
@@ -27,14 +70,11 @@ data Update = Update
   -- ^ New version of a message that is known to the bot
   -- and was edited.
   , updateCallbackQuery :: Maybe CallbackQuery
+  -- ^ New incoming callback query.
   } deriving (Show, Generic)
 
--- | The update's unique identifier.
-
+-- | Unique identifier for 'Update'.
 type UpdateId = Int32
-
-
--- ** Message
 
 -- | This object represents a message.
 data Message = Message
@@ -57,22 +97,34 @@ data Message = Message
     , messageReplyMarkup :: Maybe InlineKeyboardMarkup
     -- ^ Inline keyboard attached to the message.
     , messageCaption     :: Caption
+    -- ^ Caption for the animation, audio, document,
+    -- photo, video or voice, 0-1024 characters.
     , messagePhoto       :: Maybe [PhotoSize]
+    -- ^ Message is a photo, available sizes of the photo.
     , messageAnimation   :: Maybe Animation
+    -- ^ Message is an animation, information about the animation.
+    -- For backward compatibility, when this field is set,
+    -- the document field will also be set.
     , messageAudio       :: Maybe Audio
+    -- ^ Message is an audio file, information about the file.
     , messageDocument    :: Maybe Document
+    -- ^ Message is a general file, information about the file.
     , messageVideo       :: Maybe Video
+    -- ^ Message is a video, information about the video.
     , messageVideoNote   :: Maybe VideoNote
+    -- ^ Message is a video note, information about the video message.
     , messageVoice       :: Maybe Voice
+    -- ^ Message is a voice message, information about the file.
     } deriving (Show, Generic)
 
--- | Unique message identifier.
+-- | Unique identifier for 'Message'.
 type MessageId = Int32
 
+-- | Caption for media messages.
 type Caption = Maybe Text
 -- ** User
 
--- | This object represents a Telegram user or bot.
+-- | This object represents a Telegram 'User' or bot.
 data User = User
   { userId        :: UserId
   -- ^ Unique identifier for this user or bot.
@@ -86,11 +138,8 @@ data User = User
   -- ^ User's or bot's username.
   } deriving (Show, Generic)
 
--- | Unique identifier for this user or bot.
+-- | Unique identifier for this 'User' or bot.
 type UserId = Int32
-
-
--- ** Chat
 
 -- | This object represents a chat.
 data Chat = Chat
@@ -103,9 +152,6 @@ data Chat = Chat
 
 -- | Unique identifier for this chat.
 type ChatId = Integer
-
-
--- ** MessageEntity
 
 -- | This object represents one special entity in a text message.
 --   For example, hashtags, usernames, URLs, etc.
@@ -129,8 +175,6 @@ data MessageEntity = MessageEntity
   , messageEntityUser   :: Maybe User
   -- ^ For “text_mention” only, the mentioned user.
   } deriving (Show, Generic)
-
--- ** MessageEntityType
 
 -- | Type of the entity. Can be mention (@username),
 --   hashtag, bot_command, url, email, bold (bold text),
@@ -156,7 +200,9 @@ data MessageEntityType
   | MessageEntityPhoneNumber
   deriving (Show, Generic)
 
--- ** Sticker
+-- | Identifier for this file, which can
+-- be used to download or reuse the file.
+type FileId = Text
 
 -- | This object represents a sticker.
 data Sticker = Sticker
@@ -164,10 +210,6 @@ data Sticker = Sticker
   -- ^ Identifier for this file, which can
   -- be used to download or reuse the file.
   } deriving (Show, Generic)
-
--- | Identifier for this file, which can
--- be used to download or reuse the file.
-type FileId = Text
 
 -- | This object represents an inline keyboard
 -- that appears right next to the message it belongs to.
@@ -198,44 +240,61 @@ data InlineKeyboardButton = InlineKeyboardButton
 -- fields data or game_short_name will be present.
 data CallbackQuery = CallbackQuery
     { callbackQueryId              :: CallbackId
+    -- ^ Unique identifier for this query.
     , callbackQueryFrom            :: User
+    -- ^ Sender.
     , callbackQueryMessage         :: Maybe Message
+    -- ^ Message with the callback button that originated the query.
+    -- Note that message content and message date will not
+    -- be available if the message is too old.
     , callbackQueryInlineMessageId :: Maybe MessageId
+    -- ^ Identifier of the message sent via
+    -- the bot in inline mode, that originated the query.
     , callbackQueryData            :: Maybe Text
+    -- ^ Data associated with the callback button.
+    -- Be aware that a bad client can send arbitrary data in this field.
     } deriving (Show, Generic)
 
+-- | Unique identifier for 'CallbackQuery'.
 type CallbackId = Text
 
+-- | This object represents one size of a photo
+-- or a file\/sticker thumbnail.
 data PhotoSize = PhotoSize
     { photoFileId :: FileId
     } deriving (Show, Generic)
 
-
+-- | This object represents an animation
+-- file (GIF or H.264\/MPEG-4 AVC video without sound).
 data Animation = Animation
     { animationFileId :: FileId
     } deriving (Show, Generic)
 
-
+-- | This object represents an audio file to be treated as
+-- music by the Telegram clients.
 data Audio = Audio
     { audioFileId :: FileId
     } deriving (Show, Generic)
 
-
+-- | This object represents a general file
+-- (as opposed to photos, voice messages and audio files).
 data Document = Document
     { documentFileId :: FileId
     } deriving (Show, Generic)
 
 
+-- | This object represents a video file.
 data Video = Video
     { videoFileId :: FileId
     } deriving (Show, Generic)
 
-
+-- | This object represents a video message
+-- (available in Telegram apps as of v.4.0).
 data VideoNote = VideoNote
     { videoNoteFileId :: FileId
     } deriving (Show, Generic)
 
-
+-- | This object represents a voice note.
 data Voice = Voice
     { voiceFileId :: FileId
     } deriving (Show, Generic)
