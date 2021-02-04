@@ -43,7 +43,7 @@ import           System.IO
 -- | Log 'Message' to stdout and file.
 logStdOutAndFile
     :: MonadIO m
-    => Severity -- ^ Minimal severity of logging messages.
+    => Severity -- ^ Minimal 'Severity' of logging 'Message's.
     -> Handle -- ^ Handle for the log file.
     -> LogAction m Message
 logStdOutAndFile sev handle = cfilter
@@ -53,9 +53,18 @@ logStdOutAndFile sev handle = cfilter
 -- | Log 'Message' to stdout.
 logStdOut
     :: MonadIO m
-    => Severity -- ^ Minimal severity of logging messages.
+    => Severity -- ^ Minimal 'Severity' of logging 'Message's.
     -> LogAction m Message
 logStdOut sev = cfilter ((>= sev) . msgSeverity) richMessageAction
+
+-- | Log 'Message' to 'Handle'
+logFile
+    :: MonadIO m
+    => Severity -- ^ Minimal 'Severity' of logging 'Message's.
+    -> Handle
+    -> LogAction m Message
+logFile sev handle =
+    cfilter ((>= sev) . msgSeverity) $ richMessageHandleNoColor handle
 
 -- | Log 'Message' with some additional information
 -- e.g. ThreadId, Time.
