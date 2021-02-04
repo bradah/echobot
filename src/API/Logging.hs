@@ -17,6 +17,7 @@ module API.Logging
     , logWarning
     , logError
     , logStdOut
+    , logFile
     , logStdOutAndFile
     -- ** Severity
     , Severity(..)
@@ -46,9 +47,7 @@ logStdOutAndFile
     => Severity -- ^ Minimal 'Severity' of logging 'Message's.
     -> Handle -- ^ Handle for the log file.
     -> LogAction m Message
-logStdOutAndFile sev handle = cfilter
-    ((>= sev) . msgSeverity)
-    (richMessageAction <> richMessageHandleNoColor handle)
+logStdOutAndFile sev handle = logStdOut sev <> logFile sev handle
 
 -- | Log 'Message' to stdout.
 logStdOut
