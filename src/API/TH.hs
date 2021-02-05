@@ -9,19 +9,33 @@ ToJSON and FromJSON typeclasses for ADTs via Template Haskell.
 module API.TH
     ( -- * Derivation
       deriveJSON'
+    , deriveToJSON'
+    , deriveFromJSON
     ) where
 
-import           Data.Aeson.TH       (deriveJSON)
+import           Data.Aeson.TH       (deriveFromJSON, deriveJSON, deriveToJSON)
 import           Data.Aeson.Types    (Options (..), defaultOptions)
 import           Data.Char           (isUpper, toLower, toUpper)
 import           Data.List           (intercalate)
 import           Language.Haskell.TH
 
--- | Convinient version of deriveJSON. This function ignores
+-- | Convinient version of 'deriveJSON'. This function ignores
 -- common prefixes in record field names and converts camelType
 -- to snake_style.
 deriveJSON' :: Name -> Q [Dec]
 deriveJSON' name = deriveJSON (jsonOptions (nameBase name)) name
+
+-- | Convinient version of 'deriveToJSON'. This function ignores
+-- common prefixes in record field names and converts camelType
+-- to snake_style.
+deriveToJSON' :: Name -> Q [Dec]
+deriveToJSON' name = deriveToJSON (jsonOptions (nameBase name)) name
+
+-- | Convinient version of 'deriveFromJSON'. This function ignores
+-- common prefixes in record field names and converts camelType
+-- to snake_style.
+deriveFromJSON' :: Name -> Q [Dec]
+deriveFromJSON' name = deriveFromJSON (jsonOptions (nameBase name)) name
 
 -- | Set of options, used in this project for toJSON and fromJSON derivation.
 jsonOptions :: String -> Options
