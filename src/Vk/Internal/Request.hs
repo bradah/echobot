@@ -60,17 +60,19 @@ instance ToHttpApiData CheckLpsAction where
 
 data SendMessageParams = SendMessageParams
     { sendMessageUserId      :: UserId
-    , sendMessageMessage     :: Text
+    , sendMessageMessage     :: Maybe Text
+    , sendMessageStickerId   :: Maybe StickerId
+    , sendMessageAttachments :: [Attachment]
     , sendMessageAccessToken :: Token
     , sendMessageApiVersion  :: Double
-    }
+    } deriving (Show)
 
 data SendMessageResponse = SendMessageResponse
     { sendMessageResponseMessageId :: Maybe Int
     } deriving (Show, Generic)
 
-deriveJSON' ''CheckLpsResponse
-deriveJSON' ''GetLpsResponse
-deriveJSON' ''GetLpsError
-deriveJSON' ''GetLpsResult
-deriveJSON' ''SendMessageResponse
+deriveFromJSON' ''CheckLpsResponse
+deriveFromJSON' ''GetLpsResponse
+deriveFromJSON' ''GetLpsError
+deriveFromJSON' ''GetLpsResult
+deriveFromJSON' ''SendMessageResponse

@@ -66,17 +66,11 @@ getUpdates = do
             Nothing  -> extractUserId us
 
 
-sendText :: UserId -> Text -> Bot ()
-sendText userId t = do
-    repeatNum <- convRepeatNum . (Map.! userId) <$> gets bStateConversations
-    logInfo $ "Sending text "
-        <> showP t
-        <> " to user "
-        <> showP userId
-        <> " (repeat number: "
-        <> showP repeatNum
-        <> ")"
+sendMessage :: UserId -> Text -> [Attachment] -> Bot ()
+sendMessage userId t atts = do
     botEnv <- ask
+    repeatNum <- gets ((convRepeatNum . (Map.! userId)) . bStateConversations)
+    logInfo $ "Sending message: " <!> showP (params botEnv)
     resp <- head <$> replicateM repeatNum
         (liftClient $ Int.sendMessage $ params botEnv)
     logDebug $ "Response: " <> showT resp
@@ -84,6 +78,26 @@ sendText userId t = do
     params :: Env -> SendMessageParams
     params Env{..} = SendMessageParams
         userId
-        t
+        (Just t)
+        Nothing
+        atts
+        envToken
+        envApiVersion
+
+sendSticker :: UserId -> StickerId -> Bot ()
+sendSticker userId s = do
+    botEnv <- ask
+    repeatNum <- gets ((convRepeatNum . (Map.! userId)) . bStateConversations)
+    logInfo $ "Sending sticker: " <!> showP (params botEnv)
+    resp <- head <$> replicateM repeatNum
+        (liftClient $ Int.sendMessage $ params botEnv)
+    logDebug $ "Response: " <> showT resp
+  where
+    params :: Env -> SendMessageParams
+    params Env{..} = SendMessageParams
+        userId
+        Nothing
+        (Just s)
+        []
         envToken
         envApiVersion

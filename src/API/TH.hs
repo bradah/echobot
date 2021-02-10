@@ -7,10 +7,13 @@ ToJSON and FromJSON typeclasses for ADTs via Template Haskell.
 -}
 
 module API.TH
-    ( -- * Derivation
+    ( -- * Derivation tools
+      -- ** Derivation with TH
       deriveJSON'
     , deriveToJSON'
-    , deriveFromJSON
+    , deriveFromJSON'
+      -- ** Utils
+    , snakeFieldModifier
     ) where
 
 import           Data.Aeson.TH       (deriveFromJSON, deriveJSON, deriveToJSON)
@@ -49,7 +52,7 @@ jsonOptions tname = defaultOptions
 --   It essentially removes label prefix and converts it's name
 --   from camelType to snake_type.
 snakeFieldModifier
-  :: String -- ^ Prefix, i.e. is name of datatype.
+  :: String -- ^ Prefix, i.e. name of datatype.
   -> String -- ^ Label name.
   -> String
 snakeFieldModifier prefix xs =

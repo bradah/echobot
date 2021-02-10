@@ -1,8 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+
+
 module Vk.UpdateParser where
 
 import           Control.Applicative
 import           Control.Monad
+import           Data.Foldable       (asum)
+import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
 import           Vk.Internal.Types
 
@@ -21,8 +26,7 @@ infixl 4 <?>
 (<?>) = runUpdateParser
 
 instance Functor UpdateParser where
-  fmap f (UpdateParser p) =
-    UpdateParser $ \upd -> f <$> p upd
+  fmap f (UpdateParser p) = UpdateParser $ fmap f . p
 
 instance Applicative UpdateParser where
   pure = UpdateParser . pure . pure
@@ -43,7 +47,8 @@ instance Alternative UpdateParser where
 
 -- | Extract text from 'Update'.
 text :: UpdateParser T.Text
-text = UpdateParser $ return . updateObject >=> objectMessage >=> return . messageText
+text = UpdateParser $
+    pure . updateObject >=> objectMessage >=> pure . messageText
 
 -- | Same as 'text' but fails if there wasn't
 -- plain text (e.g. command).
@@ -62,15 +67,34 @@ command name = do
     (w:ws) | w == "/" <> name -> return (T.unwords ws)
     _                         -> empty
 
-
 updateUserId :: UpdateParser UserId
 updateUserId = UpdateParser $
-  return . updateObject >=> objectMessage >=> return . messageFromId
+    pure . updateObject >=> objectMessage >=> messageFromId
 
-{- sticker :: UpdateParser FileId
-sticker = UpdateParser $
-  updateMessage >=> messageSticker >=> return . stickerFileId
+attachments :: UpdateParser [Attachment]
+attachments = UpdateParser $
+    pure . updateObject >=> objectMessage >=> pure . messageAttachments
 
+sticker :: UpdateParser StickerId
+sticker = do
+    atts <- attachments
+    case atts of
+        [Attachment Sticker Media{..}] -> pure $ fromMaybe 0 mediaStickerId
+        _                              -> empty
+
+isAudioMessage :: UpdateParser ()
+isAudioMessage = do
+    atts <- attachments
+    case atts of
+        [Attachment AudioMessage _] -> pure ()
+        _                           -> empty
+
+unsupported :: UpdateParser ()
+unsupported = asum
+    [ isAudioMessage
+    ]
+
+{-
 updateChatId :: UpdateParser ChatId
 updateChatId = UpdateParser $
   updateMessage >=> return . messageChat >=> return . chatId

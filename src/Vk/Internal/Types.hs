@@ -1,12 +1,24 @@
-{-# LANGUAGE DeriveGeneric   #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
+
 module Vk.Internal.Types where
 
 import           API.TH
+import           API.Utils
+import           Control.Applicative   ((<|>))
+import           Data.Aeson            hiding (Object)
+import           Data.Aeson.Text
+import           Data.Char             (toLower)
 import           Data.Int              (Int32)
-import           Data.Text             (Text)
+import           Data.Maybe            (fromMaybe)
+import           Data.Text             (Text, intercalate, pack)
+import qualified Data.Text             as T (head, tail)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
+import           Servant.API           (ToHttpApiData (..))
 
 type Token = Text
 
@@ -30,14 +42,12 @@ data Object = Object
   } deriving (Show, Generic)
 
 data Message = Message
-  { messageId           :: MessageId
+  { messageId           :: Maybe MessageId
   , messageDate         :: POSIXTime
-  , messagePeerId       :: UserId
-  , messageFromId       :: UserId
+  , messagePeerId       :: Maybe UserId
+  , messageFromId       :: Maybe UserId
   , messageText         :: Text
-  , messageRandomId     :: RandomId
   , messageAttachments  :: [Attachment]
-  , messageImportant    :: Bool
   , messagePayload      :: Maybe Text
   , messageKeyboard     :: Maybe Keyboard
   , messageFwdMessages  :: Maybe [Message]
@@ -48,101 +58,72 @@ type RandomId = Int32
 type MessageId = Int32
 
 data Attachment = Attachment
-  { attachmentType         :: AttachmentType
-  , attachmentPhoto        :: Maybe Photo
-  , attachmentVideo        :: Maybe Video
-  , attachmentAudio        :: Maybe Audio
-  , attachmentAudioMessage :: Maybe AudioMessage
-  , attachmentDoc          :: Maybe Doc
-  , attachmentLink         :: Maybe Link
-  , attachmentMarket       :: Maybe Market
-  , attachmentMarketAlbum  :: Maybe MarketAlbum
-  , attachmentWall         :: Maybe Wall
-  , attachmentWallReply    :: Maybe WallReply
-  , attachmentSticker      :: Maybe Sticker
+  { attachmentType  :: AttachmentType
+  , attachmentMedia :: Media
   } deriving (Show, Generic)
+
+instance FromJSON Attachment where
+    parseJSON = withObject "attachment" $ \o -> do
+        attachmentType <- o .: "type"
+        attachmentMedia <- o .: "photo"
+            <|> o .: "video"
+            <|> o .: "audio"
+            <|> o .: "audio_message"
+            <|> o .: "sticker"
+            <|> o .: "doc"
+            <|> o .: "link"
+            <|> o .: "market"
+            <|> o .: "wall"
+        pure Attachment{..}
+
+instance ToHttpApiData Attachment where
+    toUrlPiece (Attachment atType Media{..}) =
+        toUrlPiece atType <> case atType of
+            Link    -> mempty
+            Sticker -> mempty
+            Wall    -> maybe "" showT mediaFromId
+                <> "_"
+                <> maybe "" showT mediaId
+                <> "_"
+                <> fromMaybe "" mediaAccessKey
+            _       -> maybe "" showT mediaOwnerId
+                <> "_"
+                <> maybe "" showT mediaId
+                <> "_"
+                <> fromMaybe "" mediaAccessKey
+
+instance ToHttpApiData [Attachment] where
+    toUrlPiece xs = intercalate "," $ toUrlPiece <$> xs
 
 data AttachmentType
-  = AttachmentPhoto
-  | AttachmentVideo
-  | AttachmentAudio
-  | AttachmentAudioMessage
-  | AttachmentDoc
-  | AttachmentLink
-  | AttachmentMarket
-  | AttachmentMarketAlbum
-  | AttachmentWall
-  | AttachmentWallReply
-  | AttachmentSticker
-  | AttachmentGift
-  deriving (Show, Generic)
+    = Photo
+    | Video
+    | Audio
+    | AudioMessage
+    | Doc
+    | Link
+    | Market
+    | Wall
+    | Sticker
+    deriving (Show, Generic)
 
-data Photo = Photo
-  { photoId      :: PhotoId
-  } deriving (Show, Generic)
+instance ToHttpApiData AttachmentType where
+    toUrlPiece = pack . snakeFieldModifier "" . show
 
-type PhotoId = Int32
+data Media = Media
+    { mediaId          :: Maybe MediaId
+    , mediaFromId      :: Maybe UserId
+    , mediaOwnerId     :: Maybe UserId
+    , mediaAccessKey   :: Maybe Text
+    , mediaAttachments :: Maybe [Attachment]
+    , mediaStickerId   :: Maybe StickerId
+    , mediaUrl         :: Maybe Text
+    , mediaTitle       :: Maybe Text
+    , mediaCaption     :: Maybe Text
+    , mediaDescription :: Maybe Text
+    } deriving (Show, Generic)
 
-data Video = Video
-  { videoId :: VideoId
-  } deriving (Show, Generic)
-
-type VideoId = Int32
-
-data Audio = Audio
-  { audioId :: AudioId
-  } deriving (Show, Generic)
-
-type AudioId = Int32
-
-data AudioMessage = AudioMessage
-  { audioMessageId :: AudioMessageId
-  } deriving (Show, Generic)
-
-type AudioMessageId = Int32
-
-data Doc = Doc
-  { docId :: DocId
-  } deriving (Show, Generic)
-
-type DocId = Int32
-
-data Link = Link
-  { linkUrl         :: Text
-  , linkTitle       :: Text
-  , linkCaption     :: Maybe Text
-  , linkDescription :: Text
-  , linkPhoto       :: Maybe Photo
-  } deriving (Show, Generic)
-
-data Market = Market
-  { marketId :: MarketId
-  } deriving (Show, Generic)
-
-type MarketId = Int32
-
-data MarketAlbum = MarketAlbum
-  { marketAlbumId :: MarketAlbumId
-  } deriving (Show, Generic)
-
-type MarketAlbumId = Int32
-
-data Wall = Wall
-  { wallId :: WallId
-  } deriving (Show, Generic)
-
-type WallId = Int32
-
-data WallReply = WallReply
-  { wallReplyId :: WallReplyId
-  } deriving (Show, Generic)
-
-type WallReplyId = Int32
-
-data Sticker = Sticker
-  { stickerStickerId :: StickerId
-  } deriving (Show, Generic)
-
+type MediaId = Int32
 type StickerId = Int32
 
 data Keyboard = Keyboard
@@ -178,25 +159,14 @@ type Payload = Text
 type UserId = Int32
 
 
-deriveJSON' ''ButtonActionType
-deriveJSON' ''ButtonAction
-deriveJSON' ''ButtonColor
-deriveJSON' ''Button
-deriveJSON' ''Keyboard
-deriveJSON' ''Sticker
-deriveJSON' ''WallReply
-deriveJSON' ''Wall
-deriveJSON' ''MarketAlbum
-deriveJSON' ''Market
-deriveJSON' ''Photo
-deriveJSON' ''Link
-deriveJSON' ''Doc
-deriveJSON' ''Audio
-deriveJSON' ''AudioMessage
-deriveJSON' ''Video
-deriveJSON' ''AttachmentType
-deriveJSON' ''Attachment
-deriveJSON' ''Message
-deriveJSON' ''Object
-deriveJSON' ''UpdateType
-deriveJSON' ''Update
+deriveFromJSON' ''ButtonActionType
+deriveFromJSON' ''ButtonAction
+deriveFromJSON' ''ButtonColor
+deriveFromJSON' ''Button
+deriveFromJSON' ''Keyboard
+deriveFromJSON' ''Media
+deriveFromJSON' ''AttachmentType
+deriveFromJSON' ''Message
+deriveFromJSON' ''Object
+deriveFromJSON' ''UpdateType
+deriveFromJSON' ''Update

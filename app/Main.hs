@@ -2,12 +2,14 @@ module Main where
 
 import           API.Logging
 import           Control.Exception (bracket)
+import           Control.Monad     (forever)
+import           System.Exit       (exitSuccess)
 import           System.IO
 import qualified Telegram.Bot      as Tg
 import qualified Vk.Bot            as Vk
 
 main :: IO ()
-main = bracket acquire release loop
+main = forever $ bracket acquire release loop
   where
     acquire :: IO Handle
     acquire = do
@@ -28,20 +30,7 @@ main = bracket acquire release loop
             ]
         arg <- getLine
         case arg of
-            "1" -> Tg.run $ logStdOutAndFile Debug handle
-            "2" -> Vk.run $ logFile Debug handle
-            "q" -> pure ()
-            _   -> main
-
-
--- | Release version
-
-{- main :: IO ()
-main = do
-    args <- getArgs
-    case head args of
-        "tg" -> Tg.run richMessageAction
-        "vk" -> Vk.run richMessageAction
-        "q"  -> pure ()
-        _    -> main
- -}
+            "1" -> Tg.run $ logStdOut Debug
+            "2" -> Vk.run $ logStdOut Debug
+            "q" -> exitSuccess
+            _   -> pure ()

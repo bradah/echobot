@@ -1,10 +1,10 @@
 {-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE KindSignatures    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds         #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeOperators     #-}
+
 module Vk.Internal.Methods where
 
 import           Control.Monad.IO.Class
@@ -52,7 +52,9 @@ type SendMessage
     =  "messages.send"
     :> RequiredParam "user_id" UserId
     :> RequiredParam "random_id" Int
-    :> RequiredParam "message" Text
+    :> OptionalParam "message" Text
+    :> OptionalParam "sticker_id" StickerId
+    :> RequiredParam "attachment" [Attachment]
     :> VkMethod Post SendMessageResponse
 
 sendMessage :: SendMessageParams -> ClientM SendMessageResponse
@@ -63,6 +65,8 @@ sendMessage SendMessageParams{..} = do
         sendMessageUserId
         (randId :: Int)
         sendMessageMessage
+        sendMessageStickerId
+        sendMessageAttachments
         sendMessageAccessToken
         sendMessageApiVersion
 

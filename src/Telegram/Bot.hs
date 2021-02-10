@@ -86,7 +86,7 @@ run act = do
     initBot = do
         env <- ask
         bot <- liftClient getMe
-        logInfo $ "Starting bot:"
+        logInfo $ "Starting Telegram bot:"
             <!> showP bot
         logDebug $ "Created environment:\n" <> showP env
         loop

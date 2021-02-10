@@ -61,12 +61,12 @@ getUpdates = do
     body <- mkBody
     resp <- liftClient $ Int.getUpdates body
     let ups = responseResult resp
-    logInfo $ "Updates received: " <> showP (length ups)
-    logDebug $ "Response: " <> showP resp
+    logInfo $ "Updates received: " <!> showP (length ups)
+    logDebug $ "Response: " <!> showP resp
     modify (\st -> st {bStateUid = getNewUid ups})
     conversations <- addConversations ups
     modify (\st -> st {bStateConversations = conversations})
-    logDebug $ "Current conversations: " <> showP conversations
+    logDebug $ "Current conversations: " <!> showP conversations
     return ups
 
   where
@@ -116,7 +116,7 @@ answerCallbackQuery cbId mt mb = do
         <> " with text "
         <> showP mt
     resp <- liftClient $ Int.answerCallbackQuery body
-    logDebug $ "Response: " <> showP resp
+    logDebug $ "Response: " <!> showP resp
   where
     body = AnswerCallbackBody cbId mt mb
 
@@ -150,7 +150,7 @@ repeatCommand cid = do
         <> " to "
         <> showP cid
     resp <- liftClient $ Int.sendMessage body
-    logDebug $ "Reponse: " <> showP resp
+    logDebug $ "Reponse: " <!> showP resp
   where
     body = SendMessageBody cid repeatGreeting (Just defaultRepeatInlineKeyboard)
 
@@ -185,7 +185,7 @@ editMessageText cid mid t mMarkup = do
         <> " with markup "
         <> showP mMarkup
     resp <- liftClient $ Int.editMessageText body
-    logDebug $ "Response: " <> showP resp
+    logDebug $ "Response: " <!> showP resp
   where
     body = EditMessageTextBody cid mid t mMarkup
 
@@ -203,7 +203,7 @@ sendText cid t markup = do
         <> showP repeatNum
         <> ")"
     resp <- head <$> replicateM repeatNum (liftClient $ Int.sendMessage body)
-    logDebug $ "Response: " <> showP resp
+    logDebug $ "Response: " <!> showP resp
   where
     body = SendMessageBody cid t markup
 
@@ -221,7 +221,7 @@ sendSticker cid fid = do
         <> showP repeatNum
         <> ")"
     resp <- head <$> replicateM repeatNum (liftClient $ Int.sendSticker body)
-    logDebug $ "Response: " <> showP resp
+    logDebug $ "Response: " <!> showP resp
   where
     body = SendStickerBody cid fid
 
@@ -282,7 +282,7 @@ sendVideoNote cid fid = do
         <> showP repeatNum
         <> ")"
     resp <- head <$> replicateM repeatNum (liftClient $ Int.sendVideoNote body)
-    logDebug $ "Response " <> showP resp
+    logDebug $ "Response " <!> showP resp
   where
     body = SendVideoNoteBody cid fid
 
@@ -313,4 +313,4 @@ sendMediaWithCaption method body name cid = do
         <> showP repeatNum
         <> ")"
     resp <- head <$> replicateM repeatNum (liftClient $ method body)
-    logDebug $ "Response " <> showP resp
+    logDebug $ "Response " <!> showP resp

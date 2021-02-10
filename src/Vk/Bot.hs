@@ -78,18 +78,21 @@ loop = forever $ getUpdates >>= mapM_ handleUpdate
 handleUpdate :: Update -> Bot ()
 handleUpdate up = do
     case updateToAction up of
-        Just (Start userId)      -> sendText userId startMessage
-        Just (EchoText userId t) -> sendText userId t
+        Just (Start userId)              -> sendMessage userId startMessage []
+        Just (EchoUnsupported userId)    -> sendMessage userId unsupportedText []
+        Just (EchoSticker userId sId)    -> sendSticker userId sId
+        Just (EchoMessage userId t atts) -> sendMessage userId t atts
         -- Just (EchoSticker cid s) ->
         --   void $ runReaderT (sendSticker (SendStickerBody cid s)) env
-        Nothing                  -> return ()
+        Nothing                          -> return ()
 
 data Action
     = Start UserId
     -- ^ Send greeting message with instructions.
-    | EchoText UserId Text
+    | EchoUnsupported UserId
+    | EchoSticker UserId StickerId
+    | EchoMessage UserId Text [Attachment]
     -- ^ Echo plain text.
-    --   | EchoSticker UserId FileId
     -- ^ Echo 'Sticker'.
 
 -- | Map proper 'Action' to given 'Update'.
@@ -97,7 +100,9 @@ data Action
 updateToAction :: Update -> Maybe Action
 updateToAction = runUpdateParser $ asum
     [ Start <$ command "start" <*> updateUserId
-    , EchoText <$> updateUserId <*> text
+    , EchoUnsupported <$> updateUserId <* unsupported
+    , EchoSticker <$> updateUserId <*> sticker
+    , EchoMessage <$> updateUserId <*> text <*> attachments
     --   , EchoSticker <$> updateChatId <*> sticker
     ]
 
@@ -112,3 +117,6 @@ startMessage = Data.Text.unlines
     , "Supported commands:"
     , "- /start"
     ]
+
+unsupportedText :: Text
+unsupportedText = "Sorry, VK API doesn't allow me to send messages of this type"
