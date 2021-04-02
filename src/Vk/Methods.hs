@@ -7,13 +7,13 @@ import           Control.Monad.State
 import qualified Data.HashMap.Lazy    as Map
 import           Data.Text            (Text)
 
-import           API.Logging
-import           API.Utils
+import           Bot.Log
+import           Bot.Utils
 import           Vk.Internal.Bot
 import qualified Vk.Internal.Methods  as Int
 import           Vk.Internal.Request
 import           Vk.Internal.Types
-import           Vk.UpdateParser
+import           Vk.Parser
 
 getUpdates :: Bot [Update]
 getUpdates = do
@@ -61,7 +61,7 @@ getUpdates = do
 
         extractUserId :: [Update] -> [UserId]
         extractUserId [] = []
-        extractUserId (u:us) = case updateUserId <?> u of
+        extractUserId (u:us) = case u <?> updateUserId of
             Just cid -> cid : extractUserId us
             Nothing  -> extractUserId us
 

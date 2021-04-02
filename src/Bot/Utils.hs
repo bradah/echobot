@@ -9,7 +9,7 @@ Maintainer: wspbr <rtrn.0@ya.ru>
 This module contains some useful functions.
 -}
 
-module API.Utils
+module Bot.Utils
     ( -- * Utility functions
       -- ** Show pretty text.
       showP

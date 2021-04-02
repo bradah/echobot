@@ -9,7 +9,7 @@ Maintainer: wspbr <rtrn.0@ya.ru>
 This module contains logging utilities.
 -}
 
-module API.Logging
+module Bot.Log
     ( -- * Logging
       -- ** Logging functions
       logDebug

@@ -32,7 +32,7 @@ import           Control.Monad.State
 import           Data.HashMap.Lazy
 import           Servant.Client
 
-import           API.Utils               ()
+import           Bot.Utils               ()
 import           Telegram.Internal.Types
 
 -- | Base monad representing bot application.

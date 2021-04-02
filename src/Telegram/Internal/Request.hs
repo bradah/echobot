@@ -33,7 +33,7 @@ module Telegram.Internal.Request
 import           Data.Text               (Text)
 import           GHC.Generics
 
-import           API.TH
+import           Bot.TH
 import           Telegram.Internal.Types
 
 

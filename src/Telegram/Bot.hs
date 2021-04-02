@@ -30,14 +30,14 @@ import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Servant.Client
 import           System.Directory          (doesFileExist)
 
-import           API.Logging
-import qualified API.Logging               as Log (Message)
-import           API.Utils
+import           Bot.Log
+import qualified Bot.Log                   as Log (Message)
+import           Bot.Utils
 import           Telegram.Internal.Bot
 import           Telegram.Internal.Methods (getMe)
 import           Telegram.Internal.Types
 import           Telegram.Methods
-import           Telegram.UpdateParser
+import           Telegram.Parser
 
 
 -- | Make new bot environment.
@@ -47,7 +47,7 @@ mkEnv
 mkEnv act = do
     token <- getToken
     clientEnv <- defaultClientEnv token
-    return $ Env token act clientEnv
+    pure $ Env token act clientEnv
   where
     -- | Get token from config file.
     getToken :: IO Token
@@ -123,7 +123,7 @@ data Action
 
 -- | Map proper 'Action' to an 'Update'.
 updateToAction :: Update -> Maybe Action
-updateToAction = runUpdateParser $ asum
+updateToAction = runParser $ asum
     [ Help <$ (command "help" <|> command "start") <*> updateChatId
     , Repeat <$ command "repeat" <*> updateChatId
     , EchoText <$> updateChatId <*> plainText
@@ -155,7 +155,7 @@ handleUpdate up =
         Just (EchoVoice cid voi cap) -> sendVoice cid voi cap
         Just (AnswerRepeatCallback cid mid cbid cbData) ->
             answerRepeatCallback cid mid cbid cbData
-        Nothing                  -> return ()
+        Nothing                  -> pure ()
 
 -- | Greeting message
 helpMessage :: Text

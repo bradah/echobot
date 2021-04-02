@@ -36,13 +36,13 @@ import qualified Data.HashMap.Lazy         as Map
 import           Data.Text                 (Text, unpack)
 import           Servant.Client
 
-import           API.Logging
-import           API.Utils
+import           Bot.Log
+import           Bot.Utils
 import           Telegram.Internal.Bot
 import qualified Telegram.Internal.Methods as Int
 import           Telegram.Internal.Request
 import           Telegram.Internal.Types
-import           Telegram.UpdateParser
+import           Telegram.Parser
 
 -- | Lift ClientM computation to the 'Bot' monad.
 liftClient :: ClientM a -> Bot a
@@ -78,7 +78,7 @@ getUpdates = do
     getNewUid :: [Update] -> Maybe UpdateId
     getNewUid ups
         | null ups = Nothing
-        | otherwise = (1+) <$> updateId <?> last ups
+        | otherwise = fmap (1+) $ last ups <?> updateId
 
     addConversations :: [Update] -> Bot ConvMap
     addConversations ups = do
@@ -100,7 +100,7 @@ getUpdates = do
 
         extractChatId :: [Update] -> [ChatId]
         extractChatId [] = []
-        extractChatId (u:us) = case updateChatId <?> u of
+        extractChatId (u:us) = case u <?> updateChatId of
             Just cid -> cid : extractChatId us
             Nothing  -> extractChatId us
 

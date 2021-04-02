@@ -47,7 +47,7 @@ module Telegram.Internal.Types
     ) where
 
 
-import           API.TH
+import           Bot.TH
 import           Data.Int
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)

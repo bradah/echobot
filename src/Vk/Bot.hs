@@ -11,15 +11,15 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client
 import           System.Directory        (doesFileExist)
 
-import           API.Logging
-import qualified API.Logging             as Log (Message)
-import           API.Utils
+import           Bot.Log
+import qualified Bot.Log                 as Log (Message)
+import           Bot.Utils
 import           Vk.Internal.Bot
 import qualified Vk.Internal.Methods     as Int
 import           Vk.Internal.Request
 import           Vk.Internal.Types
 import           Vk.Methods
-import           Vk.UpdateParser
+import           Vk.Parser
 
 mkEnv :: LogAction Bot Log.Message -> IO Env
 mkEnv act = do
@@ -98,7 +98,7 @@ data Action
 -- | Map proper 'Action' to given 'Update'.
 
 updateToAction :: Update -> Maybe Action
-updateToAction = runUpdateParser $ asum
+updateToAction = runParser $ asum
     [ Start <$ command "start" <*> updateUserId
     , EchoUnsupported <$> updateUserId <* unsupported
     , EchoSticker <$> updateUserId <*> sticker

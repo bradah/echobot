@@ -6,8 +6,8 @@
 
 module Vk.Internal.Types where
 
-import           API.TH
-import           API.Utils
+import           Bot.TH
+import           Bot.Utils
 import           Control.Applicative   ((<|>))
 import           Data.Aeson            hiding (Object)
 import           Data.Aeson.Text

@@ -5,7 +5,7 @@
 
 module Vk.Internal.Request where
 
-import           API.TH
+import           Bot.TH
 import           Data.Text         (Text)
 import           GHC.Generics
 import           Vk.Internal.Types

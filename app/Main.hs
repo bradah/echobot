@@ -1,6 +1,6 @@
 module Main where
 
-import           API.Logging
+import           Bot.Log
 import           Control.Exception (bracket)
 import           Control.Monad     (forever)
 import           System.Exit       (exitSuccess)

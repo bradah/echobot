@@ -11,7 +11,7 @@ import           Data.HashMap.Lazy
 import           Data.Maybe           (fromMaybe)
 import           Servant.Client
 
-import           API.Utils            ()
+import           Bot.Utils            ()
 import           Vk.Internal.Request
 import           Vk.Internal.Types
 
