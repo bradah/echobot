@@ -6,15 +6,11 @@
 module Vk.Internal.Request where
 
 import           Bot.TH
-import           Data.Text         (Text)
+import           Data.Text        (Text)
 import           GHC.Generics
-import           Vk.Internal.Types
+import           Vk.Internal.Data
 
-import           Servant.API       (ToHttpApiData (..))
-
-type LpsServer = Text
-type LpsKey = Text
-type Ts = Text
+import           Servant.API      (ToHttpApiData (..))
 
 data GetLpsParams = GetLpsParams
     { getLpsGroupId    :: Integer
@@ -33,7 +29,7 @@ data GetLpsError = GetLpsError
   } deriving (Show, Generic)
 
 data GetLpsResponse = GetLpsResponse
-  { getLpsResponseKey    :: LpsKey
+  { getLpsResponseKey    :: Text
   , getLpsResponseServer :: Text
   , getLpsResponseTs     :: Ts
   } deriving (Generic)
@@ -45,9 +41,9 @@ data CheckLpsResponse = CheckLpsResponse
   } deriving (Show, Generic)
 
 data CheckLpsParams = CheckLpsParams
-    { checkLpsServer :: LpsServer
+    { checkLpsServer :: Text
     , checkLpsAction :: CheckLpsAction
-    , checkLpsKey    :: LpsKey
+    , checkLpsKey    :: Text
     , checkLpsWait   :: Maybe Int
     , checkLpsTs     :: Ts
     }

@@ -15,9 +15,9 @@ import           Bot.Log
 import qualified Bot.Log                 as Log (Message)
 import           Bot.Utils
 import           Vk.Internal.Bot
+import           Vk.Internal.Data
 import qualified Vk.Internal.Methods     as Int
 import           Vk.Internal.Request
-import           Vk.Internal.Types
 import           Vk.Methods
 import           Vk.Parser
 

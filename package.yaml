@@ -42,6 +42,7 @@ dependencies:
 - pretty-simple
 - chronos
 - vector
+- data-default
 
 library:
   source-dirs: src

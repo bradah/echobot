@@ -37,6 +37,6 @@ showP = toStrict . pShowNoColor
 showT :: Show a => a -> Text
 showT = pack . show
 
--- | Concat two 'Text' values with "\n" between.
+-- | Concat two 'Text' values with "\\n" between.
 (<!>) :: Text -> Text -> Text
 (<!>) a b = a <> "\n" <> b

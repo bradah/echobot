@@ -19,23 +19,23 @@ module Telegram.Bot
     ) where
 
 
-import           Control.Applicative       ((<|>))
+import           Control.Applicative     ((<|>))
 import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.Configurator
-import           Data.Foldable             (asum)
-import           Data.Text                 (Text, unlines, unpack)
-import           Network.HTTP.Client       (newManager)
-import           Network.HTTP.Client.TLS   (tlsManagerSettings)
+import           Data.Foldable           (asum)
+import           Data.Text               (Text, unlines, unpack)
+import           Network.HTTP.Client     (newManager)
+import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client
-import           System.Directory          (doesFileExist)
+import           System.Directory        (doesFileExist)
 
 import           Bot.Log
-import qualified Bot.Log                   as Log (Message)
+import qualified Bot.Log                 as Log (Message)
 import           Bot.Utils
+import           Telegram.Internal.API   (getMe)
 import           Telegram.Internal.Bot
-import           Telegram.Internal.Methods (getMe)
-import           Telegram.Internal.Types
+import           Telegram.Internal.Data
 import           Telegram.Methods
 import           Telegram.Parser
 
@@ -50,7 +50,7 @@ mkEnv act = do
     pure $ Env token act clientEnv
   where
     -- | Get token from config file.
-    getToken :: IO Token
+    getToken :: IO Text
     getToken = do
         localExists <- doesFileExist "echobot.conf.local"
         let path = if localExists
@@ -60,13 +60,13 @@ mkEnv act = do
         require conf "telegram.token"
 
     -- | Make new servant client environment.
-    defaultClientEnv :: Token -> IO ClientEnv
+    defaultClientEnv :: Text -> IO ClientEnv
     defaultClientEnv token = mkClientEnv
         <$> newManager tlsManagerSettings
         <*> pure (botBaseUrl token)
 
     -- | Construct base URL.
-    botBaseUrl :: Token -> BaseUrl
+    botBaseUrl :: Text -> BaseUrl
     botBaseUrl token = BaseUrl
         Https
         "api.telegram.org"
@@ -96,46 +96,46 @@ run act = do
 
 -- | Available actions.
 data Action
-    = Help ChatId
+    = Help Int
     -- ^ Answer "\/start" or "\/help" commands.
-    | Repeat ChatId
+    | Repeat Int
     -- ^ Answer "\/repeat" command.
-    | EchoText ChatId Text
+    | EchoText Int Text
     -- ^ Echo plain text.
-    | EchoSticker ChatId FileId
+    | EchoSticker Int Text
     -- ^ Echo 'Sticker'.
-    | EchoPhoto ChatId FileId Caption
+    | EchoPhoto Int Text (Maybe Text)
     -- ^ Echo photos, see 'PhotoSize'.
-    | EchoAnimation ChatId FileId Caption
+    | EchoAnimation Int Text (Maybe Text)
     -- ^ Echo 'Animation'.
-    | EchoAudio ChatId FileId Caption
+    | EchoAudio Int Text (Maybe Text)
     -- ^ Echo 'Audio'.
-    | EchoDocument ChatId FileId Caption
+    | EchoDocument Int Text (Maybe Text)
     -- ^ Echo 'Document'.
-    | EchoVideo ChatId FileId Caption
+    | EchoVideo Int Text (Maybe Text)
     -- ^ Echo 'Video'.
-    | EchoVideoNote ChatId FileId
+    | EchoVideoNote Int Text
     -- ^ Echo 'VideoNote'.
-    | EchoVoice ChatId FileId Caption
+    | EchoVoice Int Text (Maybe Text)
     -- ^ Echo 'Voice'.
-    | AnswerRepeatCallback ChatId MessageId CallbackId Text
+    | AnswerRepeatCallback Int Int Text Text
     -- ^ Answer 'CallbackQuery', issued by pressing 'InlineKeyboardButton'.
 
 -- | Map proper 'Action' to an 'Update'.
 updateToAction :: Update -> Maybe Action
 updateToAction = runParser $ asum
-    [ Help <$ (command "help" <|> command "start") <*> updateChatId
-    , Repeat <$ command "repeat" <*> updateChatId
-    , EchoText <$> updateChatId <*> plainText
-    , EchoSticker <$> updateChatId <*> sticker
-    , EchoPhoto <$> updateChatId <*> photo <*> caption
-    , EchoAnimation <$> updateChatId <*> animation <*> caption
-    , EchoAudio <$> updateChatId <*> audio <*> caption
-    , EchoDocument <$> updateChatId <*> document <*> caption
-    , EchoVideo <$> updateChatId <*> video <*> caption
-    , EchoVideoNote <$> updateChatId <*> videoNote
-    , EchoVoice <$> updateChatId <*> voice <*> caption
-    , AnswerRepeatCallback <$> callbackChatId <*> callbackMessageId <*> callbackId <*> callbackData
+    [ Help <$ (command "help" <|> command "start") <*> chatId
+    , Repeat <$ command "repeat" <*> chatId
+    , EchoText <$> chatId <*> text
+    , EchoSticker <$> chatId <*> sticker
+    , EchoPhoto <$> chatId <*> photo <*> caption
+    , EchoAnimation <$> chatId <*> animation <*> caption
+    , EchoAudio <$> chatId <*> audio <*> caption
+    , EchoDocument <$> chatId <*> document <*> caption
+    , EchoVideo <$> chatId <*> video <*> caption
+    , EchoVideoNote <$> chatId <*> videoNote
+    , EchoVoice <$> chatId <*> voice <*> caption
+    , AnswerRepeatCallback <$> chatId <*> callbackMessageId <*> callbackId <*> callbackData
     ]
 
 -- | Map proper Telegram method to an 'Update'.

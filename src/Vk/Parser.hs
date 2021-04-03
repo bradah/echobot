@@ -21,7 +21,7 @@ import           Control.Monad
 import           Data.Foldable       (asum)
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
-import           Vk.Internal.Types
+import           Vk.Internal.Data
 
 
 -- | Extract text from 'Update'.

@@ -15,8 +15,8 @@ import           Servant.API
 import           Servant.Client         hiding (Response)
 import           System.Random          (randomIO)
 
+import           Vk.Internal.Data
 import           Vk.Internal.Request
-import           Vk.Internal.Types
 
 
 type RequiredParam = QueryParam' '[Required, Strict]
@@ -29,7 +29,7 @@ type VkMethod (verb :: [*] -> * -> *) (response :: *)
 
 type CheckLps
     =  RequiredParam "act" CheckLpsAction
-    :> RequiredParam "key" LpsKey
+    :> RequiredParam "key" Text
     :> OptionalParam "wait" Int
     :> RequiredParam "ts" Ts
     :> Post '[JSON] CheckLpsResponse

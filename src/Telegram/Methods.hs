@@ -32,16 +32,17 @@ module Telegram.Methods
     ) where
 
 import           Control.Monad.State
-import qualified Data.HashMap.Lazy         as Map
-import           Data.Text                 (Text, unpack)
+import qualified Data.HashMap.Lazy          as Map
+import           Data.Text                  (Text, unpack)
 import           Servant.Client
 
-import           Bot.Log
+import           Bot.Log                    hiding (Message)
+import           Bot.State
 import           Bot.Utils
+import qualified Telegram.Internal.API      as API
 import           Telegram.Internal.Bot
-import qualified Telegram.Internal.Methods as Int
-import           Telegram.Internal.Request
-import           Telegram.Internal.Types
+import           Telegram.Internal.Data
+import           Telegram.Internal.Requests
 import           Telegram.Parser
 
 -- | Lift ClientM computation to the 'Bot' monad.
@@ -58,70 +59,60 @@ You will receive JSON-serialized 'Update' objects as a result.
 getUpdates :: Bot [Update]
 getUpdates = do
     logInfo "Waiting for updates..."
-    body <- mkBody
-    resp <- liftClient $ Int.getUpdates body
-    let ups = responseResult resp
+    body <- mkRequest
+    resp <- liftClient $ API.getUpdates body
+    let ups = resp'result resp
     logInfo $ "Updates received: " <!> showP (length ups)
     logDebug $ "Response: " <!> showP resp
-    modify (\st -> st {bStateUid = getNewUid ups})
-    conversations <- addConversations ups
-    modify (\st -> st {bStateConversations = conversations})
-    logDebug $ "Current conversations: " <!> showP conversations
+    modify (\st -> st { offset = getNewOffset ups })
+    sessions <- modifySessions ups
+    logDebug $ "Current conversations: " <!> showP sessions
     return ups
 
   where
-    mkBody :: Bot GetUpdatesBody
-    mkBody = do
-        uid <- gets bStateUid
-        return $ GetUpdatesBody uid [UpdateMessage] (Just 25)
+    mkRequest :: Bot GetUpdatesRequest
+    mkRequest = do
+        os <- gets offset
+        return $ GetUpdatesRequest os [UpdateMessage] (Just 25)
 
-    getNewUid :: [Update] -> Maybe UpdateId
-    getNewUid ups
+    getNewOffset :: [Update] -> Maybe Int
+    getNewOffset ups
         | null ups = Nothing
         | otherwise = fmap (1+) $ last ups <?> updateId
 
-    addConversations :: [Update] -> Bot ConvMap
-    addConversations ups = do
-        convMap <- gets bStateConversations
-        let cIds = extractChatId ups
-        return $ insertIfNew cIds convMap
-      where
-        insertIfNew :: [ChatId] -> ConvMap -> ConvMap
-        insertIfNew [] convs = convs
-        insertIfNew (c:cs) convs =
-            if not $ c `Map.member` convs
-                then
-                    Map.insert
-                        c
-                        (Conversation defaultRepeatNumber)
-                        convs
-                else
-                    insertIfNew cs convs
-
-        extractChatId :: [Update] -> [ChatId]
-        extractChatId [] = []
-        extractChatId (u:us) = case u <?> updateChatId of
-            Just cid -> cid : extractChatId us
-            Nothing  -> extractChatId us
+    modifySessions :: [Update] -> Bot (SessionMap Message)
+    modifySessions [] = gets getSesMap
+    modifySessions (u:us) = case u <?> chatId of
+        Just cid -> modify (newSession cid) >> modifySessions us
+        _        -> modifySessions us
 
 {- | Use this method to send answers to callback
 queries sent from inline keyboards. The answer will be
 displayed to the user as a notification at the top of
 the chat screen or as an alert. On success, True is returned.
 -}
-answerCallbackQuery :: CallbackId -> Maybe Text -> Maybe Bool -> Bot ()
+answerCallbackQuery
+    :: Text -- ^ Callback id
+    -> Maybe Text
+    -> Maybe Bool
+    -> Bot ()
 answerCallbackQuery cbId mt mb = do
     logInfo $ "Answering callback"
         <> showP cbId
         <> " with text "
         <> showP mt
-    resp <- liftClient $ Int.answerCallbackQuery body
+    resp <- liftClient $ API.answerCallbackQuery body
     logDebug $ "Response: " <!> showP resp
   where
-    body = AnswerCallbackBody cbId mt mb
+    body = AnswerCallbackRequest cbId mt mb
 
 -- | Answer callback query issued after "\/repeat" command.
-answerRepeatCallback :: ChatId -> MessageId -> CallbackId -> Text -> Bot ()
+answerRepeatCallback
+    :: Int -- ^ Chat id
+    -> Int -- ^ Message id
+    -> Text -- Callback id
+    -> Text
+    -> Bot ()
 answerRepeatCallback cid mid cbid t = do
     answerCallbackQuery cbid Nothing Nothing
     let n = read $ unpack t
@@ -131,7 +122,7 @@ answerRepeatCallback cid mid cbid t = do
         <> showP cid
         <> " to "
         <> showP t
-    modify (changeRepeatNumber cid n)
+    modify (changeRepNum cid n)
   where
     repeatNewText :: Int -> Text
     repeatNewText n =
@@ -142,17 +133,17 @@ answerRepeatCallback cid mid cbid t = do
 
 -- | Answer "\/repeat" command.
 -- This function will also send inline keyboard to the user.
-repeatCommand :: ChatId -> Bot ()
+repeatCommand :: Int -> Bot ()
 repeatCommand cid = do
     logInfo "Received /repeat command"
     logDebug $ "Sending inline keyboard "
         <> showP defaultRepeatInlineKeyboard
         <> " to "
         <> showP cid
-    resp <- liftClient $ Int.sendMessage body
+    resp <- liftClient $ API.sendMessage body
     logDebug $ "Reponse: " <!> showP resp
   where
-    body = SendMessageBody cid repeatGreeting (Just defaultRepeatInlineKeyboard)
+    body = SendMessageRequest cid repeatGreeting (Just defaultRepeatInlineKeyboard)
 
     repeatGreeting :: Text
     repeatGreeting = "Choose how many times you want me to repeat your messages"
@@ -174,7 +165,12 @@ repeatCommand cid = do
 On success, if the edited message is not an inline message,
 the edited 'Telegram.Internal.Types.Message' is returned, otherwise True is returned.
 -}
-editMessageText :: ChatId -> MessageId -> Text -> Maybe InlineKeyboardMarkup -> Bot ()
+editMessageText
+    :: Int -- ^ Chat id
+    -> Int -- ^ Message id
+    -> Text
+    -> Maybe InlineKeyboardMarkup
+    -> Bot ()
 editMessageText cid mid t mMarkup = do
     logInfo $ "Editing message "
         <> showP mid
@@ -184,17 +180,21 @@ editMessageText cid mid t mMarkup = do
         <> showP t
         <> " with markup "
         <> showP mMarkup
-    resp <- liftClient $ Int.editMessageText body
+    resp <- liftClient $ API.editMessageText body
     logDebug $ "Response: " <!> showP resp
   where
-    body = EditMessageTextBody cid mid t mMarkup
+    body = EditMessageTextRequest cid mid t mMarkup
 
 {- | Use this method to send text messages.
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendText :: ChatId -> Text -> Maybe InlineKeyboardMarkup -> Bot ()
+sendText
+    :: Int -- ^ Chat id
+    -> Text
+    -> Maybe InlineKeyboardMarkup
+    -> Bot ()
 sendText cid t markup = do
-    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    repeatNum <- gets $ getRepNum cid
     logInfo $ "Sending text "
         <> showP t
         <> " to chat "
@@ -202,17 +202,20 @@ sendText cid t markup = do
         <> " (repeat number: "
         <> showP repeatNum
         <> ")"
-    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendMessage body)
+    resp <- head <$> replicateM repeatNum (liftClient $ API.sendMessage body)
     logDebug $ "Response: " <!> showP resp
   where
-    body = SendMessageBody cid t markup
+    body = SendMessageRequest cid t markup
 
 {- | Use this method to send static .WEBP or animated
  .TGS stickers. On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendSticker :: ChatId -> FileId -> Bot ()
+sendSticker
+    :: Int -- ^ Chat id
+    -> Text -- Sticker id
+    -> Bot ()
 sendSticker cid fid = do
-    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    repeatNum <- gets $ getRepNum cid
     logInfo $ "Sending sticker "
         <> showP fid
         <> " to chat "
@@ -220,60 +223,83 @@ sendSticker cid fid = do
         <> " (repeat number: "
         <> showP repeatNum
         <> ")"
-    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendSticker body)
+    resp <- head <$> replicateM repeatNum (liftClient $ API.sendSticker body)
     logDebug $ "Response: " <!> showP resp
   where
-    body = SendStickerBody cid fid
+    body = SendStickerRequest cid fid
 
 {- | Use this method to send photos.
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendPhoto :: ChatId -> FileId -> Caption -> Bot ()
-sendPhoto cid fid cap = sendMediaWithCaption Int.sendPhoto body "photo" cid
+sendPhoto
+    :: Int -- ^ Chat id
+    -> Text -- ^ Photo id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendPhoto cid fid cap = sendMediaWithCaption API.sendPhoto body "photo" cid
   where
-    body = SendPhotoBody cid fid cap
+    body = SendPhotoRequest cid fid cap
 
 {- | Use this method to send animation files.
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendAnimation :: ChatId -> FileId -> Caption -> Bot ()
-sendAnimation cid fid cap = sendMediaWithCaption Int.sendAnimation body "animation" cid
+sendAnimation
+    :: Int -- ^ Chat id
+    -> Text -- ^ Animation id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendAnimation cid fid cap = sendMediaWithCaption API.sendAnimation body "animation" cid
   where
-    body = SendAnimationBody cid fid cap
+    body = SendAnimationRequest cid fid cap
 
 {- | Use this method to send audio files, if you want
 Telegram clients to display them in the music player.
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendAudio :: ChatId -> FileId -> Caption -> Bot ()
-sendAudio cid fid cap = sendMediaWithCaption Int.sendAudio body "audio" cid
+sendAudio
+    :: Int -- ^ Chat id
+    -> Text -- ^ Audio id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendAudio cid fid cap = sendMediaWithCaption API.sendAudio body "audio" cid
   where
-    body = SendAudioBody cid fid cap
+    body = SendAudioRequest cid fid cap
 
 {- | Use this method to send general files.
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendDocument :: ChatId -> FileId -> Caption -> Bot ()
-sendDocument cid fid cap = sendMediaWithCaption Int.sendDocument body "document" cid
+sendDocument
+    :: Int -- ^ Chat id
+    -> Text -- ^ Document id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendDocument cid fid cap = sendMediaWithCaption API.sendDocument body "document" cid
   where
-    body = SendDocumentBody cid fid cap
+    body = SendDocumentRequest cid fid cap
 
 {- | Use this method to send video files, Telegram clients
 support mp4 videos (other formats may be sent as 'Document').
 On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendVideo :: ChatId -> FileId -> Caption -> Bot ()
-sendVideo cid fid cap = sendMediaWithCaption Int.sendVideo body "video" cid
+sendVideo
+    :: Int -- ^ Chat id
+    -> Text -- ^ Video id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendVideo cid fid cap = sendMediaWithCaption API.sendVideo body "video" cid
   where
-    body = SendVideoBody cid fid cap
+    body = SendVideoRequest cid fid cap
 
 {- | As of v.4.0, Telegram clients support rounded square mp4
 videos of up to 1 minute long. Use this method to send
 video messages. On success, the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendVideoNote :: ChatId -> FileId -> Bot ()
+sendVideoNote
+    :: Int -- ^ Chat id
+    -> Text -- ^ VideoNote id
+    -> Bot ()
 sendVideoNote cid fid = do
-    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    repeatNum <- gets $ getRepNum cid
     logInfo $ "Sending videonote "
         <> showP fid
         <> " to chat "
@@ -281,10 +307,10 @@ sendVideoNote cid fid = do
         <> " (repeat number: "
         <> showP repeatNum
         <> ")"
-    resp <- head <$> replicateM repeatNum (liftClient $ Int.sendVideoNote body)
+    resp <- head <$> replicateM repeatNum (liftClient $ API.sendVideoNote body)
     logDebug $ "Response " <!> showP resp
   where
-    body = SendVideoNoteBody cid fid
+    body = SendVideoNoteRequest cid fid
 
 {- | Use this method to send audio files, if you want Telegram clients
 to display the file as a playable voice message. For this to
@@ -292,10 +318,14 @@ work, your audio must be in an .OGG file encoded with OPUS
 (other formats may be sent as Audio or Document). On success,
 the sent 'Telegram.Internal.Types.Message' is returned.
 -}
-sendVoice :: ChatId -> FileId -> Caption -> Bot ()
-sendVoice cid fid cap = sendMediaWithCaption Int.sendVoice body "voice" cid
+sendVoice
+    :: Int -- ^ Chat id
+    -> Text -- ^ Voice id
+    -> Maybe Text -- ^ Caption
+    -> Bot ()
+sendVoice cid fid cap = sendMediaWithCaption API.sendVoice body "voice" cid
   where
-    body = SendVoiceBody cid fid cap
+    body = SendVoiceRequest cid fid cap
 
 -- | Simple abstraction above all methods sending media with 'Caption'.
 sendMediaWithCaption
@@ -303,10 +333,10 @@ sendMediaWithCaption
     => (body -> ClientM response) -- ^ Bot method
     -> body -- ^ Request body
     -> Text -- ^ Name of method (for logging)
-    -> ChatId -- ^ Destination 'ChatId'
+    -> Int -- ^ Destination 'ChatId'
     -> Bot ()
 sendMediaWithCaption method body name cid = do
-    repeatNum <- convRepeat . (Map.! cid) <$> gets bStateConversations
+    repeatNum <- gets $ getRepNum cid
     logInfo $ "Sending "
         <> name
         <> " (repeat number: "

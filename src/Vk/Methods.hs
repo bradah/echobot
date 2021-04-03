@@ -4,15 +4,15 @@ module Vk.Methods where
 
 import           Control.Monad.Reader
 import           Control.Monad.State
-import qualified Data.HashMap.Lazy    as Map
 import           Data.Text            (Text)
 
-import           Bot.Log
+import           Bot.Log              hiding (Message)
+import           Bot.State
 import           Bot.Utils
 import           Vk.Internal.Bot
+import           Vk.Internal.Data
 import qualified Vk.Internal.Methods  as Int
 import           Vk.Internal.Request
-import           Vk.Internal.Types
 import           Vk.Parser
 
 getUpdates :: Bot [Update]
@@ -24,56 +24,36 @@ getUpdates = do
     logInfo $ "Updates received: " <> showP (length ups)
     logDebug $ "Response: " <> showP resp
     putNewTs resp
-    conversations <- addConversations ups
-    modify (\st -> st {bStateConversations = conversations})
-    logDebug $ "Current conversations: " <> showP conversations
+    sessions <- modifySessions ups
+    logDebug $ "Current sessions: " <> showP sessions
     pure ups
 
   where
     mkParams :: Bot CheckLpsParams
     mkParams = do
-        ts <- gets bStateTs
+        ts <- gets offset
         Env{..} <- ask
         pure $ CheckLpsParams envLpsServer ACheck envLpsKey (Just 25) ts
 
     putNewTs :: CheckLpsResponse -> Bot ()
     putNewTs resp = case checkLpsResponseTs resp of
-        Just ts -> modify (\st -> st {bStateTs = ts})
+        Just ts -> modify (\st -> st { offset = ts })
         Nothing -> logWarning "No new Ts. Proceeding with an old one."
 
-    addConversations :: [Update] -> Bot ConvMap
-    addConversations ups = do
-        convMap <- gets bStateConversations
-        let uIds = extractUserId ups
-        return $ insertIfNew uIds convMap
-      where
-        insertIfNew :: [UserId] -> ConvMap -> ConvMap
-        insertIfNew [] convs = convs
-        insertIfNew (u:us) convs =
-            if not $ u `Map.member` convs
-                then
-                    Map.insert
-                        u
-                        (Conversation defaultRepeatNumber)
-                        convs
-                else
-                    insertIfNew us convs
-
-        extractUserId :: [Update] -> [UserId]
-        extractUserId [] = []
-        extractUserId (u:us) = case u <?> updateUserId of
-            Just cid -> cid : extractUserId us
-            Nothing  -> extractUserId us
-
+    modifySessions :: [Update] -> Bot (SessionMap Message)
+    modifySessions [] = gets getSesMap
+    modifySessions (u:us) = case u <?> updateUserId of
+            Just uid -> modify (newSession uid) >> modifySessions us
+            _        -> modifySessions us
 
 sendMessage :: UserId -> Text -> [Attachment] -> Bot ()
 sendMessage userId t atts = do
     botEnv <- ask
-    repeatNum <- gets ((convRepeatNum . (Map.! userId)) . bStateConversations)
+    repeatNum <- gets (repNum . (! userId))
     logInfo $ "Sending message: " <!> showP (params botEnv)
     resp <- head <$> replicateM repeatNum
         (liftClient $ Int.sendMessage $ params botEnv)
-    logDebug $ "Response: " <> showT resp
+    logDebug $ "Response: " <!> showT resp
   where
     params :: Env -> SendMessageParams
     params Env{..} = SendMessageParams
@@ -87,7 +67,7 @@ sendMessage userId t atts = do
 sendSticker :: UserId -> StickerId -> Bot ()
 sendSticker userId s = do
     botEnv <- ask
-    repeatNum <- gets ((convRepeatNum . (Map.! userId)) . bStateConversations)
+    repeatNum <- gets (repNum . (! userId))
     logInfo $ "Sending sticker: " <!> showP (params botEnv)
     resp <- head <$> replicateM repeatNum
         (liftClient $ Int.sendMessage $ params botEnv)

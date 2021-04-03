@@ -18,22 +18,19 @@ module Telegram.Internal.Bot
     -- ** BotState
     , BotState(..)
     , initState
-      -- ** ConvMap
-    , ConvMap
-      -- ** Conversation
-    , Conversation(..)
-    , changeRepeatNumber
-    , defaultRepeatNumber
     ) where
 
-import           Colog
+import           Colog                  hiding (Message)
+import qualified Colog                  (Message)
 import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.HashMap.Lazy
+import           Data.Text              (Text)
 import           Servant.Client
 
-import           Bot.Utils               ()
-import           Telegram.Internal.Types
+import qualified Bot.State              as Bot
+import           Bot.Utils              ()
+import           Telegram.Internal.Data
 
 -- | Base monad representing bot application.
 newtype Bot a = Bot
@@ -44,39 +41,17 @@ newtype Bot a = Bot
 
 -- | Environment in which bot runs.
 data Env = Env
-    { envToken     :: Token
+    { envToken     :: Text
     , envLogAction :: LogAction Bot Colog.Message
     , envCleintEnv :: ClientEnv
     } deriving Show
 
--- | Current bot conversations.
-type ConvMap = HashMap ChatId Conversation
-
 -- | State of bot.
-data BotState = BotState
-    { bStateUid           :: Maybe UpdateId
-    , bStateConversations :: ConvMap
-    }
+type BotState = Bot.BotState (Maybe Int) Message
 
 -- | Initial bot state.
 initState :: BotState
-initState = BotState Nothing empty
-
--- | Bot conversation.
-data Conversation = Conversation
-    { convRepeat           :: Int
-    } deriving Show
-
--- | Change number of repetitions of single message for 'Conversation'.
-changeRepeatNumber :: ChatId -> Int -> BotState -> BotState
-changeRepeatNumber cid n st@(BotState _ convs) = st
-    { bStateConversations =
-        adjust (\(Conversation _) -> Conversation n) cid convs
-    }
-
--- | Initial repetition number.
-defaultRepeatNumber :: Int
-defaultRepeatNumber = 1
+initState = Bot.BotState Nothing empty
 
 instance HasLog Env Colog.Message Bot where
     getLogAction = envLogAction

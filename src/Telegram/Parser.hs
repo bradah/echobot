@@ -1,12 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-{- |
-Copyright:  (c) 2021 wspbr
-Maintainer: wspbr <rtrn.0@ya.ru>
-
-This module contains lens-like functions to extract fields from
-Telegram API ADTs such as 'Update' or 'Message'.
--}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Telegram.Parser
     ( -- * Parsing updates
@@ -14,7 +7,7 @@ module Telegram.Parser
       Parser(..)
     , (<?>)
       -- ** Parse updates
-    , updateChatId
+    , chatId
     , updateId
       -- ** Parse callback queries
     , callbackQuery
@@ -23,7 +16,7 @@ module Telegram.Parser
     , callbackMessageId
     , callbackChatId
       -- ** Parse messages
-    , plainText
+    , text
     , command
     , caption
     , photo
@@ -37,110 +30,102 @@ module Telegram.Parser
     ) where
 
 import           Control.Applicative
-import           Control.Monad
-import qualified Data.Text               as T
+import           Control.Monad          ((>=>))
+import           Data.Text              hiding (empty, head)
 
 import           Bot.Parser
-import           Telegram.Internal.Types
-
+import           Telegram.Internal.Data
 
 -- | Get 'ChatId' of an 'Update'.
-updateChatId :: Parser Update ChatId
-updateChatId = Parser $
-  updateMessage >=> pure . messageChat >=> pure . chatId
+chatId :: Parser Update Int
+chatId = Parser $
+    upd'message >=> pure . msg'chat >=> pure . chat'chat_id
 
 -- | Get 'UpdateId' of an 'Update'.
-updateId :: Parser Update UpdateId
-updateId = Parser (pure . updateUpdateId)
+updateId :: Parser Update Int
+updateId = Parser $ pure . upd'id
 
 -- | Get 'CallbackQuery' of an 'Update'.
 callbackQuery :: Parser Update CallbackQuery
-callbackQuery = Parser updateCallbackQuery
+callbackQuery = Parser upd'callback_query
 
 -- | Get 'CallbackId' of an 'Update'.
-callbackId :: Parser Update CallbackId
+callbackId :: Parser Update Text
 callbackId = Parser $
-    updateCallbackQuery >=> pure . callbackQueryId
+    upd'callback_query >=> pure . cq'id
 
 -- | Get callback data of an 'Update'.
-callbackData :: Parser Update T.Text
+callbackData :: Parser Update Text
 callbackData = Parser $
-    updateCallbackQuery >=> callbackQueryData
+    upd'callback_query >=> cq'data
 
 -- | Get 'MessageId' from 'CallbackQuery' of an 'Update'.
-callbackMessageId :: Parser Update MessageId
+callbackMessageId :: Parser Update Int
 callbackMessageId = Parser $
-    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageMessageId
+    upd'callback_query >=> cq'message >=> pure . msg'message_id
 
 -- | Get 'ChatId' of 'Chat' in which 'CallbackQuery' was issued.
-callbackChatId :: Parser Update ChatId
+callbackChatId :: Parser Update Int
 callbackChatId = Parser $
-    updateCallbackQuery >=> callbackQueryMessage >=> pure . messageChat
-        >=> pure . chatId
+    upd'callback_query >=> cq'message >=> pure . msg'chat
+        >=> pure . chat'chat_id
 
 -- | Get 'Caption' of an 'Update'.
-caption :: Parser Update Caption
+caption :: Parser Update (Maybe Text)
 caption = Parser $
-    updateMessage >=> pure . messageCaption
+    upd'message >=> pure . msg'caption
 
 -- | Extract text from 'Update'.
-text :: Parser Update T.Text
-text = Parser $ updateMessage >=> messageText
-
--- | Same as 'text' but fails if there wasn't
--- plain text (e.g. command).
-plainText :: Parser Update T.Text
-plainText = do
-  t <- text
-  if "/" `T.isPrefixOf` t
-    then empty
-    else pure t
+text :: Parser Update Text
+text = Parser $ upd'message >=> msg'text
 
 -- | Check if bot received specific command
-command :: T.Text -> Parser Update ()
+command :: Text -> Parser Update ()
 command name = do
   t <- text
-
-  case T.words t of
+  case Data.Text.words t of
     (w:_) | w == "/" <> name -> pure ()
     _                        -> empty
 
 -- | Get 'Sticker' from an 'Update'.
-sticker :: Parser Update FileId
+sticker :: Parser Update Text
 sticker = Parser $
-  updateMessage >=> messageSticker >=> pure . stickerFileId
+  upd'message >=> msg'sticker >=> pure . stk'file_id
 
 -- | Get 'FileId' of a photo from an 'Update'.
-photo :: Parser Update FileId
+photo :: Parser Update Text
 photo = Parser $
-    updateMessage >=> messagePhoto >=> pure . photoFileId . head
+    upd'message >=> msg'photo >=> pure . ph'file_id . head
 
 -- | Get 'FileId' of an animation from an 'Update'.
-animation :: Parser Update FileId
+animation :: Parser Update Text
 animation = Parser $
-    updateMessage >=> messageAnimation >=> pure . animationFileId
+    upd'message >=> msg'animation >=> pure . anim'file_id
 
 -- | Get 'FileId' of an audio from an 'Update'.
-audio :: Parser Update FileId
+audio :: Parser Update Text
 audio = Parser $
-    updateMessage >=> messageAudio >=> pure . audioFileId
+    upd'message >=> msg'audio >=> pure . audio'file_id
 
 -- | Get 'FileId' of a document from an 'Update'.
-document :: Parser Update FileId
+document :: Parser Update Text
 document = Parser $
-    updateMessage >=> messageDocument >=> pure . documentFileId
+    upd'message >=> msg'document >=> pure . doc'file_id
 
 -- | Get 'FileId' of a video from an 'Update'.
-video :: Parser Update FileId
+video :: Parser Update Text
 video = Parser $
-    updateMessage >=> messageVideo >=> pure . videoFileId
+    upd'message >=> msg'video >=> pure . vid'file_id
 
 -- | Get 'FileId' of a video note from an 'Update'.
-videoNote :: Parser Update FileId
+videoNote :: Parser Update Text
 videoNote = Parser $
-    updateMessage >=> messageVideoNote >=> pure . videoNoteFileId
+    upd'message >=> msg'video_note >=> pure . vidnote'file_id
 
 -- | Get 'FileId' of a voice message from an 'Update'.
-voice :: Parser Update FileId
+voice :: Parser Update Text
 voice = Parser $
-    updateMessage >=> messageVoice >=> pure . voiceFileId
+    upd'message >=> msg'voice >=> pure . voice'file_id
+
+markup :: Parser Update InlineKeyboardMarkup
+markup = Parser $ upd'message >=> msg'reply_markup

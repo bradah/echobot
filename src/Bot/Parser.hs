@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 {- |
 Copyright:  (c) 2021 wspbr
 Maintainer: wspbr <rtrn.0@ya.ru>
