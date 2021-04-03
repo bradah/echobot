@@ -39,11 +39,11 @@ import           Telegram.Internal.Data
 -- | Get 'ChatId' of an 'Update'.
 chatId :: Parser Update Int
 chatId = Parser $
-    upd'message >=> pure . msg'chat >=> pure . chat'chat_id
+    upd'message >=> pure . msg'chat >=> pure . chat'id
 
 -- | Get 'UpdateId' of an 'Update'.
 updateId :: Parser Update Int
-updateId = Parser $ pure . upd'id
+updateId = Parser $ pure . upd'update_id
 
 -- | Get 'CallbackQuery' of an 'Update'.
 callbackQuery :: Parser Update CallbackQuery
@@ -68,7 +68,7 @@ callbackMessageId = Parser $
 callbackChatId :: Parser Update Int
 callbackChatId = Parser $
     upd'callback_query >=> cq'message >=> pure . msg'chat
-        >=> pure . chat'chat_id
+        >=> pure . chat'id
 
 -- | Get 'Caption' of an 'Update'.
 caption :: Parser Update (Maybe Text)

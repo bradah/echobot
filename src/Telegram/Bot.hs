@@ -20,8 +20,8 @@ module Telegram.Bot
 
 
 import           Control.Applicative     ((<|>))
+import           Control.Monad.Except
 import           Control.Monad.Reader
-import           Control.Monad.State
 import           Data.Configurator
 import           Data.Foldable           (asum)
 import           Data.Text               (Text, unlines, unpack)
@@ -79,7 +79,10 @@ run
     -> IO ()
 run act = do
     env <- mkEnv act
-    void $ runClientM (runStateT (runReaderT (runBot initBot) env) initState) (envCleintEnv env)
+    res <- runBot initBot env initState
+    case res of
+        Left e         -> print e
+        Right ((), st) -> print st
   where
     -- | Initial bot action.
     initBot :: Bot ()
@@ -92,7 +95,7 @@ run act = do
         loop
     -- | Main loop in which bot runs.
     loop :: Bot ()
-    loop = forever $ getUpdates >>= mapM_ handleUpdate
+    loop = forever $ getUpdates >>= mapM handleUpdate
 
 -- | Available actions.
 data Action
@@ -135,7 +138,8 @@ updateToAction = runParser $ asum
     , EchoVideo <$> chatId <*> video <*> caption
     , EchoVideoNote <$> chatId <*> videoNote
     , EchoVoice <$> chatId <*> voice <*> caption
-    , AnswerRepeatCallback <$> chatId <*> callbackMessageId <*> callbackId <*> callbackData
+    , AnswerRepeatCallback <$> callbackChatId
+        <*> callbackMessageId <*> callbackId <*> callbackData
     ]
 
 -- | Map proper Telegram method to an 'Update'.
@@ -155,7 +159,8 @@ handleUpdate up =
         Just (EchoVoice cid voi cap) -> sendVoice cid voi cap
         Just (AnswerRepeatCallback cid mid cbid cbData) ->
             answerRepeatCallback cid mid cbid cbData
-        Nothing                  -> pure ()
+        Nothing                  ->
+            logWarning $ "No matching Action for this Update:" <!> showP up
 
 -- | Greeting message
 helpMessage :: Text

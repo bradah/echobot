@@ -43,6 +43,9 @@ dependencies:
 - chronos
 - vector
 - data-default
+- monad-control
+- transformers-base
+- unliftio-core
 
 library:
   source-dirs: src

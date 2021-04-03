@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import           Bot.Log
@@ -7,6 +8,7 @@ import           System.Exit       (exitSuccess)
 import           System.IO
 import qualified Telegram.Bot      as Tg
 import qualified Vk.Bot            as Vk
+
 
 main :: IO ()
 main = forever $ bracket acquire release loop
@@ -30,7 +32,7 @@ main = forever $ bracket acquire release loop
             ]
         arg <- getLine
         case arg of
-            "1" -> Tg.run $ logStdOut Debug
+            "1" -> Tg.run $ logStdOutAndFile Debug handle
             "2" -> Vk.run $ logStdOut Debug
             "q" -> exitSuccess
             _   -> pure ()

@@ -1,6 +1,7 @@
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 {- |
 Copyright:  (c) 2021 wspbr
@@ -13,10 +14,13 @@ module Telegram.Internal.Bot
     ( -- * Bot monad
       -- ** Bot
       Bot(..)
+    , runBot
+    , liftClient
       -- ** Env
     , Env(..)
     -- ** BotState
     , BotState(..)
+    , IsBot
     , initState
     ) where
 
@@ -28,22 +32,34 @@ import           Data.HashMap.Lazy
 import           Data.Text              (Text)
 import           Servant.Client
 
+import           Bot.BotT
 import qualified Bot.State              as Bot
 import           Bot.Utils              ()
 import           Telegram.Internal.Data
 
 -- | Base monad representing bot application.
-newtype Bot a = Bot
-    { runBot :: ReaderT Env (StateT BotState ClientM) a
-    } deriving ( Functor, Applicative, Monad
-               , MonadReader Env, MonadState BotState, MonadIO
-               )
+type Bot = BotM Env BotState ClientM
+
+runBot :: Bot a -> Env -> BotState -> IO (Either ClientError (a, BotState))
+runBot bot env st = runClientM (runStateT (runReaderT (unBotM bot) env) st) (envClientEnv env)
+
+-- | Lift ClientM computation to the 'Bot' monad.
+liftClient :: ClientM a -> Bot a
+liftClient = BotM . lift . lift
+
+type IsBot t b =
+    ( HasLog Env Colog.Message (t b)
+    , MonadReader Env (t b)
+    , MonadState BotState (t b)
+    , MonadIO (t b)
+    , MonadTrans t
+    )
 
 -- | Environment in which bot runs.
 data Env = Env
     { envToken     :: Text
     , envLogAction :: LogAction Bot Colog.Message
-    , envCleintEnv :: ClientEnv
+    , envClientEnv :: ClientEnv
     } deriving Show
 
 -- | State of bot.

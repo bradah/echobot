@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 {- |
@@ -37,17 +38,13 @@ import           Data.Text                  (Text, unpack)
 import           Servant.Client
 
 import           Bot.Log                    hiding (Message)
-import           Bot.State
+import           Bot.State                  hiding (BotState)
 import           Bot.Utils
 import qualified Telegram.Internal.API      as API
 import           Telegram.Internal.Bot
 import           Telegram.Internal.Data
 import           Telegram.Internal.Requests
 import           Telegram.Parser
-
--- | Lift ClientM computation to the 'Bot' monad.
-liftClient :: ClientM a -> Bot a
-liftClient = Bot . lift . lift
 
 {- | Use this method to get updates from Telegram server.
 Incoming updates are stored on the server until the bot
@@ -56,11 +53,11 @@ longer than 24 hours.
 
 You will receive JSON-serialized 'Update' objects as a result.
 -}
-getUpdates :: Bot [Update]
+getUpdates :: IsBot t ClientM => (t ClientM) [Update]
 getUpdates = do
     logInfo "Waiting for updates..."
     body <- mkRequest
-    resp <- liftClient $ API.getUpdates body
+    resp <- lift $ API.getUpdates body
     let ups = resp'result resp
     logInfo $ "Updates received: " <!> showP (length ups)
     logDebug $ "Response: " <!> showP resp
@@ -70,7 +67,7 @@ getUpdates = do
     return ups
 
   where
-    mkRequest :: Bot GetUpdatesRequest
+    -- mkRequest :: Bot GetUpdatesRequest
     mkRequest = do
         os <- gets offset
         return $ GetUpdatesRequest os [UpdateMessage] (Just 25)
@@ -80,7 +77,7 @@ getUpdates = do
         | null ups = Nothing
         | otherwise = fmap (1+) $ last ups <?> updateId
 
-    modifySessions :: [Update] -> Bot (SessionMap Message)
+    -- modifySessions :: [Update] -> Bot (SessionMap Message)
     modifySessions [] = gets getSesMap
     modifySessions (u:us) = case u <?> chatId of
         Just cid -> modify (newSession cid) >> modifySessions us
@@ -141,7 +138,7 @@ repeatCommand cid = do
         <> " to "
         <> showP cid
     resp <- liftClient $ API.sendMessage body
-    logDebug $ "Reponse: " <!> showP resp
+    logDebug $ "Response: " <!> showP resp
   where
     body = SendMessageRequest cid repeatGreeting (Just defaultRepeatInlineKeyboard)
 

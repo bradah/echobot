@@ -48,7 +48,7 @@ import           GHC.Generics
 --   At most one of the optional parameters can be
 --   present in any given update.
 data Update = Update
-    { upd'id             :: Int
+    { upd'update_id      :: Int
     -- ^ The update's unique identifier.
     , upd'message        :: Maybe Message
     -- ^ New incoming message of any kind - text, photo,
@@ -109,7 +109,7 @@ data User = User
     -- ^ Unique identifier for this user or bot.
     , usr'is_bot     :: Bool
     -- ^ True, if this user is a bot.
-    , usr'first_name :: Maybe Text
+    , usr'first_name :: Text
     -- ^ User's or bot's first name.
     , usr'last_name  :: Maybe Text
     -- ^ User's or bot's last name.
@@ -119,7 +119,7 @@ data User = User
 
 -- | This object represents a chat.
 data Chat = Chat
-    { chat'chat_id  :: Int
+    { chat'id       :: Int
     -- ^ Unique identifier for this chat.
     , chat'username :: Maybe Text
     -- ^ Username, for private chats, supergroups
@@ -208,18 +208,18 @@ data InlineKeyboardButton = InlineKeyboardButton
 -- inline_message_id will be present. Exactly one of the
 -- fields data or game_short_name will be present.
 data CallbackQuery = CallbackQuery
-    { cq'id         :: Text
+    { cq'id                :: Text
     -- ^ Unique identifier for this query.
-    , cq'user       :: User
+    , cq'from              :: User
     -- ^ Sender.
-    , cq'message    :: Maybe Message
+    , cq'message           :: Maybe Message
     -- ^ Message with the callback button that originated the query.
     -- Note that message content and message date will not
     -- be available if the message is too old.
-    , cq'message_id :: Maybe Int
+    , cq'inline_message_id :: Maybe Int
     -- ^ Identifier of the message sent via
     -- the bot in inline mode, that originated the query.
-    , cq'data       :: Maybe Text
+    , cq'data              :: Maybe Text
     -- ^ Data associated with the callback button.
     -- Be aware that a bad client can send arbitrary data in this field.
     } deriving (Show, Generic)

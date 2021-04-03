@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 780964f61b2051cf0f454a9355f0458e796364066ebd75232aa3932cee9e924e
+-- hash: 80e2236165cc0c6ae77740bb8ae89095d1faf78dfdbb2cfe99b2e08982256cc8
 
 name:           echobot
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Bot.BotT
       Bot.Log
       Bot.Parser
       Bot.State
@@ -63,6 +64,7 @@ library
     , hspec-discover
     , http-client
     , http-client-tls
+    , monad-control
     , mtl
     , pretty-simple
     , quickcheck-instances
@@ -72,6 +74,8 @@ library
     , template-haskell
     , text
     , time
+    , transformers-base
+    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010
@@ -97,6 +101,7 @@ executable echobot-exe
     , hspec-discover
     , http-client
     , http-client-tls
+    , monad-control
     , mtl
     , pretty-simple
     , quickcheck-instances
@@ -106,6 +111,8 @@ executable echobot-exe
     , template-haskell
     , text
     , time
+    , transformers-base
+    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010
@@ -135,6 +142,7 @@ test-suite echobot-test
     , hspec-discover
     , http-client
     , http-client-tls
+    , monad-control
     , mtl
     , pretty-simple
     , quickcheck-instances
@@ -144,6 +152,8 @@ test-suite echobot-test
     , template-haskell
     , text
     , time
+    , transformers-base
+    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010

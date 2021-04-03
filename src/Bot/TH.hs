@@ -7,12 +7,10 @@ ToJSON and FromJSON typeclasses for ADTs via Template Haskell.
 -}
 
 module Bot.TH
-    ( -- * Derivation tools
-      -- ** Derivation with TH
+    ( -- * Derivation
       deriveJSON'
     , deriveToJSON'
     , deriveFromJSON'
-      -- ** Utils
     , snakeFieldModifier
     ) where
 
@@ -43,25 +41,27 @@ deriveFromJSON' name = deriveFromJSON (jsonOptions (nameBase name)) name
 -- | Set of options, used in this project for toJSON and fromJSON derivation.
 jsonOptions :: String -> Options
 jsonOptions tname = defaultOptions
-  { fieldLabelModifier     = snakeFieldModifier tname
-  , constructorTagModifier = snakeFieldModifier tname
-  , omitNothingFields      = True
-  }
+    { fieldLabelModifier     = safeTail . dropWhile (/= '\'')
+    , constructorTagModifier = snakeFieldModifier tname
+    , omitNothingFields      = True
+    }
+  where
+    safeTail :: [a] -> [a]
+    safeTail [] = []
+    safeTail xs = tail xs
 
 -- | This function takes care of formatting datatype's label names.
 --   It essentially removes label prefix and converts it's name
 --   from camelType to snake_type.
 snakeFieldModifier
-  :: String -- ^ Prefix, i.e. name of datatype.
-  -> String -- ^ Label name.
-  -> String
-snakeFieldModifier prefix xs =
-  wordsToSnake (deleteCommonPrefixWords prefix xs)
+    :: String -- ^ Prefix, i.e. is name of datatype.
+    -> String -- ^ Label name.
+    -> String
+snakeFieldModifier prefix xs = wordsToSnake (deleteCommonPrefixWords prefix xs)
 
 camelWords :: String -> [String]
 camelWords "" = []
-camelWords s
-  = case us of
+camelWords s = case us of
     (_:_:_) -> us : camelWords restLs
     _       -> (us ++ ls) : camelWords rest
   where
@@ -69,9 +69,7 @@ camelWords s
     (ls, rest)   = break isUpper restLs
 
 deleteCommonPrefix :: Eq a => [a] -> [a] -> [a]
-deleteCommonPrefix (x:xs) (y:ys) | x == y =
-  deleteCommonPrefix xs ys
-
+deleteCommonPrefix (x:xs) (y:ys) | x == y = deleteCommonPrefix xs ys
 deleteCommonPrefix _ ys = ys
 
 wordsToSnake :: [String] -> String
@@ -82,5 +80,6 @@ capitalise (c:s) = toUpper c : s
 capitalise ""    = ""
 
 deleteCommonPrefixWords :: String -> String -> [String]
-deleteCommonPrefixWords xs ys =
-  deleteCommonPrefix (camelWords xs) (camelWords (capitalise ys))
+deleteCommonPrefixWords xs ys = deleteCommonPrefix
+    (camelWords xs)
+    (camelWords (capitalise ys))
