@@ -5,10 +5,8 @@
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
 
-module Vk.Internal.Data where
+module Vk.Data where
 
-import           Bot.TH
-import           Bot.Utils
 import           Control.Applicative   ((<|>))
 import           Data.Aeson            hiding (Object)
 import           Data.Aeson.Text
@@ -20,6 +18,8 @@ import           Data.Text.Read
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics
 import           Servant.API           (ToHttpApiData (..))
+import           TH
+import           Utils
 
 newtype Ts = Ts Integer
     deriving (Show, Eq, Num)

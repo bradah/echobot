@@ -32,20 +32,32 @@ dependencies:
 - quickcheck-instances
 - configurator
 - random
+
 - servant
 - servant-client
 - http-client
+- http-conduit
 - http-client-tls
+- req
+
 - co-log
 - unordered-containers
 - directory
 - pretty-simple
-- chronos
 - vector
 - data-default
-- monad-control
-- transformers-base
-- unliftio-core
+- freer-simple
+- bytestring
+
+default-extensions:
+- OverloadedStrings
+- DataKinds
+- TypeOperators
+- FlexibleContexts
+- GADTs
+- LambdaCase
+- ScopedTypeVariables
+- RecordWildCards
 
 library:
   source-dirs: src

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 80e2236165cc0c6ae77740bb8ae89095d1faf78dfdbb2cfe99b2e08982256cc8
+-- hash: 0edc358145112dd689e4d69ecdf7a4cecb8d3600f26a901554eb1d4d41cbfc07
 
 name:           echobot
 version:        0.1.0.0
@@ -27,55 +27,53 @@ source-repository head
 
 library
   exposed-modules:
-      Bot.BotT
-      Bot.Log
-      Bot.Parser
-      Bot.State
-      Bot.TH
-      Bot.Utils
-      Telegram.Bot
-      Telegram.Internal.API
-      Telegram.Internal.Bot
-      Telegram.Internal.Data
-      Telegram.Internal.Requests
+      Configurator
+      Echo
+      FileProvider
+      Freer.HttpTest
+      Https
+      Log
+      Parser
+      Telegram.Data
       Telegram.Methods
       Telegram.Parser
-      Vk.Bot
-      Vk.Internal.Bot
-      Vk.Internal.Data
-      Vk.Internal.Methods
-      Vk.Internal.Request
+      Telegram.Requests
+      TH
+      Utils
+      Vk.Data
       Vk.Methods
       Vk.Parser
+      Vk.Requests
   other-modules:
       Paths_echobot
   hs-source-dirs:
       src
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
     , data-default
     , directory
+    , freer-simple
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
-    , monad-control
+    , http-conduit
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
+    , req
     , servant
     , servant-client
     , template-haskell
     , text
     , time
-    , transformers-base
-    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010
@@ -86,33 +84,34 @@ executable echobot-exe
       Paths_echobot
   hs-source-dirs:
       app
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -fno-warn-orphans
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
     , data-default
     , directory
     , echobot
+    , freer-simple
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
-    , monad-control
+    , http-conduit
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
+    , req
     , servant
     , servant-client
     , template-haskell
     , text
     , time
-    , transformers-base
-    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010
@@ -127,33 +126,34 @@ test-suite echobot-test
       Paths_echobot
   hs-source-dirs:
       test
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
     , data-default
     , directory
     , echobot
+    , freer-simple
     , hspec
     , hspec-discover
     , http-client
     , http-client-tls
-    , monad-control
+    , http-conduit
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
+    , req
     , servant
     , servant-client
     , template-haskell
     , text
     , time
-    , transformers-base
-    , unliftio-core
     , unordered-containers
     , vector
   default-language: Haskell2010

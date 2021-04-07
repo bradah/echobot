@@ -1,0 +1,403 @@
+[2021-04-06 09:56:05.71173783 UTC][Debug]   : hello
+[2021-04-06 12:59:55.045866268 MSK][Debug]   : hello
+[2021-04-06 13:01:26.212107572 MSK][Debug]   |: Hello my name is Oleg!
+[2021-04-06 13:01:58.750341532 MSK][Debug]   |: hello
+[2021-04-06 13:04:14.829597684 MSK][Debug]   |: sdf
+[2021-04-06 13:08:51.367907234 MSK][Debug]   |: hello
+[2021-04-06 13:10:15.937757698 MSK][Debug]   |: hello
+[2021-04-06 13:10:15.940284351 MSK][Warning] |: hello
+[2021-04-06 13:10:15.942495936 MSK][Error]   |: hello
+[2021-04-06 13:10:15.944637837 MSK][Info]    |: hello
+[2021-04-06 13:10:23.58693727 MSK][Debug]   |: dsf
+[2021-04-06 13:10:23.58979784 MSK][Warning] |: dsf
+[2021-04-06 13:10:23.592021485 MSK][Error]   |: dsf
+[2021-04-06 13:10:23.592718676 MSK][Info]    |: dsf
+[2021-04-06 13:11:43.350298634 MSK][Debug]   |: HI
+[2021-04-06 13:11:43.352381055 MSK][Warning] |: HI
+[2021-04-06 13:11:43.354147043 MSK][Error]   |: HI
+[2021-04-06 13:11:43.355265497 MSK][Info]    |: HI
+[2021-04-06 13:11:50.727642795 MSK][Debug]   |: S
+[2021-04-06 13:11:50.729817939 MSK][Warning] |: S
+[2021-04-06 13:11:50.731836008 MSK][Error]   |: S
+[2021-04-06 13:11:50.733911198 MSK][Info]    |: S
+[2021-04-06 13:11:51.499638707 MSK][Debug]   |: S
+[2021-04-06 13:11:51.501747285 MSK][Warning] |: S
+[2021-04-06 13:11:51.503474447 MSK][Error]   |: S
+[2021-04-06 13:11:51.504849938 MSK][Info]    |: S
+[2021-04-06 13:11:52.035330778 MSK][Debug]   |: S
+[2021-04-06 13:11:52.037388971 MSK][Warning] |: S
+[2021-04-06 13:11:52.039266745 MSK][Error]   |: S
+[2021-04-06 13:11:52.041244731 MSK][Info]    |: S
+[2021-04-06 13:11:52.299404484 MSK][Debug]   |: S
+[2021-04-06 13:11:52.301797083 MSK][Warning] |: S
+[2021-04-06 13:11:52.303849756 MSK][Error]   |: S
+[2021-04-06 13:11:52.305921951 MSK][Info]    |: S
+[2021-04-06 13:11:52.525570893 MSK][Debug]   |: S
+[2021-04-06 13:11:52.527467803 MSK][Warning] |: S
+[2021-04-06 13:11:52.529199368 MSK][Error]   |: S
+[2021-04-06 13:11:52.530874302 MSK][Info]    |: S
+[2021-04-06 13:11:52.760199846 MSK][Debug]   |: S
+[2021-04-06 13:11:52.762281483 MSK][Warning] |: S
+[2021-04-06 13:11:52.764053671 MSK][Error]   |: S
+[2021-04-06 13:11:52.765938718 MSK][Info]    |: S
+[2021-04-06 13:11:52.966466952 MSK][Debug]   |: S
+[2021-04-06 13:11:52.968418019 MSK][Warning] |: S
+[2021-04-06 13:11:52.970123355 MSK][Error]   |: S
+[2021-04-06 13:11:52.971733975 MSK][Info]    |: S
+[2021-04-06 13:11:53.175066732 MSK][Debug]   |: S
+[2021-04-06 13:11:53.176065859 MSK][Warning] |: S
+[2021-04-06 13:11:53.177063139 MSK][Error]   |: S
+[2021-04-06 13:11:53.17805652 MSK][Info]    |: S
+[2021-04-06 13:11:53.408788837 MSK][Debug]   |: S
+[2021-04-06 13:11:53.411153402 MSK][Warning] |: S
+[2021-04-06 13:11:53.413296916 MSK][Error]   |: S
+[2021-04-06 13:11:53.415409444 MSK][Info]    |: S
+[2021-04-06 13:11:53.660084832 MSK][Debug]   |: S
+[2021-04-06 13:11:53.662514172 MSK][Warning] |: S
+[2021-04-06 13:11:53.664426872 MSK][Error]   |: S
+[2021-04-06 13:11:53.666112833 MSK][Info]    |: S
+[2021-04-06 13:11:53.923504763 MSK][Debug]   |: S
+[2021-04-06 13:11:53.925497945 MSK][Warning] |: S
+[2021-04-06 13:11:53.9270534 MSK][Error]   |: S
+[2021-04-06 13:11:53.928603491 MSK][Info]    |: S
+[2021-04-06 13:11:54.215157165 MSK][Debug]   |: S
+[2021-04-06 13:11:54.217632752 MSK][Warning] |: S
+[2021-04-06 13:11:54.220086084 MSK][Error]   |: S
+[2021-04-06 13:11:54.222449148 MSK][Info]    |: S
+[2021-04-06 13:11:54.568805882 MSK][Debug]   |: S
+[2021-04-06 13:11:54.571285329 MSK][Warning] |: S
+[2021-04-06 13:11:54.573701537 MSK][Error]   |: S
+[2021-04-06 13:11:54.576149168 MSK][Info]    |: S
+[2021-04-06 13:11:54.942611446 MSK][Debug]   |: S
+[2021-04-06 13:11:54.944836762 MSK][Warning] |: S
+[2021-04-06 13:11:54.946619242 MSK][Error]   |: S
+[2021-04-06 13:11:54.949688295 MSK][Info]    |: S
+[2021-04-06 13:11:55.418293225 MSK][Debug]   |: S
+[2021-04-06 13:11:55.420662273 MSK][Warning] |: S
+[2021-04-06 13:11:55.422482089 MSK][Error]   |: S
+[2021-04-06 13:11:55.424186293 MSK][Info]    |: S
+[2021-04-06 13:11:55.721919085 MSK][Debug]   |: S
+[2021-04-06 13:11:55.723551074 MSK][Warning] |: S
+[2021-04-06 13:11:55.725168015 MSK][Error]   |: S
+[2021-04-06 13:11:55.72679609 MSK][Info]    |: S
+[2021-04-06 13:11:55.920124277 MSK][Debug]   |: S
+[2021-04-06 13:11:55.920934328 MSK][Warning] |: S
+[2021-04-06 13:11:55.921675992 MSK][Error]   |: S
+[2021-04-06 13:11:55.922363135 MSK][Info]    |: S
+[2021-04-06 13:11:56.102696704 MSK][Debug]   |: S
+[2021-04-06 13:11:56.105083329 MSK][Warning] |: S
+[2021-04-06 13:11:56.107118385 MSK][Error]   |: S
+[2021-04-06 13:11:56.109104964 MSK][Info]    |: S
+[2021-04-06 13:11:56.293536923 MSK][Debug]   |: S
+[2021-04-06 13:11:56.294482896 MSK][Warning] |: S
+[2021-04-06 13:11:56.295302009 MSK][Error]   |: S
+[2021-04-06 13:11:56.296164076 MSK][Info]    |: S
+[2021-04-06 13:11:56.499194471 MSK][Debug]   |: S
+[2021-04-06 13:11:56.500895378 MSK][Warning] |: S
+[2021-04-06 13:11:56.502333518 MSK][Error]   |: S
+[2021-04-06 13:11:56.504171203 MSK][Info]    |: S
+[2021-04-06 13:11:56.692027575 MSK][Debug]   |: S
+[2021-04-06 13:11:56.693724223 MSK][Warning] |: S
+[2021-04-06 13:11:56.695214516 MSK][Error]   |: S
+[2021-04-06 13:11:56.697241745 MSK][Info]    |: S
+[2021-04-06 13:11:56.896032786 MSK][Debug]   |: S
+[2021-04-06 13:11:56.896996559 MSK][Warning] |: S
+[2021-04-06 13:11:56.89786624 MSK][Error]   |: S
+[2021-04-06 13:11:56.898796695 MSK][Info]    |: S
+[2021-04-06 13:11:57.100408373 MSK][Debug]   |: S
+[2021-04-06 13:11:57.101523016 MSK][Warning] |: S
+[2021-04-06 13:11:57.102612971 MSK][Error]   |: S
+[2021-04-06 13:11:57.103651068 MSK][Info]    |: S
+[2021-04-06 13:11:57.302055764 MSK][Debug]   |: S
+[2021-04-06 13:11:57.30319376 MSK][Warning] |: S
+[2021-04-06 13:11:57.304183814 MSK][Error]   |: S
+[2021-04-06 13:11:57.305186731 MSK][Info]    |: S
+[2021-04-06 13:11:57.49574393 MSK][Debug]   |: S
+[2021-04-06 13:11:57.496688788 MSK][Warning] |: S
+[2021-04-06 13:11:57.497579468 MSK][Error]   |: S
+[2021-04-06 13:11:57.498614979 MSK][Info]    |: S
+[2021-04-06 13:11:57.677046992 MSK][Debug]   |: S
+[2021-04-06 13:11:57.677870043 MSK][Warning] |: S
+[2021-04-06 13:11:57.678517351 MSK][Error]   |: S
+[2021-04-06 13:11:57.679125433 MSK][Info]    |: S
+[2021-04-06 13:11:57.88821214 MSK][Debug]   |: S
+[2021-04-06 13:11:57.890351479 MSK][Warning] |: S
+[2021-04-06 13:11:57.892052613 MSK][Error]   |: S
+[2021-04-06 13:11:57.893796687 MSK][Info]    |: S
+[2021-04-06 13:11:58.07514819 MSK][Debug]   |: S
+[2021-04-06 13:11:58.075833587 MSK][Warning] |: S
+[2021-04-06 13:11:58.076325943 MSK][Error]   |: S
+[2021-04-06 13:11:58.07676304 MSK][Info]    |: S
+[2021-04-06 13:11:58.286922337 MSK][Debug]   |: S
+[2021-04-06 13:11:58.288846871 MSK][Warning] |: S
+[2021-04-06 13:11:58.290683987 MSK][Error]   |: S
+[2021-04-06 13:11:58.292741513 MSK][Info]    |: S
+[2021-04-06 13:11:58.473648899 MSK][Debug]   |: S
+[2021-04-06 13:11:58.474534228 MSK][Warning] |: S
+[2021-04-06 13:11:58.475302779 MSK][Error]   |: S
+[2021-04-06 13:11:58.476655059 MSK][Info]    |: S
+[2021-04-06 13:11:58.665076966 MSK][Debug]   |: S
+[2021-04-06 13:11:58.666166004 MSK][Warning] |: S
+[2021-04-06 13:11:58.667248324 MSK][Error]   |: S
+[2021-04-06 13:11:58.668318274 MSK][Info]    |: S
+[2021-04-06 13:11:58.85977952 MSK][Debug]   |: S
+[2021-04-06 13:11:58.861454089 MSK][Warning] |: S
+[2021-04-06 13:11:58.863092965 MSK][Error]   |: S
+[2021-04-06 13:11:58.864573759 MSK][Info]    |: S
+[2021-04-06 13:11:59.048079517 MSK][Debug]   |: S
+[2021-04-06 13:11:59.050337245 MSK][Warning] |: S
+[2021-04-06 13:11:59.052000164 MSK][Error]   |: S
+[2021-04-06 13:11:59.053751469 MSK][Info]    |: S
+[2021-04-06 13:31:12.442336331 MSK][Debug]   |: hello
+[2021-04-06 13:31:12.445277185 MSK][Warning] |: hello
+[2021-04-06 13:31:12.44800539 MSK][Error]   |: hello
+[2021-04-06 13:31:12.450669411 MSK][Info]    |: hello
+[2021-04-06 13:31:33.91873502 MSK][Debug]   |: [As
+[2021-04-06 13:31:33.92073545 MSK][Warning] |: [As
+[2021-04-06 13:31:33.922520015 MSK][Error]   |: [As
+[2021-04-06 13:31:33.924400738 MSK][Info]    |: [As
+[2021-04-06 13:31:36.622681718 MSK][Debug]   |: s
+[2021-04-06 13:31:36.625208329 MSK][Warning] |: s
+[2021-04-06 13:31:36.627008591 MSK][Error]   |: s
+[2021-04-06 13:31:36.627664034 MSK][Info]    |: s
+[2021-04-06 13:31:37.746522793 MSK][Debug]   |: 
+[2021-04-06 13:31:37.748707832 MSK][Warning] |: 
+[2021-04-06 13:31:37.750356947 MSK][Error]   |: 
+[2021-04-06 13:31:37.750873579 MSK][Info]    |: 
+[2021-04-06 13:31:39.673250151 MSK][Debug]   |: sdf
+[2021-04-06 13:31:39.675322899 MSK][Warning] |: sdf
+[2021-04-06 13:31:39.677062136 MSK][Error]   |: sdf
+[2021-04-06 13:31:39.677697796 MSK][Info]    |: sdf
+[2021-04-06 13:31:42.930823048 MSK][Debug]   |: asdf
+[2021-04-06 13:31:42.933395423 MSK][Warning] |: asdf
+[2021-04-06 13:31:42.935588203 MSK][Error]   |: asdf
+[2021-04-06 13:31:42.936333884 MSK][Info]    |: asdf
+[2021-04-06 13:31:51.027379604 MSK][Debug]   |: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:31:51.032573818 MSK][Warning] |: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:31:51.034236087 MSK][Error]   |: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:31:51.035834834 MSK][Info]    |: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:32:00.338472229 MSK][Debug]   |: a
+[2021-04-06 13:32:00.340901691 MSK][Warning] |: a
+[2021-04-06 13:32:00.343388442 MSK][Error]   |: a
+[2021-04-06 13:32:00.345699539 MSK][Info]    |: a
+[2021-04-06 13:32:10.349986186 MSK][Debug]   |: ahfjaksdhfjahsdfjkhsdjfhasdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+[2021-04-06 13:32:10.357657867 MSK][Warning] |: ahfjaksdhfjahsdfjkhsdjfhasdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+[2021-04-06 13:32:10.365744811 MSK][Error]   |: ahfjaksdhfjahsdfjkhsdjfhasdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+[2021-04-06 13:32:10.373545646 MSK][Info]    |: ahfjaksdhfjahsdfjkhsdjfhasdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+[2021-04-06 13:33:04.917032683 MSK][Debug]   s
+[2021-04-06 13:33:04.919197012 MSK][Warning] s
+[2021-04-06 13:33:04.921411273 MSK][Error]   s
+[2021-04-06 13:33:04.923621031 MSK][Info]    s
+[2021-04-06 13:33:09.385089352 MSK][Debug]   hello&
+[2021-04-06 13:33:09.387715167 MSK][Warning] hello&
+[2021-04-06 13:33:09.390082646 MSK][Error]   hello&
+[2021-04-06 13:33:09.392306106 MSK][Info]    hello&
+[2021-04-06 13:33:11.626705573 MSK][Debug]   hello?
+[2021-04-06 13:33:11.629506663 MSK][Warning] hello?
+[2021-04-06 13:33:11.63167588 MSK][Error]   hello?
+[2021-04-06 13:33:11.633494306 MSK][Info]    hello?
+[2021-04-06 13:42:54.29774223 MSK][Debug]   fasdfasdf
+[2021-04-06 13:42:54.299920863 MSK][Warning] fasdfasdf
+[2021-04-06 13:42:54.301677294 MSK][Error]   fasdfasdf
+[2021-04-06 13:42:54.30369713 MSK][Info]    fasdfasdf
+[2021-04-06 13:51:52.458673842 MSK][Debug]   hello
+[2021-04-06 13:51:52.461551406 MSK][Warning] hello
+[2021-04-06 13:51:52.463750778 MSK][Error]   hello
+[2021-04-06 13:51:52.46589705 MSK][Info]    hello
+[2021-04-06 13:51:54.821301364 MSK][Debug]   kashdlfjkhasdljkfhlasdjkfasd
+[2021-04-06 13:51:54.824341694 MSK][Warning] kashdlfjkhasdljkfhlasdjkfasd
+[2021-04-06 13:51:54.827128235 MSK][Error]   kashdlfjkhasdljkfhlasdjkfasd
+[2021-04-06 13:51:54.829550432 MSK][Info]    kashdlfjkhasdljkfhlasdjkfasd
+[2021-04-06 13:52:10.128933713 MSK][Debug]   daaaaaaaaaaaaaaaaaaaamin
+[2021-04-06 13:52:10.131654663 MSK][Warning] daaaaaaaaaaaaaaaaaaaamin
+[2021-04-06 13:52:10.134123555 MSK][Error]   daaaaaaaaaaaaaaaaaaaamin
+[2021-04-06 13:52:10.13487563 MSK][Info]    daaaaaaaaaaaaaaaaaaaamin
+[2021-04-06 13:52:26.124869239 MSK][Debug]   sssshello
+[2021-04-06 13:52:26.12697239 MSK][Warning] sssshello
+[2021-04-06 13:52:26.128738635 MSK][Error]   sssshello
+[2021-04-06 13:52:26.130156836 MSK][Info]    sssshello
+[2021-04-06 13:52:31.475768928 MSK][Debug]   aaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:52:31.47839794 MSK][Warning] aaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:52:31.480861136 MSK][Error]   aaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:52:31.483183377 MSK][Info]    aaaaaaaaaaaaaaaaaaaaaaaaa
+[2021-04-06 13:52:38.819426974 MSK][Debug]   shit
+[2021-04-06 13:52:38.822108137 MSK][Warning] shit
+[2021-04-06 13:52:38.824388949 MSK][Error]   shit
+[2021-04-06 13:52:38.826335805 MSK][Info]    shit
+[][Debug]   s
+[][Warning] s
+[][Error]   s
+[][Info]    s
+[+03:00][Debug]   s
+[+03:00][Warning] s
+[+03:00][Error]   s
+[+03:00][Info]    s
+[Tue Apr  6 14:00:21 MSK 2021][Debug]   s
+[Tue Apr  6 14:00:21 MSK 2021][Warning] s
+[Tue Apr  6 14:00:21 MSK 2021][Error]   s
+[Tue Apr  6 14:00:21 MSK 2021][Info]    s
+[Tue Apr  6 14:01:10 MSK 2021][Debug]   sdfasdf
+[Tue Apr  6 14:01:10 MSK 2021][Warning] sdfasdf
+[Tue Apr  6 14:01:10 MSK 2021][Error]   sdfasdf
+[Tue Apr  6 14:01:10 MSK 2021][Info]    sdfasdf
+[Tue Apr  6 14:01:15 MSK 2021][Debug]   sdfasdfsdf
+[Tue Apr  6 14:01:15 MSK 2021][Warning] sdfasdfsdf
+[Tue Apr  6 14:01:15 MSK 2021][Error]   sdfasdfsdf
+[Tue Apr  6 14:01:15 MSK 2021][Info]    sdfasdfsdf
+[Tue Apr  6 14:02:56 MSK 2021][Debug]   :r
+[Tue Apr  6 14:02:56 MSK 2021][Warning] :r
+[Tue Apr  6 14:02:56 MSK 2021][Error]   :r
+[Tue Apr  6 14:02:56 MSK 2021][Info]    :r
+[14:03:02][Debug]   s
+[14:03:02][Warning] s
+[14:03:02][Error]   s
+[14:03:02][Info]    s
+[278862488000][Debug]   s
+[280209545000][Warning] s
+[281517611000][Error]   s
+[282751890000][Info]    s
+[281186238000][Debug]   sd
+[281737572000][Warning] sd
+[282134415000][Error]   sd
+[282418429000][Info]    sd
+[846800248000][Debug]   dsf
+[847984648000][Warning] dsf
+[849031841000][Error]   dsf
+[850253438000][Info]    dsf
+[091232448000][Debug]   f
+[092898942000][Warning] f
+[094028680000][Error]   f
+[095165390000][Info]    f
+[288712839000][Debug]   f
+[290307006000][Warning] f
+[291604764000][Error]   f
+[292862117000][Info]    f
+[665685151000][Debug]   ff
+[667053772000][Warning] ff
+[668107470000][Error]   ff
+[669249945000][Info]    ff
+[866936862000][Debug]   f
+[868189484000][Warning] f
+[869195735000][Error]   f
+[870102553000][Info]    f
+[079024260000][Debug]   f
+[080252595000][Warning] f
+[081266724000][Error]   f
+[082235993000][Info]    f
+[264247129000][Debug]   f
+[265791906000][Warning] f
+[266928885000][Error]   f
+[268131309000][Info]    f
+[473041571000][Debug]   f
+[473520091000][Warning] f
+[473917993000][Error]   f
+[474275836000][Info]    f
+[682430476000][Debug]   f
+[682926116000][Warning] f
+[683346703000][Error]   f
+[683728124000][Info]    f
+[887757184000][Debug]   f
+[888182690000][Warning] f
+[888568012000][Error]   f
+[888934842000][Info]    f
+[185550872000][Debug]   f
+[186678936000][Warning] f
+[187540910000][Error]   f
+[188436548000][Info]    f
+[398173799000][Debug]   d
+[398641670000][Warning] d
+[399039633000][Error]   d
+[399309168000][Info]    d
+[649062618000][Debug]   d
+[649574566000][Warning] d
+[649968358000][Error]   d
+[650352559000][Info]    d
+[868079809000][Debug]   s
+[868548953000][Warning] s
+[868926930000][Error]   s
+[869278846000][Info]    s
+[181942045000][Debug]   df
+[182603180000][Warning] df
+[183108193000][Error]   df
+[183571347000][Info]    df
+[500862443000][Debug]   sdf
+[501532491000][Warning] sdf
+[502003651000][Error]   sdf
+[502425552000][Info]    sdf
+[835334403000][Debug]   adf
+[835971814000][Warning] adf
+[836338392000][Error]   adf
+[836640965000][Info]    adf
+[205825354000][Debug]   asdf
+[207167837000][Warning] asdf
+[208410699000][Error]   asdf
+[209615270000][Info]    asdf
+[583398294000][Debug]   asdf
+[584834240000][Warning] asdf
+[586059797000][Error]   asdf
+[587248417000][Info]    asdf
+[015524901000][Debug]   asdf
+[016791851000][Warning] asdf
+[017830099000][Error]   asdf
+[018773885000][Info]    asdf
+[407893745000][Debug]   asdf
+[408447707000][Warning] asdf
+[408893097000][Error]   asdf
+[409355586000][Info]    asdf
+[852537550000][Debug]   asdf
+[853175224000][Warning] asdf
+[853601008000][Error]   asdf
+[854005892000][Info]    asdf
+[284701439000][Debug]   asdf
+[285524773000][Warning] asdf
+[286087799000][Error]   asdf
+[286617684000][Info]    asdf
+[718700399000][Debug]   asdf
+[720090809000][Warning] asdf
+[721305574000][Error]   asdf
+[722261951000][Info]    asdf
+[115540194000][Debug]   asdf
+[117011219000][Warning] asdf
+[118051460000][Error]   asdf
+[118951640000][Info]    asdf
+[Tue Apr  6 14:06:24 MSK 2021][Debug]   s
+[Tue Apr  6 14:06:24 MSK 2021][Warning] s
+[Tue Apr  6 14:06:24 MSK 2021][Error]   s
+[Tue Apr  6 14:06:24 MSK 2021][Info]    s
+[Tue Apr  6 14:07:39 MSK 2021][Debug]   sdfasdf
+[Tue Apr  6 14:07:39 MSK 2021][Warning] sdfasdf
+[Tue Apr  6 14:07:39 MSK 2021][Error]   sdfasdf
+[Tue Apr  6 14:07:39 MSK 2021][Info]    sdfasdf
+[Tue Apr  6 14:20:16 MSK 2021][Debug]   [Info]    [06 Apr 2021 11:20:08.305 +00:00] [Telegram.Bot.logInfo#92] [ThreadId 347] Starting Telegram bot:
+[Tue Apr  6 14:20:16 MSK 2021][Warning] [Info]    [06 Apr 2021 11:20:08.305 +00:00] [Telegram.Bot.logInfo#92] [ThreadId 347] Starting Telegram bot:
+[Tue Apr  6 14:20:16 MSK 2021][Error]   [Info]    [06 Apr 2021 11:20:08.305 +00:00] [Telegram.Bot.logInfo#92] [ThreadId 347] Starting Telegram bot:
+[Tue Apr  6 14:20:16 MSK 2021][Info]    [Info]    [06 Apr 2021 11:20:08.305 +00:00] [Telegram.Bot.logInfo#92] [ThreadId 347] Starting Telegram bot:
+[Tue Apr  6 14:20:20 MSK 2021][Debug]   Response
+[Tue Apr  6 14:20:20 MSK 2021][Warning] Response
+[Tue Apr  6 14:20:20 MSK 2021][Error]   Response
+[Tue Apr  6 14:20:20 MSK 2021][Info]    Response
+[Tue Apr  6 14:20:51 MSK 2021][Error]   [Info]    [06 Apr 2021 11:20:08.305 +00:00] [Telegram.Bot.logInfo#92] [ThreadId 347] Starting Telegram bot:
+[Tue Apr  6 14:20:53 MSK 2021][Error]   Response
+[Tue Apr  6 14:20:54 MSK 2021][Error]       { resp'ok = True
+[Tue Apr  6 14:20:54 MSK 2021][Error]       , resp'description = Nothing
+[Tue Apr  6 14:20:54 MSK 2021][Error]       , resp'result = User
+[Tue Apr  6 14:20:55 MSK 2021][Error]           { usr'id = 1113143589
+[Tue Apr  6 14:20:55 MSK 2021][Error]           , usr'is_bot = True
+[Tue Apr  6 14:20:55 MSK 2021][Error]           , usr'first_name = "Echo"
+[Tue Apr  6 14:20:55 MSK 2021][Error]           , usr'last_name = Nothing
+[Tue Apr  6 14:20:56 MSK 2021][Error]           , usr'username = Just "dirtehbot"
+[Tue Apr  6 14:20:56 MSK 2021][Error]           }
+[Tue Apr  6 14:20:56 MSK 2021][Error]       , resp'errorCode = Nothing
+[Tue Apr  6 14:20:56 MSK 2021][Error]       }
+[Tue Apr  6 14:20:57 MSK 2021][Error]   [Debug]   [06 Apr 2021 11:20:08.310 +00:00] [Telegram.Bot.logDebug#94] [ThreadId 347] Created environment:
+[Tue Apr  6 14:20:57 MSK 2021][Error]   Env
+[Tue Apr  6 14:20:57 MSK 2021][Error]       { envToken = "1113143589:AAFCASoox-IOgugA_Yuhx6GA1EhlLXCpY74"
+[Tue Apr  6 14:20:57 MSK 2021][Error]       , envLogAction = LogAction
+[Tue Apr  6 14:20:58 MSK 2021][Error]       , envClientEnv = BaseUrl
+[Tue Apr  6 14:20:58 MSK 2021][Error]           { baseUrlScheme = Https
+[Tue Apr  6 14:20:58 MSK 2021][Error]           , baseUrlHost = "api.telegram.org"
+[Tue Apr  6 14:20:58 MSK 2021][Error]           , baseUrlPort = 443
+[Tue Apr  6 14:20:58 MSK 2021][Error]           , baseUrlPath = "/bot1113143589:AAFCASoox-IOgugA_Yuhx6GA1EhlLXCpY74"
+[Tue Apr  6 14:20:59 MSK 2021][Error]           }
+[Tue Apr  6 14:20:59 MSK 2021][Error]       }
+[Tue Apr  6 14:20:59 MSK 2021][Error]   [Info]    [06 Apr 2021 11:20:08.312 +00:00] [Telegram.Methods.logInfo#58] [ThreadId 347] Waiting for updates...

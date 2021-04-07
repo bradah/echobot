@@ -8,7 +8,7 @@ Maintainer: wspbr <rtrn.0@ya.ru>
 This module defines basic Telegram API types.
 -}
 
-module Telegram.Internal.Data
+module Telegram.Data
     ( -- * Available types
       -- ** Token
       Update(..)
@@ -38,7 +38,7 @@ module Telegram.Internal.Data
     ) where
 
 
-import           Bot.TH
+import           TH
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           GHC.Generics

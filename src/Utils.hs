@@ -9,7 +9,7 @@ Maintainer: wspbr <rtrn.0@ya.ru>
 This module contains some useful functions.
 -}
 
-module Bot.Utils
+module Utils
     ( -- * Utility functions
       -- ** Show pretty text.
       showP
@@ -17,17 +17,9 @@ module Bot.Utils
     , (<!>)
     ) where
 
-import           Colog              (LogAction)
 import           Data.Text          (Text, pack)
 import           Data.Text.Lazy     (toStrict)
-import           Servant.Client     (ClientEnv (..))
 import           Text.Pretty.Simple
-
-instance Show ClientEnv where
-    show (ClientEnv _ base _) = show base
-
-instance Show (LogAction a b) where
-    show _ = "LogAction"
 
 -- | Pretty version of show for 'Text'.
 showP :: Show a => a -> Text

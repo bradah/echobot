@@ -45,7 +45,7 @@ runBot bot env st = runClientM (runStateT (runReaderT (unBotM bot) env) st) (env
 
 -- | Lift ClientM computation to the 'Bot' monad.
 liftClient :: ClientM a -> Bot a
-liftClient = BotM . lift . lift
+liftClient = lift
 
 type IsBot t b =
     ( HasLog Env Colog.Message (t b)

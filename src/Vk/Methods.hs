@@ -2,11 +2,11 @@
 {-# LANGUAGE RecordWildCards   #-}
 module Vk.Methods where
 
-import           Control.Monad.Reader
+{- import           Control.Monad.Reader
 import           Control.Monad.State
 import           Data.Text            (Text)
 
-import           Bot.Log              hiding (Message)
+import           Log              hiding (Message)
 import           Bot.State
 import           Bot.Utils
 import           Vk.Internal.Bot
@@ -81,3 +81,4 @@ sendSticker userId s = do
         []
         envToken
         envApiVersion
+ -}

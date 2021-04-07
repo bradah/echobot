@@ -1,10 +1,15 @@
-{-# LANGUAGE OverloadedStrings #-}
+module Main where
+
+main :: IO ()
+main = putStrLn "implement me pls"
+{- {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import           Bot.Log
 import           Control.Exception (bracket)
 import           Control.Monad     (forever)
 import           System.Exit       (exitSuccess)
+import Control.Monad.Freer
 import           System.IO
 import qualified Telegram.Bot      as Tg
 import qualified Vk.Bot            as Vk
@@ -36,3 +41,5 @@ main = forever $ bracket acquire release loop
             "2" -> Vk.run $ logStdOut Debug
             "q" -> exitSuccess
             _   -> pure ()
+ -}
+

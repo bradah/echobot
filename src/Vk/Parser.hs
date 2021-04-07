@@ -15,13 +15,13 @@ module Vk.Parser
     , unsupported
     ) where
 
-import           Bot.Parser
+import           Parser
 import           Control.Applicative
 import           Control.Monad
 import           Data.Foldable       (asum)
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
-import           Vk.Internal.Data
+import           Vk.Data
 
 
 -- | Extract text from 'Update'.

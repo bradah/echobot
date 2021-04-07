@@ -6,7 +6,7 @@ This module contains lens-like functions to extract fields from
 Telegram API ADTs such as 'Update' or 'Message'.
 -}
 
-module Bot.Parser
+module Parser
     ( Parser(..)
     , (<?>)
     ) where

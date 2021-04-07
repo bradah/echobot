@@ -3,12 +3,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Vk.Internal.Request where
+module Vk.Requests where
 
-import           Bot.TH
+import           TH
 import           Data.Text        (Text)
 import           GHC.Generics
-import           Vk.Internal.Data
+import           Vk.Data
 
 import           Servant.API      (ToHttpApiData (..))
 

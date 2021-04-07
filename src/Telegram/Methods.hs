@@ -8,8 +8,8 @@ Maintainer: wspbr <rtrn.0@ya.ru>
 This module contains high-level functions for Telegram API methods.
 -}
 
-module Telegram.Methods
-    ( -- * Available methods
+module Telegram.Methods where
+{-     ( -- * Available methods
       liftClient
       -- ** Getting updates
     , getUpdates
@@ -341,3 +341,4 @@ sendMediaWithCaption method body name cid = do
         <> ")"
     resp <- head <$> replicateM repeatNum (liftClient $ method body)
     logDebug $ "Response " <!> showP resp
+ -}

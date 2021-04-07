@@ -6,7 +6,7 @@ This module contains useful functions providing simple derivation of
 ToJSON and FromJSON typeclasses for ADTs via Template Haskell.
 -}
 
-module Bot.TH
+module TH
     ( -- * Derivation
       deriveJSON'
     , deriveToJSON'

@@ -33,8 +33,8 @@ import           Control.Applicative
 import           Control.Monad          ((>=>))
 import           Data.Text              hiding (empty, head)
 
-import           Bot.Parser
-import           Telegram.Internal.Data
+import           Parser
+import           Telegram.Data
 
 -- | Get 'ChatId' of an 'Update'.
 chatId :: Parser Update Int

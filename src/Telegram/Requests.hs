@@ -9,7 +9,7 @@ This module defines basic Telegram API types for request bodies
 and responses.
 -}
 
-module Telegram.Internal.Requests
+module Telegram.Requests
     ( -- * Requests and responses
       -- ** Response
       Response(..)
@@ -33,8 +33,8 @@ module Telegram.Internal.Requests
 import           Data.Text              (Text)
 import           GHC.Generics
 
-import           Bot.TH
-import           Telegram.Internal.Data
+import           TH
+import           Telegram.Data
 
 
 -- | Telegram response.
