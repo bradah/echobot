@@ -10,39 +10,47 @@ This module defines basic Telegram API types.
 
 module Telegram.Data
     ( -- * Available types
-      -- ** Token
-      Update(..)
+      -- ** Response
+      Response (..)
+      -- ** Update
+    , Update (..)
       -- ** Message
-    , Message(..)
+    , Message (..)
       -- ** User
-    , User(..)
+    , User (..)
       -- ** Chat
-    , Chat(..)
+    , Chat (..)
       -- ** Message entities
-    , MessageEntity(..)
-    , MessageEntityType(..)
+    , MessageEntity (..)
+    , MessageEntityType (..)
       -- ** Inline keyboards
-    , InlineKeyboardMarkup(..)
-    , InlineKeyboardButton(..)
+    , InlineKeyboardMarkup (..)
+    , InlineKeyboardButton (..)
       -- ** Callbacks
-    , CallbackQuery(..)
+    , CallbackQuery (..)
       -- ** Media
-    , Sticker(..)
-    , PhotoSize(..)
-    , Animation(..)
-    , Audio(..)
-    , Document(..)
-    , Video(..)
-    , VideoNote(..)
-    , Voice(..)
+    , Sticker (..)
+    , PhotoSize (..)
+    , Animation (..)
+    , Audio (..)
+    , Document (..)
+    , Video (..)
+    , VideoNote (..)
+    , Voice (..)
     ) where
 
 
-import           TH
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
-import           GHC.Generics
+import           TH                    (deriveFromJSON', deriveJSON')
 
+-- | Telegram response.
+data Response a = Response
+    { resp'ok          :: Bool
+    , resp'description :: Maybe Text
+    , resp'result      :: a
+    , resp'errorCode   :: Maybe Int
+    } deriving (Show)
 
 -- | This object represents an incoming update.
 --   At most one of the optional parameters can be
@@ -58,7 +66,7 @@ data Update = Update
     -- and was edited.
     , upd'callback_query :: Maybe CallbackQuery
     -- ^ New incoming callback query.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents a message.
 data Message = Message
@@ -99,7 +107,7 @@ data Message = Message
     -- ^ Message is a video note, information about the video message.
     , msg'voice        :: Maybe Voice
     -- ^ Message is a voice message, information about the file.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- ** User
 
@@ -115,7 +123,7 @@ data User = User
     -- ^ User's or bot's last name.
     , usr'username   :: Maybe Text
     -- ^ User's or bot's username.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents a chat.
 data Chat = Chat
@@ -124,7 +132,7 @@ data Chat = Chat
     , chat'username :: Maybe Text
     -- ^ Username, for private chats, supergroups
     -- and channels if available.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents one special entity in a text message.
 --   For example, hashtags, usernames, URLs, etc.
@@ -147,7 +155,7 @@ data MessageEntity = MessageEntity
     -- after user taps on the text.
     , msgent'user   :: Maybe User
     -- ^ For “text_mention” only, the mentioned user.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | Type of the entity. Can be mention (@username),
 --   hashtag, bot_command, url, email, bold (bold text),
@@ -171,14 +179,14 @@ data MessageEntityType
     | TextMention
     | Cashtag
     | PhoneNumber
-    deriving (Show, Generic)
+    deriving (Show)
 
 -- | This object represents a sticker.
 newtype Sticker = Sticker
     { stk'file_id :: Text
     -- ^ Identifier for this file, which can
     -- be used to download or reuse the file.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents an inline keyboard
 -- that appears right next to the message it belongs to.
@@ -186,7 +194,7 @@ newtype InlineKeyboardMarkup = InlineKeyboardMarkup
     { kbmup'inline_keyboard :: [[InlineKeyboardButton]]
     -- ^ Array of button rows, each represented
     -- by an Array of 'InlineKeyboardButton' objects
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents one button of an inline
 -- keyboard. You must use exactly one of the optional fields.
@@ -197,7 +205,7 @@ data InlineKeyboardButton = InlineKeyboardButton
     -- ^ Data to be sent in a callback
     -- query to the bot when button is pressed,
     -- 1-64 bytes
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents an incoming callback query
 -- from a callback button in an inline keyboard.
@@ -222,63 +230,63 @@ data CallbackQuery = CallbackQuery
     , cq'data              :: Maybe Text
     -- ^ Data associated with the callback button.
     -- Be aware that a bad client can send arbitrary data in this field.
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents one size of a photo
 -- or a file\/sticker thumbnail.
 newtype PhotoSize = PhotoSize
     { ph'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents an animation
 -- file (GIF or H.264\/MPEG-4 AVC video without sound).
 newtype Animation = Animation
     { anim'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents an audio file to be treated as
 -- music by the Telegram clients.
 newtype Audio = Audio
     { audio'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents a general file
 -- (as opposed to photos, voice messages and audio files).
 newtype Document = Document
     { doc'file_id :: Text
-    } deriving (Show, Generic)
-
+    } deriving (Show)
 
 -- | This object represents a video file.
 newtype Video = Video
     { vid'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents a video message
 -- (available in Telegram apps as of v.4.0).
 newtype VideoNote = VideoNote
     { vidnote'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 -- | This object represents a voice note.
 newtype Voice = Voice
     { voice'file_id :: Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
-deriveJSON' ''Animation
-deriveJSON' ''Audio
-deriveJSON' ''Document
-deriveJSON' ''Video
-deriveJSON' ''VideoNote
-deriveJSON' ''Voice
-deriveJSON' ''PhotoSize
-deriveJSON' ''CallbackQuery
 deriveJSON' ''InlineKeyboardButton
 deriveJSON' ''InlineKeyboardMarkup
-deriveJSON' ''User
-deriveJSON' ''Chat
-deriveJSON' ''MessageEntityType
-deriveJSON' ''MessageEntity
-deriveJSON' ''Message
-deriveJSON' ''Update
-deriveJSON' ''Sticker
+deriveFromJSON' ''Animation
+deriveFromJSON' ''Audio
+deriveFromJSON' ''Document
+deriveFromJSON' ''Video
+deriveFromJSON' ''VideoNote
+deriveFromJSON' ''Voice
+deriveFromJSON' ''PhotoSize
+deriveFromJSON' ''CallbackQuery
+deriveFromJSON' ''User
+deriveFromJSON' ''Chat
+deriveFromJSON' ''MessageEntityType
+deriveFromJSON' ''MessageEntity
+deriveFromJSON' ''Message
+deriveFromJSON' ''Update
+deriveFromJSON' ''Sticker
+deriveFromJSON' ''Response

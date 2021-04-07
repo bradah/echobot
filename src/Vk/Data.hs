@@ -8,18 +8,15 @@
 module Vk.Data where
 
 import           Control.Applicative   ((<|>))
-import           Data.Aeson            hiding (Object)
-import           Data.Aeson.Text
-import           Data.Char             (toLower)
+import           Data.Aeson            (FromJSON (parseJSON), ToJSON (toJSON),
+                                        withObject, withText, (.:))
 import           Data.Maybe            (fromMaybe)
 import           Data.Text             (Text, intercalate, pack)
-import qualified Data.Text             as T (head, tail)
-import           Data.Text.Read
+import           Data.Text.Read        (decimal)
 import           Data.Time.Clock.POSIX (POSIXTime)
-import           GHC.Generics
 import           Servant.API           (ToHttpApiData (..))
-import           TH
-import           Utils
+import           TH                    (deriveFromJSON', snakeFieldModifier)
+import           Utils                 (showT)
 
 newtype Ts = Ts Integer
     deriving (Show, Eq, Num)
@@ -40,7 +37,7 @@ type Token = Text
 data Update = Update
   { updateType   :: UpdateType
   , updateObject :: Object
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data UpdateType
   = UpdateTypeMessageNew
@@ -50,11 +47,11 @@ data UpdateType
   | UpdateTypeMessageDeny
   | UpdateTypeMessageTypingState
   | UpdateTypeMessageEvent
-  deriving (Show, Generic)
+  deriving (Show)
 
 data Object = Object
   { objectMessage    :: Maybe Message
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data Message = Message
   { messageId           :: Maybe MessageId
@@ -67,7 +64,7 @@ data Message = Message
   , messageKeyboard     :: Maybe Keyboard
   , messageFwdMessages  :: Maybe [Message]
   , messageReplyMessage :: Maybe Message
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 type RandomId = Int
 type MessageId = Int
@@ -75,7 +72,7 @@ type MessageId = Int
 data Attachment = Attachment
   { attachmentType  :: AttachmentType
   , attachmentMedia :: Media
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 instance FromJSON Attachment where
     parseJSON = withObject "attachment" $ \o -> do
@@ -120,7 +117,7 @@ data AttachmentType
     | Market
     | Wall
     | Sticker
-    deriving (Show, Generic)
+    deriving (Show)
 
 instance ToHttpApiData AttachmentType where
     toUrlPiece = pack . snakeFieldModifier "" . show
@@ -136,7 +133,7 @@ data Media = Media
     , mediaTitle       :: Maybe Text
     , mediaCaption     :: Maybe Text
     , mediaDescription :: Maybe Text
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 type MediaId = Int
 type StickerId = Int
@@ -145,34 +142,33 @@ data Keyboard = Keyboard
   { keyboardOneTime :: Bool
   , keyboardButton  :: [[Button]]
   , keyboardInline  :: Bool
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data Button = Button
   { buttonAction :: ButtonAction
   , buttonColor  :: ButtonColor
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data ButtonColor
   = ButtonColorPrimary
   | ButtonColorSecondary
   | ButtonColorNegative
   | ButtonColorPositive
-  deriving (Show, Generic)
+  deriving (Show)
 
 data ButtonAction = ButtonAction
   { buttonActionType    :: ButtonActionType
   , buttonActionLabel   :: Maybe Text
   , buttonActionPayload :: Payload
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data ButtonActionType
   = ButtonActionText
-  deriving (Show, Generic)
+  deriving (Show)
 
 type Payload = Text
 
 type UserId = Int
-
 
 deriveFromJSON' ''ButtonActionType
 deriveFromJSON' ''ButtonAction

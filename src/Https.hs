@@ -1,32 +1,47 @@
-module Https where
+module Https
+    ( Https (..)
+    , Url
+    , get
+    , post
+    , reqHttps
+    , url
+    , ReqBodyUrlEnc (..)
+    , json
+    , ReqBodyJson (..)
+    , (/:)
+    , (=:)
+    , https
+    ) where
 
-import           Control.Exception         (try)
-import           Control.Monad.Freer       hiding (run)
-import           Control.Monad.Freer.Error
-import           Control.Monad.IO.Class
-import           Data.Aeson
-import           Network.HTTP.Req          hiding (Https)
-import qualified Network.HTTP.Req          as Req (Scheme (..))
+import           Control.Monad.Freer (Eff, LastMember, Member, interpret, send)
+import           Data.Aeson          (FromJSON, ToJSON)
+import           Error               (AppError (HttpsError), Error, throwError,
+                                      try)
+import           Network.HTTP.Req    (FormUrlEncodedParam, GET (GET), HttpBody,
+                                      NoReqBody (NoReqBody), POST (POST),
+                                      ReqBodyJson (..), ReqBodyUrlEnc (..),
+                                      defaultHttpConfig, https, jsonResponse,
+                                      req, responseBody, runReq, (/:), (=:))
+import qualified Network.HTTP.Req    as Req (Scheme (..), Url)
 
 data Https a where
     Get
         :: (FromJSON a)
-        => Url 'Req.Https
+        => Url
         -> Https a
     Post
         :: (FromJSON a, HttpBody b)
-        => Url 'Req.Https
+        => Url
         -> b
         -> Https a
 
-newtype HttpsError = HttpsError HttpException
-    deriving Show
+type Url = Req.Url 'Req.Https
 
 get
     :: ( Member Https r
        , FromJSON a
        )
-    => Url 'Req.Https
+    => Url
     -> Eff r a
 get = send . Get
 
@@ -35,14 +50,14 @@ post
        , FromJSON a
        , HttpBody b
        )
-    => Url Req.Https
+    => Url
     -> b
     -> Eff r a
 post endpoint body = send $ Post endpoint body
 
 reqHttps
     :: ( LastMember IO r
-       , Member (Error HttpsError) r
+       , Member (Error AppError) r
        , FromJSON a
        )
     => Eff (Https : r) a
@@ -61,5 +76,5 @@ reqHttps = interpret $ \case
 url :: FormUrlEncodedParam -> ReqBodyUrlEnc
 url = ReqBodyUrlEnc
 
-json :: FromJSON a => a -> ReqBodyJson a
+json :: ToJSON a => a -> ReqBodyJson a
 json = ReqBodyJson

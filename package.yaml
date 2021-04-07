@@ -57,10 +57,14 @@ default-extensions:
 - GADTs
 - LambdaCase
 - ScopedTypeVariables
+- TypeApplications
 - RecordWildCards
+- ConstraintKinds
 
 library:
   source-dirs: src
+  ghc-options:
+  - -Wall
 
 executables:
   echobot-exe:
@@ -71,7 +75,6 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
-    - -fno-warn-orphans
     dependencies:
     - echobot
 

@@ -1,15 +1,14 @@
 module FileProvider where
 
-import           Control.Exception         (IOException, try)
-import           Control.Monad.Freer
-import           Control.Monad.Freer.Error
-import           Data.Text                 (Text)
-import qualified Data.Text.IO              as T (hGetContents, hGetLine,
-                                                 hPutStrLn)
-import           Prelude                   hiding (readFile)
-import           System.IO                 (BufferMode (..), Handle,
-                                            IOMode (..), hSetBuffering)
-import qualified System.IO                 as IO (hClose, openFile)
+import           Control.Monad.Freer (Eff, Member, Members, interpret, send)
+import           Data.Text           (Text)
+import qualified Data.Text.IO        as T (hGetContents, hGetLine, hPutStrLn)
+import           Error               (AppError (FileProviderError), Error,
+                                      IOException, catchError, throwError, try)
+import           Prelude             hiding (readFile)
+import           System.IO           (BufferMode (..), Handle, IOMode (..),
+                                      hSetBuffering)
+import qualified System.IO           as IO (hClose, openFile)
 
 data FileProvider a where
     OpenFile :: FilePath -> IOMode -> FileProvider Handle
@@ -17,9 +16,6 @@ data FileProvider a where
     HGetContents :: Handle -> FileProvider Text
     HPutStrLn :: Handle -> Text -> FileProvider ()
     HGetLine :: Handle -> FileProvider Text
-
-newtype FileProviderError = FileProviderError String
-    deriving Show
 
 openFile
     :: Member FileProvider r
@@ -54,7 +50,7 @@ hGetLine
 hGetLine = send . HGetLine
 
 localFileProvider
-    :: Members [IO, Error FileProviderError] r
+    :: Members [IO, Error AppError] r
     => Eff (FileProvider : r) a
     -> Eff r a
 localFileProvider = interpret $ \case
@@ -62,34 +58,31 @@ localFileProvider = interpret $ \case
         h <- IO.openFile path mode
         hSetBuffering h NoBuffering
         pure h
-    HClose handle        -> sendOrThrow $ IO.hClose handle
-    HGetContents handle  -> sendOrThrow $ T.hGetContents handle
-    HPutStrLn handle text -> sendOrThrow $ T.hPutStrLn handle text
-    HGetLine handle -> sendOrThrow $ T.hGetLine handle
+    HClose h        -> sendOrThrow $ IO.hClose h
+    HGetContents h  -> sendOrThrow $ T.hGetContents h
+    HPutStrLn h text -> sendOrThrow $ T.hPutStrLn h text
+    HGetLine h -> sendOrThrow $ T.hGetLine h
 
 sendOrThrow
-    :: forall r a . Members [IO, Error FileProviderError] r
+    :: forall r a . Members [IO, Error AppError] r
     => IO a
     -> Eff r a
 sendOrThrow io = send (try io) >>= either onFail pure
   where
     onFail :: IOException -> Eff r a
-    onFail = throwError . FileProviderError . show
+    onFail = throwError . FileProviderError
 
 withFile
-    :: Members [IO, FileProvider, Error FileProviderError] r
+    :: Members [IO, FileProvider, Error AppError] r
     => FilePath
     -> IOMode
     -> (Handle -> Eff r a)
     -> Eff r a
 withFile path mode act = do
     h <- openFile path mode
-    r <- catchError (act h) (\e -> hClose h >> throwError (e :: FileProviderError))
+    r <- catchError (act h) (\e -> hClose h >> throwError (e :: AppError))
     hClose h
     pure r
-
-fileExample :: Eff (FileProvider : r) Text
-fileExample = readFile "hie.yaml"
 
 readFile
     :: Member FileProvider r

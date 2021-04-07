@@ -1,8 +1,6 @@
 module Echo where
 
-import           Control.Monad.Freer.Reader
-
-import           Control.Monad              (forever)
+import           Control.Monad       (forever)
 import           Control.Monad.Freer
 
 data Echo a where

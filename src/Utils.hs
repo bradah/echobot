@@ -1,7 +1,3 @@
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-
 {- |
 Copyright:  (c) 2021 wspbr
 Maintainer: wspbr <rtrn.0@ya.ru>

@@ -11,9 +11,7 @@ module Parser
     , (<?>)
     ) where
 
-import           Control.Applicative
-import           Control.Monad
-import qualified Data.Text           as T
+import           Control.Applicative (Alternative (..))
 
 -- | Generalized type of record field selectors.
 newtype Parser a b = Parser

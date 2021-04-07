@@ -27,11 +27,12 @@ module Telegram.Parser
     , video
     , videoNote
     , voice
+    , markup
     ) where
 
 import           Control.Applicative
-import           Control.Monad          ((>=>))
-import           Data.Text              hiding (empty, head)
+import           Control.Monad       ((>=>))
+import           Data.Text           hiding (empty, head)
 
 import           Parser
 import           Telegram.Data

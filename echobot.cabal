@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0edc358145112dd689e4d69ecdf7a4cecb8d3600f26a901554eb1d4d41cbfc07
+-- hash: c08de5e442a09e57eda0325d1f5d370f290da04314dd999999fecfe1b17a2773
 
 name:           echobot
 version:        0.1.0.0
@@ -27,17 +27,21 @@ source-repository head
 
 library
   exposed-modules:
+      App
       Configurator
       Echo
+      Error
       FileProvider
-      Freer.HttpTest
       Https
       Log
       Parser
+      Telegram.Config
       Telegram.Data
+      Telegram.Echo
       Telegram.Methods
       Telegram.Parser
       Telegram.Requests
+      Telegram.State
       TH
       Utils
       Vk.Data
@@ -48,7 +52,8 @@ library
       Paths_echobot
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
+  ghc-options: -Wall
   build-depends:
       QuickCheck
     , aeson
@@ -84,8 +89,8 @@ executable echobot-exe
       Paths_echobot
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -fno-warn-orphans
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
     , aeson
@@ -126,7 +131,7 @@ test-suite echobot-test
       Paths_echobot
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables RecordWildCards
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck

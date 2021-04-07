@@ -1,19 +1,16 @@
 module Configurator where
 
 import           Control.Monad.Freer
-import           Control.Monad.Freer.Error
 import           Data.Aeson
-import           Data.ByteString.Lazy      (fromStrict)
-import           Data.Text                 (Text)
+import           Data.ByteString.Lazy (fromStrict)
 import           Data.Text.Encoding
-import           Prelude                   hiding (readFile)
+import           Error
+import           Prelude              hiding (readFile)
 
 import           FileProvider
 
 data Configurator a where
     Load :: FromJSON a => FilePath -> Configurator a
-
-newtype ConfiguratorError = FailedParse String
 
 load
     :: ( Member Configurator r
@@ -24,7 +21,7 @@ load
 load = send . Load
 
 fileConfigurator
-    :: ( Members [FileProvider, Error ConfiguratorError] r
+    :: ( Members [FileProvider, Error AppError] r
        , FromJSON a
        )
     => Eff (Configurator : r) a
@@ -34,12 +31,5 @@ fileConfigurator = interpret $ \case
         text <- readFile path
         let bs = fromStrict $ encodeUtf8 text
         case eitherDecode bs of
-            Left e     -> throwError $ FailedParse e
+            Left e     -> throwError $ ConfiguratorError path e
             Right conf -> pure conf
-
--------------------------------------
-
-data Config = Config
-    { token :: Text
-    , api   :: Text
-    } deriving Show

@@ -5,12 +5,11 @@
 
 module Vk.Requests where
 
-import           TH
-import           Data.Text        (Text)
-import           GHC.Generics
-import           Vk.Data
+import           Data.Text   (Text)
+import           TH          (deriveFromJSON')
+import           Vk.Data     (Attachment, StickerId, Token, Ts, Update, UserId)
 
-import           Servant.API      (ToHttpApiData (..))
+import           Servant.API (ToHttpApiData (..))
 
 data GetLpsParams = GetLpsParams
     { getLpsGroupId    :: Integer
@@ -21,24 +20,24 @@ data GetLpsParams = GetLpsParams
 data GetLpsResult = GetLpsResult
   { getLpsResultResponse :: Maybe GetLpsResponse
   , getLpsResultError    :: Maybe GetLpsError
-  } deriving (Generic)
+  }
 
 data GetLpsError = GetLpsError
   { errorCode :: Int
   , errorMsg  :: Text
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data GetLpsResponse = GetLpsResponse
   { getLpsResponseKey    :: Text
   , getLpsResponseServer :: Text
   , getLpsResponseTs     :: Ts
-  } deriving (Generic)
+  }
 
 data CheckLpsResponse = CheckLpsResponse
   { checkLpsResponseTs      :: Maybe Ts
   , checkLpsResponseUpdates :: [Update]
   , checkLpsResponseFailed  :: Maybe Int
-  } deriving (Show, Generic)
+  } deriving (Show)
 
 data CheckLpsParams = CheckLpsParams
     { checkLpsServer :: Text
@@ -63,9 +62,9 @@ data SendMessageParams = SendMessageParams
     , sendMessageApiVersion  :: Double
     } deriving (Show)
 
-data SendMessageResponse = SendMessageResponse
+newtype SendMessageResponse = SendMessageResponse
     { sendMessageResponseMessageId :: Maybe Int
-    } deriving (Show, Generic)
+    } deriving (Show)
 
 deriveFromJSON' ''CheckLpsResponse
 deriveFromJSON' ''GetLpsResponse
