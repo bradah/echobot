@@ -49,11 +49,11 @@ hGetLine
     -> Eff r Text
 hGetLine = send . HGetLine
 
-localFileProvider
+runIOFileProvider
     :: Members [IO, Error AppError] r
     => Eff (FileProvider : r) a
     -> Eff r a
-localFileProvider = interpret $ \case
+runIOFileProvider = interpret $ \case
     OpenFile path mode   -> sendOrThrow $ do
         h <- IO.openFile path mode
         hSetBuffering h NoBuffering
@@ -73,7 +73,7 @@ sendOrThrow io = send (try io) >>= either onFail pure
     onFail = throwError . FileProviderError
 
 withFile
-    :: Members [IO, FileProvider, Error AppError] r
+    :: Members [FileProvider, Error AppError] r
     => FilePath
     -> IOMode
     -> (Handle -> Eff r a)

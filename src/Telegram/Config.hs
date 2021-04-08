@@ -1,9 +1,9 @@
 module Telegram.Config where
 
-import           Configurator
-import           Control.Monad.Freer
-import           Control.Monad.Freer.Reader
-import           Data.Aeson
+import           Control.Monad.Freer        (Eff, Member)
+import           Control.Monad.Freer.Reader (Reader, asks)
+import           Data.Aeson                 (FromJSON (parseJSON), withObject,
+                                             (.:))
 import           Data.Text                  (Text)
 import           Https                      (Url, https, (/:))
 
@@ -22,16 +22,3 @@ baseUrl
 baseUrl = do
     tok <- asks token
     pure $ https "api.telegram.org" /: "bot" <> tok
-
-loadConfig
-    :: Member Configurator r
-    => Eff r Config
-loadConfig = load "config.json"
-
-{- runLoadConfig :: IO (Either FileProviderError  (Either ConfiguratorError  Config))
-runLoadConfig = runM
-    . runError
-    . runError
-    . localFileProvider
-    . fileConfigurator
-    $ loadConfig -}

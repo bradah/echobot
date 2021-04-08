@@ -1,7 +1,8 @@
 module Telegram.State where
 
 import           Data.HashMap.Strict hiding (insert, member, (!))
-import qualified Data.HashMap.Strict as Map (adjust, insert, member, (!))
+import qualified Data.HashMap.Strict as Map (adjust, delete, insert, member,
+                                             (!))
 
 data State = State
     { st'offset   :: Maybe Int
@@ -32,6 +33,9 @@ newSession :: Int -> State -> State
 newSession k st = if not $ member k st
     then insert k defaultSession st
     else st
+
+deleteSession :: Int -> State -> State
+deleteSession = overSessions . Map.delete
 
 member :: Int -> State -> Bool
 member k = Map.member k . st'sessions

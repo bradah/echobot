@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c08de5e442a09e57eda0325d1f5d370f290da04314dd999999fecfe1b17a2773
+-- hash: a75bec5f401944a2afefed1685cd685fa5fe2c7a84c103f7e14eb3bedc610e91
 
 name:           echobot
 version:        0.1.0.0
@@ -52,7 +52,7 @@ library
       Paths_echobot
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
   ghc-options: -Wall
   build-depends:
       QuickCheck
@@ -89,7 +89,7 @@ executable echobot-exe
       Paths_echobot
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
@@ -131,7 +131,7 @@ test-suite echobot-test
       Paths_echobot
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck

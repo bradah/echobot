@@ -1,56 +1,71 @@
 module App where
 
+import           Configurator               (Configurator, load,
+                                             runPureConfigurator)
 import           Control.Monad.Freer        (Eff, LastMember, Members, runM)
 import           Control.Monad.Freer.Reader (runReader)
-import           Control.Monad.Freer.State  (evalState)
+import           Control.Monad.Freer.State  (execState)
 import           Data.Aeson                 (FromJSON (parseJSON), withObject,
                                              withText, (.:))
-
-import           Configurator               (Configurator, fileConfigurator,
-                                             load)
 import           Error                      (AppError, Error, runError)
-import           FileProvider               (FileProvider, localFileProvider)
-import           Https                      (reqHttps)
-import qualified Log
+import           FileProvider               (FileProvider, runIOFileProvider)
+import           Https                      (Https, runIOHttps)
+import           Log                        hiding (Config (..))
+import qualified Log                        (Config (..))
 
+import           Echo
+import           Prelude                    hiding (log)
 import qualified Telegram.Config            as Tg
-import           Telegram.Data              (Update)
-import           Telegram.Methods           (getUpdates)
-import           Telegram.State             (defaultState)
+import           Telegram.Data
+import           Telegram.Echo
+import qualified Telegram.State             as Tg (State, defaultState)
 
 runApp :: IO ()
 runApp = do
     r <- runM
         . runError @AppError
-        . localFileProvider
-        . fileConfigurator
+        . runIOFileProvider
+        . runPureConfigurator
+        . runIOHttps
         $ app
-    either print (pure . const ()) r
+    either print pure r
 
-app
-    :: ( Members [ Configurator
+app :: ( Members [ Configurator
                  , FileProvider
                  , Error AppError
+                 , Https
                  ] r
        , LastMember IO r
        )
-    => Eff r [Update]
+    => Eff r ()
 app = do
     conf <- load "config.json"
-    case platform conf of
-        Telegram -> runReader (logConfig conf)
-            . Log.ioLog
-            . evalState defaultState
-            . runReader (tgConfig conf)
-            . reqHttps
-            $ getUpdates
-        Vk -> pure []
+    runReader (log conf) . runIOLog $ do
+        logDebug $ "Loaded config " <+> conf
+        case platform conf of
+            Telegram -> do
+                r <- runPureTelegram (telegram conf)
+                logWarning $ "Telegram bot has been stopped, last state: " <+> r
+            Vk -> pure ()
+
+runPureTelegram
+    :: ( Members [ Log
+                 , Error AppError
+                 , Https
+                 ]
+       ) r
+    => Tg.Config
+    -> Eff r Tg.State
+runPureTelegram conf = runReader conf
+    . execState Tg.defaultState
+    . runPureEcho
+    $ echo @Update
 
 data Config = Config
-    { tgConfig  :: Tg.Config
+    { telegram :: Tg.Config
     -- , vkConfig  :: Vk.Config
-    , logConfig :: Log.Config
-    , platform  :: Platform
+    , log      :: Log.Config
+    , platform :: Platform
     } deriving Show
 
 instance FromJSON Config where

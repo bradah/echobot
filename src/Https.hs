@@ -3,7 +3,7 @@ module Https
     , Url
     , get
     , post
-    , reqHttps
+    , runIOHttps
     , url
     , ReqBodyUrlEnc (..)
     , json
@@ -23,6 +23,7 @@ import           Network.HTTP.Req    (FormUrlEncodedParam, GET (GET), HttpBody,
                                       defaultHttpConfig, https, jsonResponse,
                                       req, responseBody, runReq, (/:), (=:))
 import qualified Network.HTTP.Req    as Req (Scheme (..), Url)
+
 
 data Https a where
     Get
@@ -55,14 +56,14 @@ post
     -> Eff r a
 post endpoint body = send $ Post endpoint body
 
-reqHttps
+runIOHttps
     :: ( LastMember IO r
        , Member (Error AppError) r
        , FromJSON a
        )
     => Eff (Https : r) a
     -> Eff r a
-reqHttps = interpret $ \case
+runIOHttps = interpret $ \case
     Get endpoint ->
         run $ req GET endpoint NoReqBody jsonResponse mempty
     Post endpoint body ->

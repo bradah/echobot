@@ -60,6 +60,7 @@ default-extensions:
 - TypeApplications
 - RecordWildCards
 - ConstraintKinds
+- KindSignatures
 
 library:
   source-dirs: src

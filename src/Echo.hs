@@ -3,23 +3,24 @@ module Echo where
 import           Control.Monad       (forever)
 import           Control.Monad.Freer
 
-data Echo a where
-    Listen :: Echo [a]
-    Reply :: a -> Echo b
+
+data Echo u a where
+    Listen :: Echo u [u]
+    Reply :: u -> Echo u ()
 
 
 listen
-    :: Member Echo r
-    => Eff r [e]
+    :: Member (Echo u) r
+    => Eff r [u]
 listen = send Listen
 
 reply
-    :: Member Echo r
-    => a
-    -> Eff r b
+    :: Member (Echo u) r
+    => u
+    -> Eff r ()
 reply = send . Reply
 
 echo
-    :: Member Echo r
-    => Eff r e
-echo = forever $ listen >>= mapM reply
+    :: forall u r . Member (Echo u) r
+    => Eff r [u]
+echo = forever $ listen @u >>= mapM_ reply

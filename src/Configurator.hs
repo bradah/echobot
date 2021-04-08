@@ -20,13 +20,13 @@ load
     -> Eff r a
 load = send . Load
 
-fileConfigurator
+runPureConfigurator
     :: ( Members [FileProvider, Error AppError] r
        , FromJSON a
        )
     => Eff (Configurator : r) a
     -> Eff r a
-fileConfigurator = interpret $ \case
+runPureConfigurator = interpret $ \case
     Load path -> do
         text <- readFile path
         let bs = fromStrict $ encodeUtf8 text

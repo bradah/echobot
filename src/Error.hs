@@ -5,7 +5,7 @@ module Error
 
 import           Control.Exception         as M
 import           Control.Monad.Freer.Error as M
-import           Network.HTTP.Client       as M (HttpException)
+import           Network.HTTP.Req          as M (HttpException)
 
 
 data AppError

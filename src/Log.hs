@@ -1,13 +1,14 @@
 module Log
     ( Log (..)
-    , ioLog
+    , HasLog
+    , runIOLog
     , Config (..)
     , logInfo
     , logDebug
     , logWarning
     , logError
-    , showT
-    , showP
+    , HasCallStack
+    , (<+>)
     ) where
 
 import           Control.Monad              (unless)
@@ -27,7 +28,6 @@ import           GHC.Stack                  (CallStack, HasCallStack,
                                              getCallStack, withFrozenCallStack)
 import           Prelude                    hiding (log)
 import           System.IO                  (IOMode (..))
-import           Utils                      (showP, showT)
 
 import           FileProvider               (FileProvider, hPutStrLn, withFile)
 
@@ -40,13 +40,16 @@ data Message = Message
     , msgText      :: !Text
     }
 
+type HasLog (r :: [* -> *]) =
+    (Member Log r, HasCallStack)
+
 logMessage
     :: Member Log r
     => Message
     -> Eff r ()
 logMessage = send . LogMessage
 
-ioLog
+runIOLog
     :: Members
      [ IO
      , Reader Config
@@ -55,7 +58,7 @@ ioLog
      ] r
     => Eff (Log : r) a
     -> Eff r a
-ioLog = interpret $ \case
+runIOLog = interpret $ \case
     LogMessage msg@Message {..} -> do
         Config {..} <- ask
         unless (msgVerbosity < globalVerbosity) $ do
@@ -71,23 +74,23 @@ ioLog = interpret $ \case
 
 format :: ZonedTime -> Message -> Text
 format time Message {..} = mconcat
-    [ pack $ show msgVerbosity
-    , "[", prettyTime, "]"
-    , "[", showCallStack, "]  "
+    [ "[", prettyTime, "] "
+    , pack $ show msgVerbosity
     , msgText
+    , "\n\t at [", showCallStack, "]\n"
     ]
   where
     prettyTime :: Text
     prettyTime = pack $ formatTime defaultTimeLocale "%c" time
 
     showCallStack :: Text
-    showCallStack = case getCallStack msgStack of
-        []  -> "<unknown loc>"
-        [x] -> showLoc x
-        xs  -> showLoc $ last xs
+    showCallStack = case reverse $ getCallStack msgStack of
+        []                             -> "<unknown loc>"
+        [(name, loc)]                  -> showLoc name loc
+        (callerName, _) : (_, loc) : _ -> showLoc callerName loc
 
-    showLoc :: (String, SrcLoc) -> Text
-    showLoc (name, SrcLoc {..}) = pack srcLocModule
+    showLoc :: String -> SrcLoc -> Text
+    showLoc name SrcLoc{..} = pack srcLocModule
         <> "." <> pack name
         <> "#" <> pack (show srcLocStartLine)
 
@@ -123,8 +126,8 @@ instance FromJSON Config where
         <*> o .: "where_to_log"
 
 data Verbosity
-    = Info
-    | Debug
+    = Debug
+    | Info
     | Warning
     | Error
     deriving (Eq, Ord)
@@ -132,16 +135,16 @@ data Verbosity
 instance FromJSON Verbosity where
     parseJSON = withText "Verbosity" $ \s ->
         case s of
-        "info" -> pure Info
         "debug" -> pure Debug
+        "info" -> pure Info
         "warning" -> pure Warning
         "error" -> pure Error
         _ -> fail $ "parsing Verbosity failed, unexpected " ++ show s ++
-                    " (expected \"info\", \"debug\", \"warning\", or \"error\")"
+                    " (expected \"debug\", \"info\", \"warning\", or \"error\")"
 
 instance Show Verbosity where
-    show Info    = "[Info]    "
     show Debug   = "[Debug]   "
+    show Info    = "[Info]    "
     show Warning = "[Warning] "
     show Error   = "[Error]   "
 
@@ -161,3 +164,6 @@ instance FromJSON WhereToLog where
         "both" -> pure Both
         _ -> fail $ "parsing WhereToLog failed, unexpected " ++ show s ++
                     " (expected \"none\", \"stdout\", \"file\", or \"both\")"
+
+(<+>) :: Show a => Text -> a -> Text
+t <+> a = t <> pack (show a)
