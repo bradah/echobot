@@ -2,7 +2,7 @@ module Vk.Config where
 
 import           Data.Aeson
 import           Data.Text
-import           Https      (Url)
+import           Eff.Https  (Url)
 
 data Config = Config
     { token          :: Text

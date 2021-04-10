@@ -6,9 +6,9 @@ import           Control.Monad.Freer
 import           Control.Monad.Freer.State
 import           Data.Maybe
 import           Data.Text                 (Text)
-import           Https                     hiding (get)
-import           Log                       hiding (Config)
-import           Random
+import           Eff.Https                 hiding (get)
+import           Eff.Log                   hiding (Config)
+import           Eff.Random
 import           Vk.Config
 import           Vk.Data
 import           Vk.Parser

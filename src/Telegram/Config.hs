@@ -5,7 +5,7 @@ import           Control.Monad.Freer.Reader (Reader, asks)
 import           Data.Aeson                 (FromJSON (parseJSON), withObject,
                                              (.:))
 import           Data.Text                  (Text)
-import           Https                      (Url, https, (/:))
+import           Eff.Https                  (Url, https, (/:))
 
 newtype Config = Config
     { token :: Text

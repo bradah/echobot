@@ -1,4 +1,4 @@
-module Echo where
+module Eff.Echo where
 
 import           Control.Monad       (forever)
 import           Control.Monad.Freer

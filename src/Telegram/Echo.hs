@@ -6,8 +6,8 @@ import           Control.Applicative ((<|>))
 import           Control.Monad       (void)
 import           Data.Foldable       (asum)
 import           Data.Text
-import           Echo
-import           Log
+import           Eff.Echo
+import           Eff.Log
 import           Telegram.Data
 import           Telegram.Methods
 import           Telegram.Parser

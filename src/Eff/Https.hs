@@ -1,4 +1,4 @@
-module Https
+module Eff.Https
     ( Https (..)
     , Url
     , get
@@ -15,7 +15,7 @@ module Https
 
 import           Control.Monad.Freer (Eff, LastMember, Member, interpret, send)
 import           Data.Aeson          (FromJSON, ToJSON)
-import           Error               (AppError (HttpsError), Error, throwError,
+import           Eff.Error           (AppError (HttpsError), Error, throwError,
                                       try)
 import           Network.HTTP.Req    (FormUrlEncodedParam, GET (GET), HttpBody,
                                       NoReqBody (NoReqBody), POST (POST),

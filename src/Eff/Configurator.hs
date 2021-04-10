@@ -1,13 +1,13 @@
-module Configurator where
+module Eff.Configurator where
 
 import           Control.Monad.Freer
 import           Data.Aeson
 import           Data.ByteString.Lazy (fromStrict)
 import           Data.Text.Encoding
-import           Error
 import           Prelude              hiding (readFile)
 
-import           FileProvider
+import           Eff.Error
+import           Eff.FileProvider
 
 data Configurator a where
     Load :: FromJSON a => FilePath -> Configurator a

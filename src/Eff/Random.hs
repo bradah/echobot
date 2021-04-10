@@ -1,4 +1,4 @@
-module Random where
+module Eff.Random where
 
 import           Control.Monad.Freer
 import           Control.Monad.Freer.State

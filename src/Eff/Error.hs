@@ -1,4 +1,4 @@
-module Error
+module Eff.Error
     ( AppError (..)
     , module M
     ) where

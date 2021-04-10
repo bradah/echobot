@@ -1,9 +1,9 @@
-module FileProvider where
+module Eff.FileProvider where
 
 import           Control.Monad.Freer (Eff, Member, Members, interpret, send)
 import           Data.Text           (Text)
 import qualified Data.Text.IO        as T (hGetContents, hGetLine, hPutStrLn)
-import           Error               (AppError (FileProviderError), Error,
+import           Eff.Error           (AppError (FileProviderError), Error,
                                       IOException, catchError, throwError, try)
 import           Prelude             hiding (readFile)
 import           System.IO           (BufferMode (..), Handle, IOMode (..),

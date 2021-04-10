@@ -1,4 +1,4 @@
-module Log
+module Eff.Log
     ( Log (..)
     , HasLog
     , runIOLog
@@ -21,15 +21,15 @@ import           Data.Text                  (Text, pack)
 import qualified Data.Text.IO               as T (putStrLn)
 import           Data.Time.Format           (defaultTimeLocale, formatTime)
 import           Data.Time.LocalTime        (ZonedTime, getZonedTime)
-import           Error                      (AppError)
-import qualified Error                      as E (Error (..))
+import           Eff.Error                  (AppError)
+import qualified Eff.Error                  as E (Error (..))
 import           GHC.Stack                  (CallStack, HasCallStack,
                                              SrcLoc (..), callStack,
                                              getCallStack, withFrozenCallStack)
 import           Prelude                    hiding (log)
 import           System.IO                  (IOMode (..))
 
-import           FileProvider               (FileProvider, hPutStrLn, withFile)
+import           Eff.FileProvider           (FileProvider, hPutStrLn, withFile)
 
 data Log a where
     LogMessage :: !Message -> Log ()

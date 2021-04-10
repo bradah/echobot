@@ -1,22 +1,23 @@
 module App where
 
 import           AppState
-import           Configurator               (Configurator, load,
-                                             runPureConfigurator)
 import           Control.Monad.Freer        (Eff, LastMember, Members, runM)
 import           Control.Monad.Freer.Reader (runReader)
 import           Control.Monad.Freer.State
 import           Data.Aeson                 (FromJSON (parseJSON), withObject,
                                              withText, (.:))
-import           Error
-import           FileProvider               (FileProvider, runIOFileProvider)
-import           Https                      (Https, runIOHttps)
-import           Log                        hiding (Config (..))
-import qualified Log                        (Config (..))
 
-import           Echo
+import           Eff.Configurator           (Configurator, load,
+                                             runPureConfigurator)
+import           Eff.Echo
+import           Eff.Error
+import           Eff.FileProvider           (FileProvider, runIOFileProvider)
+import           Eff.Https                  (Https, runIOHttps)
+import           Eff.Log                    hiding (Config (..))
+import qualified Eff.Log                    as Log (Config (..))
+import           Eff.Random
+
 import           Prelude                    hiding (log)
-import           Random
 
 import qualified Telegram.Config            as Tg
 import qualified Telegram.Data              as Tg

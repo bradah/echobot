@@ -38,9 +38,9 @@ import           Control.Monad.Freer.Reader (Reader)
 import           Control.Monad.Freer.State  (State, gets, modify)
 import           Data.Aeson                 (ToJSON)
 import           Data.Text                  (Text, unpack)
-import           Https                      (Https, ReqBodyJson, get, json,
+import           Eff.Https                  (Https, ReqBodyJson, get, json,
                                              post, (/:))
-import           Log                        (HasCallStack, Log, logDebug,
+import           Eff.Log                    (HasCallStack, Log, logDebug,
                                              logInfo, (<+>))
 import           Telegram.Config            (Config, baseUrl)
 import           Telegram.Data
