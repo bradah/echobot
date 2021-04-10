@@ -6,16 +6,18 @@ module Vk.Data where
 
 import           AppState              (AppState (..))
 import           Control.Applicative   ((<|>))
-import           Data.Aeson            (FromJSON (parseJSON), ToJSON (toJSON),
-                                        withObject, withText, (.:))
+import           Data.Aeson            hiding (Object)
+import           Data.Aeson.Text       (encodeToLazyText)
 import           Data.HashMap.Strict   (fromList)
 import           Data.Maybe            (fromMaybe)
 import           Data.Text             (Text, intercalate, pack)
+import           Data.Text.Lazy        (toStrict)
 import           Data.Text.Read        (decimal)
 import           Data.Time.Clock.POSIX (POSIXTime)
-import           Servant.API           (ToHttpApiData (..))
-import           TH                    (deriveFromJSON', snakeFieldModifier)
+import           TH                    (deriveFromJSON', deriveToJSON',
+                                        snakeFieldModifier)
 import           Utils                 (showT)
+import           Web.HttpApiData       (ToHttpApiData (..))
 
 type VkState = AppState Ts
 
@@ -66,7 +68,6 @@ data Message = Message
     , msg'text          :: Text
     , msg'attachments   :: [Attachment]
     , msg'payload       :: Maybe Text
-    , msg'keyboard      :: Maybe Keyboard
     , msg'fwd_messages  :: Maybe [Message]
     , msg'reply_message :: Maybe Message
     } deriving (Show)
@@ -139,15 +140,21 @@ data Media = Media
 
 
 data Keyboard = Keyboard
-    { keyboard'one_time :: Bool
-    , keyboard'button   :: [[Button]]
+    { keyboard'one_time :: Maybe Bool
+    , keyboard'buttons  :: [[Button]]
     , keyboard'inline   :: Bool
     } deriving (Show)
+
+instance ToHttpApiData Keyboard where
+    toUrlPiece = toStrict . encodeToLazyText
 
 data Button = Button
     { button'action :: ButtonAction
     , button'color  :: ButtonColor
     } deriving (Show)
+
+instance ToHttpApiData Button where
+    toUrlPiece = toStrict . encodeToLazyText
 
 data ButtonColor
     = Primary
@@ -156,21 +163,33 @@ data ButtonColor
     | Positive
     deriving (Show)
 
+instance ToHttpApiData ButtonColor where
+    toUrlPiece = toStrict . encodeToLazyText
+
 data ButtonAction = ButtonAction
     { btnAct'type    :: ButtonActionType
-    , btnAct'label   :: Maybe Text
+    , btnAct'label   :: Text
     , btnAct'payload :: Text
     } deriving (Show)
+
+instance ToHttpApiData ButtonAction where
+    toUrlPiece = toStrict . encodeToLazyText
 
 data ButtonActionType
     = Text
     deriving (Show)
 
-deriveFromJSON' ''ButtonActionType
-deriveFromJSON' ''ButtonAction
-deriveFromJSON' ''ButtonColor
-deriveFromJSON' ''Button
-deriveFromJSON' ''Keyboard
+instance ToHttpApiData ButtonActionType where
+    toUrlPiece = toStrict . encodeToLazyText
+
+instance ToJSON ButtonActionType where
+    toJSON Text = "text"
+
+deriveToJSON' ''ButtonAction
+deriveToJSON' ''ButtonColor
+deriveToJSON' ''Button
+deriveToJSON' ''Keyboard
+
 deriveFromJSON' ''Media
 deriveFromJSON' ''AttachmentType
 deriveFromJSON' ''Message

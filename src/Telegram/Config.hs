@@ -7,13 +7,17 @@ import           Data.Aeson                 (FromJSON (parseJSON), withObject,
 import           Data.Text                  (Text)
 import           Eff.Https                  (Url, https, (/:))
 
-newtype Config = Config
-    { token :: Text
+data Config = Config
+    { token         :: Text
+    , startMessage  :: Text
+    , initialRepNum :: Int
     } deriving Show
 
 instance FromJSON Config where
     parseJSON = withObject "telegram" $ \o -> do
         token <- o .: "token"
+        startMessage <- o .: "start_message"
+        initialRepNum <- o .: "initial_repeat_num"
         pure Config {..}
 
 baseUrl

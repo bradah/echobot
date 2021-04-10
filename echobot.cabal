@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 68230cec578ae7ca12b3e6502219452c964414cfc729d04574b736c369ecbc75
+-- hash: 59262f65ad9146a39be5037ab7cd3e842e6b06ce40623300fe88285f39d3d200
 
 name:           echobot
 version:        0.1.0.0
@@ -69,16 +69,12 @@ library
     , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
-    , http-conduit
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
     , req
-    , servant
-    , servant-client
     , template-haskell
     , text
     , time
@@ -107,16 +103,12 @@ executable echobot-exe
     , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
-    , http-conduit
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
     , req
-    , servant
-    , servant-client
     , template-haskell
     , text
     , time
@@ -149,16 +141,12 @@ test-suite echobot-test
     , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
-    , http-conduit
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
     , random
     , req
-    , servant
-    , servant-client
     , template-haskell
     , text
     , time

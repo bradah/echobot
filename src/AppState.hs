@@ -15,17 +15,16 @@ newtype Session = Session
     { ses'repNum :: Int
     } deriving Show
 
-defaultSession :: Session
-defaultSession = Session
-    { ses'repNum = 1
-    }
-
 overSessions :: (SesMap -> SesMap) -> AppState a -> AppState a
 overSessions f st = st { st'sessions = f $ st'sessions st }
 
-newSession :: Int -> AppState a -> AppState a
-newSession k st = if not $ member k st
-    then insert k defaultSession st
+newSession
+    :: Int -- ^ Key
+    -> Int -- ^ Value
+    -> AppState a
+    -> AppState a
+newSession k v st = if not $ member k st
+    then insert k (Session v) st
     else st
 
 deleteSession :: Int -> AppState a -> AppState a

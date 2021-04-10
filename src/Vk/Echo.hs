@@ -1,18 +1,18 @@
 module Vk.Echo where
 
-import           Control.Monad.Freer
+import           Control.Monad.Freer (Eff, interpret)
 
 import           Control.Monad       (void)
 import           Data.Foldable       (asum)
-import           Data.Text
+import           Data.Text           (Text)
 
-import           Eff.Echo
-import           Eff.Log
+import           Eff.Echo            (Echo (..))
+import           Eff.Log             (logWarning, (<+>))
 
-import           Vk.Data
+import           Vk.Data             (Update)
 import           Vk.Methods
 import           Vk.Parser
-import           Vk.Requests
+import           Vk.Requests         (CheckLpsResponse (checkLpsResp'updates))
 
 runPureEcho
     :: Method r
@@ -22,7 +22,7 @@ runPureEcho = interpret $ \case
     Listen -> checkLpsResp'updates <$> checkLps
     Reply u -> case updateToAction u of
         Just act -> act
-        Nothing  -> logWarning $ "No matching Action for this Update:" <+> u
+        Nothing  -> logWarning $ "No matching Action for this Update: " <+> u
 
 
 updateToAction
@@ -30,22 +30,12 @@ updateToAction
     => Update
     -> Maybe (Eff r ())
 updateToAction = runParser . asum $ fmap (fmap void)
-    [ sendMessage <$ command "start" <*> updateUserId <*> pure startMessage <*> pure []
-    , sendMessage <$> updateUserId <* unsupported <*> pure unsupportedText <*> pure []
+    [ startCommand <$ command "start" <*> updateUserId
+    , answerRepeatPayload <$> updateUserId <*> payload
+    , repeatCommand <$ command "repeat" <*> updateUserId
+    , sendTextWithAttachments <$> updateUserId <* unsupported <*> pure unsupportedText <*> pure []
     , sendSticker <$> updateUserId <*> sticker
-    , sendMessage <$> updateUserId <*> text <*> attachments
-    ]
-
-startMessage :: Text
-startMessage = Data.Text.unlines
-    [ "Hi! This bot merely echoes your messages c:"
-    , ""
-    , "Supported messages:"
-    , "- plain text"
-    , "- stickers"
-    , ""
-    , "Supported commands:"
-    , "- /start"
+    , sendTextWithAttachments <$> updateUserId <*> text <*> attachments
     ]
 
 unsupportedText :: Text

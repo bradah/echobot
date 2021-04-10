@@ -33,11 +33,7 @@ dependencies:
 - configurator
 - random
 
-- servant
-- servant-client
-- http-client
-- http-conduit
-- http-client-tls
+- http-api-data
 - req
 
 - co-log

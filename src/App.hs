@@ -69,7 +69,7 @@ runPureVk :: Members [ Log , Error AppError , Https ] r
           -> Eff r Vk.VkState
 runPureVk conf = evalState conf
                . execState Vk.defaultVkState
-               . runPureRandom 0
+               . runPureRandom 5
                . Vk.runPureEcho $ do
     result <- Vk.getLps
     case getLpsResult'error result of

@@ -3,13 +3,13 @@
 
 module Vk.Requests where
 
-import           Data.Text        (Text, split, stripPrefix)
-import           TH               (deriveFromJSON')
+import           Data.Text         (Text, split, stripPrefix)
+import           TH                (deriveFromJSON')
 import           Vk.Data
 
 import           Data.Aeson
-import           Network.HTTP.Req (Scheme (..), Url, https, (/:))
-import           Servant.API      (ToHttpApiData (..))
+import           Network.HTTP.Req  (Scheme (..), Url, https, (/:))
+import           Web.HttpApiData (ToHttpApiData (..))
 
 data GetLpsParams = GetLpsParams
     { getLps'group_id    :: Integer

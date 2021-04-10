@@ -9,6 +9,7 @@ module Eff.Log
     , logError
     , HasCallStack
     , (<+>)
+    , showT
     ) where
 
 import           Control.Monad              (unless)
@@ -30,6 +31,7 @@ import           Prelude                    hiding (log)
 import           System.IO                  (IOMode (..))
 
 import           Eff.FileProvider           (FileProvider, hPutStrLn, withFile)
+import           Utils                      (showT)
 
 data Log a where
     LogMessage :: !Message -> Log ()

@@ -6,6 +6,7 @@ module Eff.Https
     , runIOHttps
     , url
     , ReqBodyUrlEnc (..)
+    , FormUrlEncodedParam
     , json
     , ReqBodyJson (..)
     , (/:)

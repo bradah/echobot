@@ -6,6 +6,7 @@ module Vk.Parser
     , command
     , updateUserId
     , attachments
+    , payload
     , sticker
     , isAudioMessage
     , unsupported
@@ -49,6 +50,10 @@ updateUserId = Parser $
 attachments :: Parser Update [Attachment]
 attachments = Parser $
     pure . upd'object >=> obj'message >=> pure . msg'attachments
+
+payload :: Parser Update T.Text
+payload = Parser $
+    pure . upd'object >=> obj'message >=> msg'payload
 
 sticker :: Parser Update Int
 sticker = do
