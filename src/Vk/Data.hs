@@ -1,15 +1,14 @@
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
 
 module Vk.Data where
 
+import           AppState              (AppState (..))
 import           Control.Applicative   ((<|>))
 import           Data.Aeson            (FromJSON (parseJSON), ToJSON (toJSON),
                                         withObject, withText, (.:))
+import           Data.HashMap.Strict   (fromList)
 import           Data.Maybe            (fromMaybe)
 import           Data.Text             (Text, intercalate, pack)
 import           Data.Text.Read        (decimal)
@@ -17,6 +16,14 @@ import           Data.Time.Clock.POSIX (POSIXTime)
 import           Servant.API           (ToHttpApiData (..))
 import           TH                    (deriveFromJSON', snakeFieldModifier)
 import           Utils                 (showT)
+
+type VkState = AppState Ts
+
+defaultVkState :: VkState
+defaultVkState = AppState
+    { st'offset = Ts 0
+    , st'sessions = fromList []
+    }
 
 newtype Ts = Ts Integer
     deriving (Show, Eq, Num)
@@ -32,52 +39,47 @@ instance FromJSON Ts where
 instance ToHttpApiData Ts where
     toUrlPiece (Ts ts) = toUrlPiece ts
 
-type Token = Text
-
 data Update = Update
-  { updateType   :: UpdateType
-  , updateObject :: Object
-  } deriving (Show)
+    { upd'type   :: UpdateType
+    , upd'object :: Object
+    } deriving (Show)
 
 data UpdateType
-  = UpdateTypeMessageNew
-  | UpdateTypeMessageReply
-  | UpdateTypeMessageEdit
-  | UpdateTypeMessageAllow
-  | UpdateTypeMessageDeny
-  | UpdateTypeMessageTypingState
-  | UpdateTypeMessageEvent
-  deriving (Show)
+    = MessageNew
+    | MessageReply
+    | MessageEdit
+    | MessageAllow
+    | MessageDeny
+    | MessageTypingState
+    | MessageEvent
+    deriving (Show)
 
-data Object = Object
-  { objectMessage    :: Maybe Message
-  } deriving (Show)
+newtype Object = Object
+    { obj'message    :: Maybe Message
+    } deriving (Show)
 
 data Message = Message
-  { messageId           :: Maybe MessageId
-  , messageDate         :: POSIXTime
-  , messagePeerId       :: Maybe UserId
-  , messageFromId       :: Maybe UserId
-  , messageText         :: Text
-  , messageAttachments  :: [Attachment]
-  , messagePayload      :: Maybe Text
-  , messageKeyboard     :: Maybe Keyboard
-  , messageFwdMessages  :: Maybe [Message]
-  , messageReplyMessage :: Maybe Message
-  } deriving (Show)
-
-type RandomId = Int
-type MessageId = Int
+    { msg'id            :: Maybe Int
+    , msg'date          :: POSIXTime
+    , msg'peer_id       :: Maybe Int
+    , msg'from_id       :: Maybe Int
+    , msg'text          :: Text
+    , msg'attachments   :: [Attachment]
+    , msg'payload       :: Maybe Text
+    , msg'keyboard      :: Maybe Keyboard
+    , msg'fwd_messages  :: Maybe [Message]
+    , msg'reply_message :: Maybe Message
+    } deriving (Show)
 
 data Attachment = Attachment
-  { attachmentType  :: AttachmentType
-  , attachmentMedia :: Media
-  } deriving (Show)
+    { attachment'type  :: AttachmentType
+    , attachment'media :: Media
+    } deriving (Show)
 
 instance FromJSON Attachment where
     parseJSON = withObject "attachment" $ \o -> do
-        attachmentType <- o .: "type"
-        attachmentMedia <- o .: "photo"
+        attachment'type <- o .: "type"
+        attachment'media <- o .: "photo"
             <|> o .: "video"
             <|> o .: "audio"
             <|> o .: "audio_message"
@@ -93,16 +95,16 @@ instance ToHttpApiData Attachment where
         toUrlPiece atType <> case atType of
             Link    -> mempty
             Sticker -> mempty
-            Wall    -> maybe "" showT mediaFromId
+            Wall    -> maybe "" showT media'from_id
                 <> "_"
-                <> maybe "" showT mediaId
+                <> maybe "" showT media'id
                 <> "_"
-                <> fromMaybe "" mediaAccessKey
-            _       -> maybe "" showT mediaOwnerId
+                <> fromMaybe "" media'access_key
+            _       -> maybe "" showT media'owner_id
                 <> "_"
-                <> maybe "" showT mediaId
+                <> maybe "" showT media'id
                 <> "_"
-                <> fromMaybe "" mediaAccessKey
+                <> fromMaybe "" media'access_key
 
 instance ToHttpApiData [Attachment] where
     toUrlPiece xs = intercalate "," $ toUrlPiece <$> xs
@@ -123,52 +125,46 @@ instance ToHttpApiData AttachmentType where
     toUrlPiece = pack . snakeFieldModifier "" . show
 
 data Media = Media
-    { mediaId          :: Maybe MediaId
-    , mediaFromId      :: Maybe UserId
-    , mediaOwnerId     :: Maybe UserId
-    , mediaAccessKey   :: Maybe Text
-    , mediaAttachments :: Maybe [Attachment]
-    , mediaStickerId   :: Maybe StickerId
-    , mediaUrl         :: Maybe Text
-    , mediaTitle       :: Maybe Text
-    , mediaCaption     :: Maybe Text
-    , mediaDescription :: Maybe Text
+    { media'id          :: Maybe Int
+    , media'from_id     :: Maybe Int
+    , media'owner_id    :: Maybe Int
+    , media'access_key  :: Maybe Text
+    , media'attachments :: Maybe [Attachment]
+    , media'sticker_id  :: Maybe Int
+    , media'url         :: Maybe Text
+    , media'title       :: Maybe Text
+    , media'caption     :: Maybe Text
+    , media'description :: Maybe Text
     } deriving (Show)
 
-type MediaId = Int
-type StickerId = Int
 
 data Keyboard = Keyboard
-  { keyboardOneTime :: Bool
-  , keyboardButton  :: [[Button]]
-  , keyboardInline  :: Bool
-  } deriving (Show)
+    { keyboard'one_time :: Bool
+    , keyboard'button   :: [[Button]]
+    , keyboard'inline   :: Bool
+    } deriving (Show)
 
 data Button = Button
-  { buttonAction :: ButtonAction
-  , buttonColor  :: ButtonColor
-  } deriving (Show)
+    { button'action :: ButtonAction
+    , button'color  :: ButtonColor
+    } deriving (Show)
 
 data ButtonColor
-  = ButtonColorPrimary
-  | ButtonColorSecondary
-  | ButtonColorNegative
-  | ButtonColorPositive
-  deriving (Show)
+    = Primary
+    | Secondary
+    | Negative
+    | Positive
+    deriving (Show)
 
 data ButtonAction = ButtonAction
-  { buttonActionType    :: ButtonActionType
-  , buttonActionLabel   :: Maybe Text
-  , buttonActionPayload :: Payload
-  } deriving (Show)
+    { btnAct'type    :: ButtonActionType
+    , btnAct'label   :: Maybe Text
+    , btnAct'payload :: Text
+    } deriving (Show)
 
 data ButtonActionType
-  = ButtonActionText
-  deriving (Show)
-
-type Payload = Text
-
-type UserId = Int
+    = Text
+    deriving (Show)
 
 deriveFromJSON' ''ButtonActionType
 deriveFromJSON' ''ButtonAction

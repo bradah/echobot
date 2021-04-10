@@ -26,20 +26,12 @@ import qualified Network.HTTP.Req    as Req (Scheme (..), Url)
 
 
 data Https a where
-    Get
-        :: (FromJSON a)
-        => Url
-        -> Https a
-    Post
-        :: (FromJSON a, HttpBody b)
-        => Url
-        -> b
-        -> Https a
+    Get :: (FromJSON a) => Url -> Https a
+    Post :: (FromJSON a, HttpBody b) => Url -> b -> Https a
 
 type Url = Req.Url 'Req.Https
 
-get
-    :: ( Member Https r
+get :: ( Member Https r
        , FromJSON a
        )
     => Url
@@ -54,7 +46,7 @@ post
     => Url
     -> b
     -> Eff r a
-post endpoint body = send $ Post endpoint body
+post host body = send $ Post host body
 
 runIOHttps
     :: ( LastMember IO r
@@ -64,10 +56,10 @@ runIOHttps
     => Eff (Https : r) a
     -> Eff r a
 runIOHttps = interpret $ \case
-    Get endpoint ->
-        run $ req GET endpoint NoReqBody jsonResponse mempty
-    Post endpoint body ->
-        run $ req POST endpoint body jsonResponse mempty
+    Get host ->
+        run $ req GET host NoReqBody jsonResponse mempty
+    Post host body ->
+        run $ req POST host body jsonResponse mempty
   where
     run reqAct = do
         eitherResult <- send . try $

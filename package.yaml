@@ -66,6 +66,7 @@ library:
   source-dirs: src
   ghc-options:
   - -Wall
+  - -fno-warn-orphans
 
 executables:
   echobot-exe:

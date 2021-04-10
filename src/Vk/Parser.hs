@@ -1,7 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-
-
 module Vk.Parser
     ( Parser (..)
     , (<?>)
@@ -15,19 +11,19 @@ module Vk.Parser
     , unsupported
     ) where
 
-import           Parser
 import           Control.Applicative
 import           Control.Monad
 import           Data.Foldable       (asum)
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
+import           Parser
 import           Vk.Data
 
 
 -- | Extract text from 'Update'.
 text :: Parser Update T.Text
 text = Parser $
-    pure . updateObject >=> objectMessage >=> pure . messageText
+    pure . upd'object >=> obj'message >=> pure . msg'text
 
 -- | Same as 'text' but fails if there wasn't
 -- plain text (e.g. command).
@@ -46,19 +42,19 @@ command name = do
     (w:ws) | w == "/" <> name -> return (T.unwords ws)
     _                         -> empty
 
-updateUserId :: Parser Update UserId
+updateUserId :: Parser Update Int
 updateUserId = Parser $
-    pure . updateObject >=> objectMessage >=> messageFromId
+    pure . upd'object >=> obj'message >=> msg'from_id
 
 attachments :: Parser Update [Attachment]
 attachments = Parser $
-    pure . updateObject >=> objectMessage >=> pure . messageAttachments
+    pure . upd'object >=> obj'message >=> pure . msg'attachments
 
-sticker :: Parser Update StickerId
+sticker :: Parser Update Int
 sticker = do
     atts <- attachments
     case atts of
-        [Attachment Sticker Media{..}] -> pure $ fromMaybe 0 mediaStickerId
+        [Attachment Sticker Media{..}] -> pure $ fromMaybe 0 media'sticker_id
         _                              -> empty
 
 isAudioMessage :: Parser Update ()

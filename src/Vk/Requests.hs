@@ -1,50 +1,57 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 module Vk.Requests where
 
-import           Data.Text   (Text)
-import           TH          (deriveFromJSON')
-import           Vk.Data     (Attachment, StickerId, Token, Ts, Update, UserId)
+import           Data.Text        (Text, split, stripPrefix)
+import           TH               (deriveFromJSON')
+import           Vk.Data
 
-import           Servant.API (ToHttpApiData (..))
+import           Data.Aeson
+import           Network.HTTP.Req (Scheme (..), Url, https, (/:))
+import           Servant.API      (ToHttpApiData (..))
 
 data GetLpsParams = GetLpsParams
-    { getLpsGroupId    :: Integer
-    , getLpsToken      :: Token
-    , getLpsApiVersion :: Double
+    { getLps'group_id    :: Integer
+    , getLps'token       :: Text
+    , getLps'api_version :: Double
     }
 
 data GetLpsResult = GetLpsResult
-  { getLpsResultResponse :: Maybe GetLpsResponse
-  , getLpsResultError    :: Maybe GetLpsError
-  }
+    { getLpsResult'response :: Maybe GetLpsResponse
+    , getLpsResult'error    :: Maybe GetLpsError
+    } deriving Show
 
 data GetLpsError = GetLpsError
-  { errorCode :: Int
-  , errorMsg  :: Text
-  } deriving (Show)
+    { error'code :: Int
+    , error'msg  :: Text
+    } deriving (Show)
 
 data GetLpsResponse = GetLpsResponse
-  { getLpsResponseKey    :: Text
-  , getLpsResponseServer :: Text
-  , getLpsResponseTs     :: Ts
-  }
+    { getLpsResp'key    :: Text
+    , getLpsResp'server :: Url 'Https
+    , getLpsResp'ts     :: Ts
+    } deriving Show
+
+instance FromJSON (Url 'Https) where
+    parseJSON = withText "Url" $ \s -> do
+        case stripPrefix "https://" s of
+            Just t -> let (p:ps) = split (== '/') t
+                      in pure $ foldl (/:) (https p) ps
+            Nothing -> fail "Expected \"https://\" prefix"
 
 data CheckLpsResponse = CheckLpsResponse
-  { checkLpsResponseTs      :: Maybe Ts
-  , checkLpsResponseUpdates :: [Update]
-  , checkLpsResponseFailed  :: Maybe Int
-  } deriving (Show)
+    { checkLpsResp'ts      :: Maybe Ts
+    , checkLpsResp'updates :: [Update]
+    , checkLpsResp'failed  :: Maybe Int
+    } deriving (Show)
 
 data CheckLpsParams = CheckLpsParams
-    { checkLpsServer :: Text
-    , checkLpsAction :: CheckLpsAction
-    , checkLpsKey    :: Text
-    , checkLpsWait   :: Maybe Int
-    , checkLpsTs     :: Ts
+    { checkLps'server :: Text
+    , checkLps'action :: CheckLpsAction
+    , checkLps'key    :: Text
+    , checkLps'wait   :: Maybe Int
+    , checkLps'ts     :: Ts
     }
 
 data CheckLpsAction
@@ -54,16 +61,16 @@ instance ToHttpApiData CheckLpsAction where
     toQueryParam ACheck = "a_check"
 
 data SendMessageParams = SendMessageParams
-    { sendMessageUserId      :: UserId
-    , sendMessageMessage     :: Maybe Text
-    , sendMessageStickerId   :: Maybe StickerId
-    , sendMessageAttachments :: [Attachment]
-    , sendMessageAccessToken :: Token
-    , sendMessageApiVersion  :: Double
+    { sendMsg'user_id      :: Int
+    , sendMsg'message      :: Maybe Text
+    , sendMsg'sticker_id   :: Maybe Int
+    , sendMsg'attachments  :: [Attachment]
+    , sendMsg'access_token :: Text
+    , sendMsg'api_version  :: Double
     } deriving (Show)
 
 newtype SendMessageResponse = SendMessageResponse
-    { sendMessageResponseMessageId :: Maybe Int
+    { sendMsgResp'message_id :: Maybe Int
     } deriving (Show)
 
 deriveFromJSON' ''CheckLpsResponse

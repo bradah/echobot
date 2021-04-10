@@ -10,8 +10,10 @@ This module defines basic Telegram API types.
 
 module Telegram.Data
     ( -- * Available types
+      TgState
+    , defaultTgState
       -- ** Response
-      Response (..)
+    , Response (..)
       -- ** Update
     , Update (..)
       -- ** Message
@@ -40,9 +42,19 @@ module Telegram.Data
     ) where
 
 
+import           AppState              (AppState (..))
+import           Data.HashMap.Strict   (fromList)
 import           Data.Text             (Text)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           TH                    (deriveFromJSON', deriveJSON')
+
+type TgState = AppState (Maybe Int)
+
+defaultTgState :: AppState (Maybe Int)
+defaultTgState = AppState
+    { st'offset = Nothing
+    , st'sessions = fromList []
+    }
 
 -- | Telegram response.
 data Response a = Response

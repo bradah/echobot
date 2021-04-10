@@ -8,9 +8,8 @@ This module contains high-level functions for Telegram API methods.
 module Telegram.Methods
     ( -- * Available methods
       Method
-    ,
       -- ** getMe
-      getMe
+    , getMe
       -- ** Getting updates
     , getUpdates
       -- ** Callbacks
@@ -32,6 +31,7 @@ module Telegram.Methods
     , sendVoice
     ) where
 
+import           AppState
 import           Control.Monad              (replicateM)
 import           Control.Monad.Freer        (Eff, Member, Members)
 import           Control.Monad.Freer.Reader (Reader)
@@ -46,14 +46,11 @@ import           Telegram.Config            (Config, baseUrl)
 import           Telegram.Data
 import           Telegram.Parser
 import           Telegram.Requests
-import           Telegram.State             hiding (State (..))
-import qualified Telegram.State             as Tg (State (..))
-
 
 -- | Simple shortcut for methods constraints
 type Method r = Members
     [ Reader Config
-    , State Tg.State
+    , State (AppState (Maybe Int))
     , Https
     , Log
     ] r
@@ -93,25 +90,27 @@ getUpdates = do
     logDebug $ "Current sessions: " <+> sessions
     pure resp
   where
-    mkBody :: Member (State Tg.State) r => Eff r (ReqBodyJson GetUpdatesRequest)
+    mkBody :: Member (State TgState) r => Eff r (ReqBodyJson GetUpdatesRequest)
     mkBody = do
-        offset <- gets Tg.st'offset
+        offset <- gets st'offset
         pure . json $ GetUpdatesRequest
             { updates'offset = offset
             , updates'update_type = [UpdateMessage]
             , updates'timeout = Just 25
             }
 
-    putNewOffset :: Member (State Tg.State) r => [Update] -> Eff r ()
+    putNewOffset
+        :: Member (State TgState) r => [Update] -> Eff r ()
     putNewOffset ups
         | null ups = pure ()
         | otherwise = let newOffset = fmap (+1) $ last ups <?> updateId
-                      in modify (\st -> st { Tg.st'offset = newOffset })
+                      in modify (\st -> st { st'offset = newOffset })
 
-    putNewSessions :: Member (State Tg.State) r => [Update] -> Eff r SesMap
-    putNewSessions [] = gets Tg.st'sessions
+    putNewSessions
+        :: Member (State TgState) r => [Update] -> Eff r SesMap
+    putNewSessions [] = (gets @TgState) st'sessions
     putNewSessions (u:us) = case u <?> chatId of
-        Just cid -> modify (newSession cid) >> putNewSessions us
+        Just cid -> (modify @TgState) (newSession cid) >> putNewSessions us
         _        -> putNewSessions us
 
 {- | Use this method to send answers to callback
@@ -151,7 +150,7 @@ answerRepeatCallback cid mid cbid t = do
         newText = confirmationText n
     _ <- editMessageText cid mid newText Nothing
     logDebug $ "Changing repetition number for " <+> cid <> " to " <+> t
-    modify (changeRepNum cid n)
+    (modify @TgState) (changeRepNum cid n)
     pure resp
   where
     confirmationText :: Int -> Text
@@ -235,7 +234,7 @@ methodWithRepNum
     -> Text -- ^ Hint for logging
     -> Eff r (Response Message)
 methodWithRepNum cid endpoint body hint = do
-    repeatNum <- gets $ getRepNum cid
+    repeatNum <- (gets @TgState) $ getRepNum cid
     logInfo $ "Sending " <> hint <> " to chat " <+> cid
         <> " (repeat: " <+> repeatNum <> ")"
     logDebug $ "Request body: " <+> body

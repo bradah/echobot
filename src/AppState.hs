@@ -1,11 +1,11 @@
-module Telegram.State where
+module AppState where
 
 import           Data.HashMap.Strict hiding (insert, member, (!))
 import qualified Data.HashMap.Strict as Map (adjust, delete, insert, member,
                                              (!))
 
-data State = State
-    { st'offset   :: Maybe Int
+data AppState a = AppState
+    { st'offset   :: a
     , st'sessions :: SesMap
     } deriving Show
 
@@ -20,40 +20,34 @@ defaultSession = Session
     { ses'repNum = 1
     }
 
-defaultState :: State
-defaultState = State
-    { st'offset = Nothing
-    , st'sessions = fromList []
-    }
-
-overSessions :: (SesMap -> SesMap) -> State -> State
+overSessions :: (SesMap -> SesMap) -> AppState a -> AppState a
 overSessions f st = st { st'sessions = f $ st'sessions st }
 
-newSession :: Int -> State -> State
+newSession :: Int -> AppState a -> AppState a
 newSession k st = if not $ member k st
     then insert k defaultSession st
     else st
 
-deleteSession :: Int -> State -> State
+deleteSession :: Int -> AppState a -> AppState a
 deleteSession = overSessions . Map.delete
 
-member :: Int -> State -> Bool
+member :: Int -> AppState a -> Bool
 member k = Map.member k . st'sessions
 
-insert :: Int -> Session -> State -> State
+insert :: Int -> Session -> AppState a -> AppState a
 insert k v = overSessions (Map.insert k v)
 
-(!) :: State -> Int -> Session
+(!) :: AppState a -> Int -> Session
 st ! k = st'sessions st Map.! k
 
 -- | Change number of repetitions of single message for 'Session'.
 changeRepNum
     :: Int -- ^ Session id.
     -> Int -- ^ New repetition number.
-    -> State
-    -> State
+    -> AppState a
+    -> AppState a
 changeRepNum sid n =
     overSessions (Map.adjust (\ses -> ses { ses'repNum = n }) sid)
 
-getRepNum :: Int -> State -> Int
+getRepNum :: Int -> AppState a -> Int
 getRepNum sid st = ses'repNum $ st ! sid

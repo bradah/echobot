@@ -41,10 +41,11 @@ updateToAction = runParser . asum $ fmap (fmap void)
     , sendVideo <$> chatId <*> video <*> caption
     , sendVideoNote <$> chatId <*> videoNote
     , sendVoice <$> chatId <*> voice <*> caption
-    ] <> fmap (fmap void)
-        [ answerRepeatCallback <$> callbackChatId
-            <*> callbackMessageId <*> callbackId <*> callbackData
-        ]
+    ]
+        <> fmap (fmap void)
+    [ answerRepeatCallback <$> callbackChatId
+        <*> callbackMessageId <*> callbackId <*> callbackData
+    ]
 
 -- | Greeting message
 helpMessage :: Text

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a75bec5f401944a2afefed1685cd685fa5fe2c7a84c103f7e14eb3bedc610e91
+-- hash: 322ea2906b97b8d84a09170a9535535d13e33f2c9176e26de6f043ab0bd000ce
 
 name:           echobot
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       App
+      AppState
       Configurator
       Echo
       Error
@@ -35,16 +36,18 @@ library
       Https
       Log
       Parser
+      Random
       Telegram.Config
       Telegram.Data
       Telegram.Echo
       Telegram.Methods
       Telegram.Parser
       Telegram.Requests
-      Telegram.State
       TH
       Utils
+      Vk.Config
       Vk.Data
+      Vk.Echo
       Vk.Methods
       Vk.Parser
       Vk.Requests
@@ -53,7 +56,7 @@ library
   hs-source-dirs:
       src
   default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
-  ghc-options: -Wall
+  ghc-options: -Wall -fno-warn-orphans
   build-depends:
       QuickCheck
     , aeson
