@@ -31,19 +31,38 @@ dependencies:
 - QuickCheck
 - quickcheck-instances
 - configurator
-- servant
-- servant-client
-- http-client
-- http-client-tls
+- random
+
+- http-api-data
+- req
+
 - co-log
 - unordered-containers
 - directory
 - pretty-simple
-- chronos
 - vector
+- data-default
+- freer-simple
+- bytestring
+
+default-extensions:
+- OverloadedStrings
+- DataKinds
+- TypeOperators
+- FlexibleContexts
+- GADTs
+- LambdaCase
+- ScopedTypeVariables
+- TypeApplications
+- RecordWildCards
+- ConstraintKinds
+- KindSignatures
 
 library:
   source-dirs: src
+  ghc-options:
+  - -Wall
+  - -fno-warn-orphans
 
 executables:
   echobot-exe:
@@ -54,7 +73,6 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
-    - -fno-warn-orphans
     dependencies:
     - echobot
 

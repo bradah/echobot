@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2aa7abf1bf7925342d884042c028051a8ae595e03a82697b5c4457d9ae8017cc
+-- hash: 59262f65ad9146a39be5037ab7cd3e842e6b06ce40623300fe88285f39d3d200
 
 name:           echobot
 version:        0.1.0.0
@@ -27,37 +27,54 @@ source-repository head
 
 library
   exposed-modules:
-      API.Logging
-      API.TH
-      API.Utils
-      Telegram.Bot
-      Telegram.Internal.Bot
-      Telegram.Internal.Methods
-      Telegram.Internal.Request
-      Telegram.Internal.Types
+      App
+      AppState
+      Eff.Configurator
+      Eff.Echo
+      Eff.Error
+      Eff.FileProvider
+      Eff.Https
+      Eff.Log
+      Eff.Random
+      Parser
+      Telegram.Config
+      Telegram.Data
+      Telegram.Echo
       Telegram.Methods
-      Telegram.UpdateParser
+      Telegram.Parser
+      Telegram.Requests
+      TH
+      Utils
+      Vk.Config
+      Vk.Data
+      Vk.Echo
+      Vk.Methods
+      Vk.Parser
+      Vk.Requests
   other-modules:
       Paths_echobot
   hs-source-dirs:
       src
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
+  ghc-options: -Wall -fno-warn-orphans
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
+    , data-default
     , directory
+    , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , servant
-    , servant-client
+    , random
+    , req
     , template-haskell
     , text
     , time
@@ -71,25 +88,27 @@ executable echobot-exe
       Paths_echobot
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -fno-warn-orphans
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
+    , data-default
     , directory
     , echobot
+    , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , servant
-    , servant-client
+    , random
+    , req
     , template-haskell
     , text
     , time
@@ -107,25 +126,27 @@ test-suite echobot-test
       Paths_echobot
   hs-source-dirs:
       test
+  default-extensions: OverloadedStrings DataKinds TypeOperators FlexibleContexts GADTs LambdaCase ScopedTypeVariables TypeApplications RecordWildCards ConstraintKinds KindSignatures
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck
     , aeson
     , base >=4.7 && <5
-    , chronos
+    , bytestring
     , co-log
     , configurator
+    , data-default
     , directory
     , echobot
+    , freer-simple
     , hspec
     , hspec-discover
-    , http-client
-    , http-client-tls
+    , http-api-data
     , mtl
     , pretty-simple
     , quickcheck-instances
-    , servant
-    , servant-client
+    , random
+    , req
     , template-haskell
     , text
     , time
