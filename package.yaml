@@ -22,7 +22,6 @@ description:         Please see the README on GitHub at <https://github.com/wspb
 dependencies:
 - base >= 4.7 && < 5
 - aeson
-- mtl
 - text
 - time
 - template-haskell
@@ -32,16 +31,9 @@ dependencies:
 - quickcheck-instances
 - configurator
 - random
-
 - http-api-data
 - req
-
-- co-log
 - unordered-containers
-- directory
-- pretty-simple
-- vector
-- data-default
 - freer-simple
 - bytestring
 

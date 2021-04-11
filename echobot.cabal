@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 59262f65ad9146a39be5037ab7cd3e842e6b06ce40623300fe88285f39d3d200
+-- hash: 4a4926a5b28335d28f83f8ae49d5ac707c143eb0735f68985b46816b437d228e
 
 name:           echobot
 version:        0.1.0.0
@@ -44,7 +44,6 @@ library
       Telegram.Parser
       Telegram.Requests
       TH
-      Utils
       Vk.Config
       Vk.Data
       Vk.Echo
@@ -62,16 +61,11 @@ library
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , co-log
     , configurator
-    , data-default
-    , directory
     , freer-simple
     , hspec
     , hspec-discover
     , http-api-data
-    , mtl
-    , pretty-simple
     , quickcheck-instances
     , random
     , req
@@ -79,7 +73,6 @@ library
     , text
     , time
     , unordered-containers
-    , vector
   default-language: Haskell2010
 
 executable echobot-exe
@@ -95,17 +88,12 @@ executable echobot-exe
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , co-log
     , configurator
-    , data-default
-    , directory
     , echobot
     , freer-simple
     , hspec
     , hspec-discover
     , http-api-data
-    , mtl
-    , pretty-simple
     , quickcheck-instances
     , random
     , req
@@ -113,7 +101,6 @@ executable echobot-exe
     , text
     , time
     , unordered-containers
-    , vector
   default-language: Haskell2010
 
 test-suite echobot-test
@@ -133,17 +120,12 @@ test-suite echobot-test
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , co-log
     , configurator
-    , data-default
-    , directory
     , echobot
     , freer-simple
     , hspec
     , hspec-discover
     , http-api-data
-    , mtl
-    , pretty-simple
     , quickcheck-instances
     , random
     , req
@@ -151,5 +133,4 @@ test-suite echobot-test
     , text
     , time
     , unordered-containers
-    , vector
   default-language: Haskell2010

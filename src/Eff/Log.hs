@@ -31,7 +31,6 @@ import           Prelude                    hiding (log)
 import           System.IO                  (IOMode (..))
 
 import           Eff.FileProvider           (FileProvider, hPutStrLn, withFile)
-import           Utils                      (showT)
 
 data Log a where
     LogMessage :: !Message -> Log ()
@@ -169,3 +168,7 @@ instance FromJSON WhereToLog where
 
 (<+>) :: Show a => Text -> a -> Text
 t <+> a = t <> pack (show a)
+
+-- | 'show' for 'Text'.
+showT :: Show a => a -> Text
+showT = pack . show

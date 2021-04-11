@@ -73,7 +73,7 @@ runPureVk conf = evalState conf
                . Vk.runPureEcho $ do
     result <- Vk.getLps
     case getLpsResult'error result of
-        Just e -> throwError $ VkError e
+        Just e -> throwError . OtherError $ showT e
         Nothing -> case getLpsResult'response result of
             Nothing -> do
                 logError $ "No response in " <+> result

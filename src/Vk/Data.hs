@@ -16,7 +16,7 @@ import           Data.Text.Read        (decimal)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import           TH                    (deriveFromJSON', deriveToJSON',
                                         snakeFieldModifier)
-import           Utils                 (showT)
+import           Eff.Log                 (showT)
 import           Web.HttpApiData       (ToHttpApiData (..))
 
 type VkState = AppState Ts
