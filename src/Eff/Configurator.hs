@@ -1,4 +1,19 @@
-module Eff.Configurator where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines simple configuration loading effect.
+-}
+
+module Eff.Configurator
+    (
+    -- * Configurator
+    -- ** Instruction set
+      Configurator (..)
+    , load
+    -- ** Run
+    , runPureConfigurator
+    ) where
 
 import           Control.Monad.Freer
 import           Data.Aeson
@@ -9,23 +24,26 @@ import           Prelude              hiding (readFile)
 import           Eff.Error
 import           Eff.FileProvider
 
+-- | Instruction set for 'Configurator' effect.
 data Configurator a where
     Load :: FromJSON a => FilePath -> Configurator a
 
-load
-    :: ( Member Configurator r
-       , FromJSON a
-       )
-    => FilePath
-    -> Eff r a
+-- | Load 'FromJSON' instance from 'FilePath'.
+load :: ( Member Configurator r
+        , FromJSON a
+        )
+     => FilePath
+     -> Eff r a
 load = send . Load
 
-runPureConfigurator
-    :: ( Members [FileProvider, Error AppError] r
-       , FromJSON a
-       )
-    => Eff (Configurator : r) a
-    -> Eff r a
+-- | Run 'Configurator' effect. Note that it actually doesn't
+-- depend on IO, so one could implement 'FileProvider' using pure
+-- computations to simulate config loading purely.
+runPureConfigurator :: ( Members [FileProvider, Error AppError] r
+                       , FromJSON a
+                       )
+                    => Eff (Configurator : r) a
+                    -> Eff r a
 runPureConfigurator = interpret $ \case
     Load path -> do
         text <- readFile path

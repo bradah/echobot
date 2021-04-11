@@ -1,5 +1,13 @@
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines simple error throwing and catching effect.
+-}
 module Eff.Error
-    ( AppError (..)
+    ( -- * Error
+      -- ** AppError
+      AppError (..)
     , module M
     ) where
 
@@ -8,6 +16,8 @@ import           Control.Monad.Freer.Error as M
 import           Data.Text                 (Text)
 import           Network.HTTP.Req          as M (HttpException)
 
+-- | This type represents all possible kinds of errors in
+-- this application.
 data AppError
     = FileProviderError
         IOException

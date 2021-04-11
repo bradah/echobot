@@ -1,7 +1,7 @@
 module App where
 
 import           AppState
-import           Control.Monad.Freer        (Eff, LastMember, Members, runM)
+import           Control.Monad.Freer        (Eff, Members, runM)
 import           Control.Monad.Freer.Reader (runReader)
 import           Control.Monad.Freer.State
 import           Data.Aeson                 (FromJSON (parseJSON), withObject,
@@ -9,6 +9,7 @@ import           Data.Aeson                 (FromJSON (parseJSON), withObject,
 
 import           Eff.Configurator           (Configurator, load,
                                              runPureConfigurator)
+import           Eff.Console
 import           Eff.Echo
 import           Eff.Error
 import           Eff.FileProvider           (FileProvider, runIOFileProvider)
@@ -16,6 +17,7 @@ import           Eff.Https                  (Https, runIOHttps)
 import           Eff.Log                    hiding (Config (..))
 import qualified Eff.Log                    as Log (Config (..))
 import           Eff.Random
+import           Eff.Time
 
 import           Prelude                    hiding (log)
 
@@ -23,40 +25,51 @@ import qualified Telegram.Config            as Tg
 import qualified Telegram.Data              as Tg
 import qualified Telegram.Echo              as Tg
 
+import           Data.Text
 import qualified Vk.Config                  as Vk
 import qualified Vk.Data                    as Vk
 import qualified Vk.Echo                    as Vk
 import qualified Vk.Methods                 as Vk
 import           Vk.Requests
 
-runApp :: IO ()
-runApp = do
-    r <- runM
-        . runError @AppError
-        . runIOFileProvider
-        . runPureConfigurator
-        . runIOHttps
-        $ app
-    either print pure r
+runApp :: IO (Either AppError ((), [Text]))
+runApp = runM
+       . runError @AppError
+       . runIOFileProvider
+       . runIOHttps
+       . runIOTime
+       . runPureConsole
+       . runPureConfigurator
+       $ app
 
-app :: ( Members [ Configurator , FileProvider , Error AppError , Https ] r
-       , LastMember IO r
+
+app :: ( Members [ Configurator
+                 , FileProvider
+                 , Error AppError
+                 , Https
+                 , Console
+                 , Time
+                 ] r
        , HasCallStack
        )
     => Eff r ()
 app = do
     conf <- load "config.json"
-    runReader (log conf) . runIOLog $ do
+    runReader (log conf) . runPureLog $ do
         logDebug $ "Loaded config :" <+> conf
         case platform conf of
             Telegram -> do
                 r <- runPureTelegram (telegram conf)
                 logWarning $ "Telegram bot has been stopped, last state: " <+> r
             Vk -> do
-                r <- runPureVk (vk conf)
-                logWarning $ "Vk bot has been stopped, last state: " <+> r
+                -- r <- runPureVk (vk conf)
+                logWarning $ "Vk bot has been stopped, last state: " -- <+> r
 
-runPureTelegram :: Members [ Log , Error AppError , Https ] r
+
+runPureTelegram :: Members [ Log
+                           , Error AppError
+                           , Https
+                           ] r
                 => Tg.Config
                 -> Eff r Tg.TgState
 runPureTelegram conf = runReader conf
@@ -64,7 +77,11 @@ runPureTelegram conf = runReader conf
     . Tg.runPureEcho
     $ echo @Tg.Update
 
-runPureVk :: Members [ Log , Error AppError , Https ] r
+
+runPureVk :: Members [ Log
+                     , Error AppError
+                     , Https
+                     ] r
           => Vk.Config
           -> Eff r Vk.VkState
 runPureVk conf = evalState conf

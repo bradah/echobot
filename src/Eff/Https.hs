@@ -1,9 +1,20 @@
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Abstract DSL to work with HTTPS queries.
+-}
+
 module Eff.Https
-    ( Https (..)
+    ( -- * Https
+      -- ** Instruction Set
+      Https (..)
     , Url
     , get
     , post
+      -- ** Run
     , runIOHttps
+      -- Construct request bodies
     , url
     , ReqBodyUrlEnc (..)
     , FormUrlEncodedParam
@@ -26,12 +37,15 @@ import           Network.HTTP.Req    (FormUrlEncodedParam, GET (GET), HttpBody,
 import qualified Network.HTTP.Req    as Req (Scheme (..), Url)
 
 
+-- | Instruction set for 'Https' effect.
 data Https a where
     Get :: (FromJSON a) => Url -> Https a
     Post :: (FromJSON a, HttpBody b) => Url -> b -> Https a
 
+-- | Path to endpoint.
 type Url = Req.Url 'Req.Https
 
+-- | Acquire data using HTTPS.
 get :: ( Member Https r
        , FromJSON a
        )
@@ -39,23 +53,23 @@ get :: ( Member Https r
     -> Eff r a
 get = send . Get
 
-post
-    :: ( Member Https r
-       , FromJSON a
-       , HttpBody b
-       )
-    => Url
-    -> b
-    -> Eff r a
+-- | Post request using HTTPS.
+post :: ( Member Https r
+        , FromJSON a
+        , HttpBody b
+        )
+     => Url
+     -> b
+     -> Eff r a
 post host body = send $ Post host body
 
-runIOHttps
-    :: ( LastMember IO r
-       , Member (Error AppError) r
-       , FromJSON a
-       )
-    => Eff (Https : r) a
-    -> Eff r a
+-- | Run 'Https' in 'IO' using @req@.
+runIOHttps :: ( LastMember IO r
+              , Member (Error AppError) r
+              , FromJSON a
+              )
+           => Eff (Https : r) a
+           -> Eff r a
 runIOHttps = interpret $ \case
     Get host ->
         run $ req GET host NoReqBody jsonResponse mempty
@@ -67,8 +81,10 @@ runIOHttps = interpret $ \case
             responseBody <$> runReq defaultHttpConfig reqAct
         either (throwError . HttpsError) pure eitherResult
 
+-- | Construct url encoded parameters.
 url :: FormUrlEncodedParam -> ReqBodyUrlEnc
 url = ReqBodyUrlEnc
 
+-- | Construct json request body.
 json :: ToJSON a => a -> ReqBodyJson a
 json = ReqBodyJson

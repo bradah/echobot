@@ -1,15 +1,28 @@
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Simple logging DSL.
+-}
+
 module Eff.Log
-    ( Log (..)
-    , HasLog
-    , runIOLog
+    ( -- * Log
+      -- ** Instruction set
+      Log (..)
+      -- ** Run
+    , runPureLog
+      -- ** Configure logging
     , Config (..)
+      -- ** Log with verbosity
     , logInfo
     , logDebug
     , logWarning
     , logError
-    , HasCallStack
+      -- ** Construct log messages
     , (<+>)
     , showT
+      -- ** Find location
+    , HasCallStack
     ) where
 
 import           Control.Monad              (unless)
@@ -19,60 +32,62 @@ import           Control.Monad.Freer.Reader (Reader, ask)
 import           Data.Aeson                 (FromJSON (parseJSON), withObject,
                                              withText, (.:))
 import           Data.Text                  (Text, pack)
-import qualified Data.Text.IO               as T (putStrLn)
-import           Data.Time.Format           (defaultTimeLocale, formatTime)
-import           Data.Time.LocalTime        (ZonedTime, getZonedTime)
+import           Eff.Console
 import           Eff.Error                  (AppError)
 import qualified Eff.Error                  as E (Error (..))
+import           Eff.Time
 import           GHC.Stack                  (CallStack, HasCallStack,
                                              SrcLoc (..), callStack,
                                              getCallStack, withFrozenCallStack)
-import           Prelude                    hiding (log)
-import           System.IO                  (IOMode (..))
+import           Prelude                    hiding (appendFile, log)
 
-import           Eff.FileProvider           (FileProvider, hPutStrLn, withFile)
+import           Eff.FileProvider
 
+
+-- | Instruction set for 'Log' effect.
 data Log a where
     LogMessage :: !Message -> Log ()
 
+-- | Log message data structure.
 data Message = Message
     { msgVerbosity :: !Verbosity
     , msgStack     :: !CallStack
     , msgText      :: !Text
     }
 
-type HasLog (r :: [* -> *]) =
-    (Member Log r, HasCallStack)
-
+-- | Log 'Message'.
 logMessage
     :: Member Log r
     => Message
     -> Eff r ()
 logMessage = send . LogMessage
 
-runIOLog
+-- | Run 'Log' effect. This can be done purely
+-- since it depends on 'Time', 'Console' and 'FileProvider'
+-- effects and not on 'IO' directly.
+runPureLog
     :: Members
-     [ IO
+     [ Console
+     , Time
      , Reader Config
      , FileProvider
      , E.Error AppError
      ] r
     => Eff (Log : r) a
     -> Eff r a
-runIOLog = interpret $ \case
+runPureLog = interpret $ \case
     LogMessage msg@Message {..} -> do
         Config {..} <- ask
         unless (msgVerbosity < globalVerbosity) $ do
-            time <- send getZonedTime
+            time <- getZonedTime
             let text = format time msg
             case whereToLog of
                 None   -> pure ()
-                Stdout -> send $ T.putStrLn text
-                File   -> withFile logFilePath AppendMode (`hPutStrLn` text)
-                Both -> do
-                    send $ T.putStrLn text
-                    withFile logFilePath AppendMode (`hPutStrLn` text)
+                Stdout -> putLine text
+                File   -> appendFile logFilePath text
+                Both   -> putLine text >> appendFile logFilePath text
 
+-- | Format messages before logging them.
 format :: ZonedTime -> Message -> Text
 format time Message {..} = mconcat
     [ "[", prettyTime, "] "
@@ -95,7 +110,6 @@ format time Message {..} = mconcat
         <> "." <> pack name
         <> "#" <> pack (show srcLocStartLine)
 
-
 logInfo, logDebug, logWarning, logError
     :: (Member Log r, HasCallStack) => Text -> Eff r ()
 logInfo = log Info
@@ -114,6 +128,7 @@ log msgVerbosity msgText = withFrozenCallStack $ logMessage Message
         , ..
         }
 
+-- | 'Log' configuration.
 data Config = Config
     { globalVerbosity :: Verbosity
     , logFilePath     :: FilePath
@@ -126,6 +141,7 @@ instance FromJSON Config where
         <*> o .: "file_path"
         <*> o .: "where_to_log"
 
+-- | 'Log' verbosity levels.
 data Verbosity
     = Debug
     | Info
@@ -149,6 +165,7 @@ instance Show Verbosity where
     show Warning = "[Warning] "
     show Error   = "[Error]   "
 
+-- | Destination points for log messages.
 data WhereToLog
     = None
     | Stdout
@@ -166,8 +183,9 @@ instance FromJSON WhereToLog where
         _ -> fail $ "parsing WhereToLog failed, unexpected " ++ show s ++
                     " (expected \"none\", \"stdout\", \"file\", or \"both\")"
 
+-- | Convert rhs value to 'Text' and concatenate with lhs.
 (<+>) :: Show a => Text -> a -> Text
-t <+> a = t <> pack (show a)
+t <+> a = t <> showT a
 
 -- | 'show' for 'Text'.
 showT :: Show a => a -> Text
