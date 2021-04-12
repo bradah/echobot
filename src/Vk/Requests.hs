@@ -1,32 +1,44 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Vk.Requests where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
 
-import           Data.Text         (Text, split, stripPrefix)
-import           TH                (deriveFromJSON')
+Vk API responses.
+-}
+
+module Vk.Requests
+    ( -- * Responses.
+      GetLpsResult (..)
+    , GetLpsError (..)
+    , GetLpsResponse (..)
+    , CheckLpsResponse (..)
+    , CheckLpsAction (..)
+    , SendMessageResponse (..)
+    ) where
+
+import           Data.Text        (Text, split, stripPrefix)
+import           TH               (deriveFromJSON')
 import           Vk.Data
 
 import           Data.Aeson
-import           Network.HTTP.Req  (Scheme (..), Url, https, (/:))
-import           Web.HttpApiData (ToHttpApiData (..))
+import           Network.HTTP.Req (Scheme (..), Url, https, (/:))
+import           Web.HttpApiData  (ToHttpApiData (..))
 
-data GetLpsParams = GetLpsParams
-    { getLps'group_id    :: Integer
-    , getLps'token       :: Text
-    , getLps'api_version :: Double
-    }
-
+-- | Result of 'Vk.Methods.getLps'.
 data GetLpsResult = GetLpsResult
     { getLpsResult'response :: Maybe GetLpsResponse
     , getLpsResult'error    :: Maybe GetLpsError
     } deriving Show
 
+-- | Information of error occured in 'Vk.Methods.getLps'.
 data GetLpsError = GetLpsError
     { error'code :: Int
     , error'msg  :: Text
     } deriving (Show)
 
+-- | Actual useful information of 'GetLpsResult'.
 data GetLpsResponse = GetLpsResponse
     { getLpsResp'key    :: Text
     , getLpsResp'server :: Url 'Https
@@ -40,35 +52,21 @@ instance FromJSON (Url 'Https) where
                       in pure $ foldl (/:) (https p) ps
             Nothing -> fail "Expected \"https://\" prefix"
 
+-- | Response on 'Vk.Methods.checkLps'.
 data CheckLpsResponse = CheckLpsResponse
     { checkLpsResp'ts      :: Maybe Ts
     , checkLpsResp'updates :: [Update]
     , checkLpsResp'failed  :: Maybe Int
     } deriving (Show)
 
-data CheckLpsParams = CheckLpsParams
-    { checkLps'server :: Text
-    , checkLps'action :: CheckLpsAction
-    , checkLps'key    :: Text
-    , checkLps'wait   :: Maybe Int
-    , checkLps'ts     :: Ts
-    }
-
+-- | Action for checkLps.
 data CheckLpsAction
     = ACheck
 
 instance ToHttpApiData CheckLpsAction where
     toQueryParam ACheck = "a_check"
 
-data SendMessageParams = SendMessageParams
-    { sendMsg'user_id      :: Int
-    , sendMsg'message      :: Maybe Text
-    , sendMsg'sticker_id   :: Maybe Int
-    , sendMsg'attachments  :: [Attachment]
-    , sendMsg'access_token :: Text
-    , sendMsg'api_version  :: Double
-    } deriving (Show)
-
+-- | Response on 'Vk.Methods.sendMessage'.
 newtype SendMessageResponse = SendMessageResponse
     { sendMsgResp'message_id :: Maybe Int
     } deriving (Show)

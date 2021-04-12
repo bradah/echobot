@@ -2,8 +2,7 @@
 Copyright:  (c) 2021 wspbr
 Maintainer: wspbr <rtrn.0@ya.ru>
 
-This module contains lens-like functions to extract fields from
-Telegram API ADTs such as 'Update' or 'Message'.
+Parse Haskell data structures.
 -}
 
 module Parser

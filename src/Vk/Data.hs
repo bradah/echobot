@@ -2,7 +2,35 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 
-module Vk.Data where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+This module defines basic Vk API types.
+-}
+
+module Vk.Data
+    ( -- * Available types
+      VkState
+    , defaultVkState
+    , Ts (..)
+      -- ** Bot updates
+    , Update (..)
+    , UpdateType (..)
+    , Object (..)
+      -- Messages
+    , Message (..)
+      -- ** Message attachments
+    , Attachment (..)
+    , AttachmentType (..)
+    , Media (..)
+      -- ** Keyboards
+    , Keyboard (..)
+    , Button (..)
+    , ButtonColor (..)
+    , ButtonAction (..)
+    , ButtonActionType (..)
+    ) where
 
 import           AppState              (AppState (..))
 import           Control.Applicative   ((<|>))
@@ -14,19 +42,22 @@ import           Data.Text             (Text, intercalate, pack)
 import           Data.Text.Lazy        (toStrict)
 import           Data.Text.Read        (decimal)
 import           Data.Time.Clock.POSIX (POSIXTime)
+import           Eff.Log               (showT)
 import           TH                    (deriveFromJSON', deriveToJSON',
                                         snakeFieldModifier)
-import           Eff.Log                 (showT)
 import           Web.HttpApiData       (ToHttpApiData (..))
 
+-- | State in which bot accounts current dialogs.
 type VkState = AppState Ts
 
+-- | Initial value to start bot with.
 defaultVkState :: VkState
 defaultVkState = AppState
     { st'offset = Ts 0
     , st'sessions = fromList []
     }
 
+-- | Basically number of last acquired 'Update'.
 newtype Ts = Ts Integer
     deriving (Show, Eq, Num)
 
@@ -41,11 +72,13 @@ instance FromJSON Ts where
 instance ToHttpApiData Ts where
     toUrlPiece (Ts ts) = toUrlPiece ts
 
+-- | Vk bot update.
 data Update = Update
     { upd'type   :: UpdateType
     , upd'object :: Object
     } deriving (Show)
 
+-- | Kind of 'Update'.
 data UpdateType
     = MessageNew
     | MessageReply
@@ -56,10 +89,12 @@ data UpdateType
     | MessageEvent
     deriving (Show)
 
+-- | Object field of 'Update'.
 newtype Object = Object
     { obj'message    :: Maybe Message
     } deriving (Show)
 
+-- | Vk bot message.
 data Message = Message
     { msg'id            :: Maybe Int
     , msg'date          :: POSIXTime
@@ -72,6 +107,7 @@ data Message = Message
     , msg'reply_message :: Maybe Message
     } deriving (Show)
 
+-- | 'Message' attachments.
 data Attachment = Attachment
     { attachment'type  :: AttachmentType
     , attachment'media :: Media
@@ -110,6 +146,7 @@ instance ToHttpApiData Attachment where
 instance ToHttpApiData [Attachment] where
     toUrlPiece xs = intercalate "," $ toUrlPiece <$> xs
 
+-- | Kind of 'Attachment'.
 data AttachmentType
     = Photo
     | Video
@@ -125,6 +162,7 @@ data AttachmentType
 instance ToHttpApiData AttachmentType where
     toUrlPiece = pack . snakeFieldModifier "" . show
 
+-- | Vk API media.
 data Media = Media
     { media'id          :: Maybe Int
     , media'from_id     :: Maybe Int
@@ -138,7 +176,7 @@ data Media = Media
     , media'description :: Maybe Text
     } deriving (Show)
 
-
+-- | Keyboard.
 data Keyboard = Keyboard
     { keyboard'one_time :: Maybe Bool
     , keyboard'buttons  :: [[Button]]
@@ -148,6 +186,7 @@ data Keyboard = Keyboard
 instance ToHttpApiData Keyboard where
     toUrlPiece = toStrict . encodeToLazyText
 
+-- | Button.
 data Button = Button
     { button'action :: ButtonAction
     , button'color  :: ButtonColor
@@ -156,6 +195,7 @@ data Button = Button
 instance ToHttpApiData Button where
     toUrlPiece = toStrict . encodeToLazyText
 
+-- | Color of 'Button's.
 data ButtonColor
     = Primary
     | Secondary
@@ -166,6 +206,7 @@ data ButtonColor
 instance ToHttpApiData ButtonColor where
     toUrlPiece = toStrict . encodeToLazyText
 
+-- | Actions of 'Button's.
 data ButtonAction = ButtonAction
     { btnAct'type    :: ButtonActionType
     , btnAct'label   :: Text
@@ -175,6 +216,7 @@ data ButtonAction = ButtonAction
 instance ToHttpApiData ButtonAction where
     toUrlPiece = toStrict . encodeToLazyText
 
+-- | Kind of 'ButtonAction's.
 data ButtonActionType
     = Text
     deriving (Show)

@@ -2,7 +2,7 @@
 Copyright:  (c) 2021 wspbr
 Maintainer: wspbr <rtrn.0@ya.ru>
 
-This module contains high-level functions for Telegram API methods.
+Telegram API methods.
 -}
 
 module Telegram.Methods

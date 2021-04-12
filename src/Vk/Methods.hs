@@ -1,4 +1,23 @@
-module Vk.Methods where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Vk API methods.
+-}
+module Vk.Methods
+    ( -- * Available methods
+      Method
+      -- ** Long Poll Server
+    , getLps
+    , checkLps
+      -- ** Send messages
+    , sendTextWithAttachments
+    , sendSticker
+      -- Answer commands
+    , repeatCommand
+    , answerRepeatPayload
+    , startCommand
+    ) where
 
 import           AppState
 import           Control.Monad
@@ -17,7 +36,7 @@ import           Vk.Data
 import           Vk.Parser
 import           Vk.Requests
 
-
+-- | Simple shortcut for methods constraints
 type Method r = Members
     [ Https
     , Log
@@ -28,6 +47,7 @@ type Method r = Members
 
 type MethodWithCallStack r = (Method r, HasCallStack)
 
+-- | Get Long Poll Server.
 getLps :: MethodWithCallStack r => Eff r GetLpsResult
 getLps = do
     params <- mkParams
@@ -50,6 +70,8 @@ getLps = do
             <> "access_token" =: token
             <> "v" =: (5.122 :: Float)
 
+-- | Check Long Poll Server for 'Update's.
+-- This method also adds new 'Session's for new users.
 checkLps :: MethodWithCallStack r => Eff r CheckLpsResponse
 checkLps = do
     logInfo "Waiting for updates..."
@@ -88,6 +110,7 @@ checkLps = do
             Just uid -> (modify @VkState) (newSession uid n) >> putNewSessions us
             _        -> putNewSessions us
 
+-- | Vk API messages.send method.
 sendMessage :: MethodWithCallStack r
             => Int -- ^ User id
             -> Maybe Int -- ^ Repetition number
@@ -118,6 +141,7 @@ sendMessage userId mRepNum params hint = do
             <> "access_token" =: token
             <> "v" =: (5.122 :: Float)
 
+-- | Send text and list of 'Attachment's
 sendTextWithAttachments :: MethodWithCallStack r
             => Int -- ^ User id
             -> Text
@@ -128,6 +152,7 @@ sendTextWithAttachments userId t atts = do
               <> "attachment" =: atts
     sendMessage userId Nothing params "text with attachments"
 
+-- | Send stickers.
 sendSticker :: MethodWithCallStack r
             => Int -- ^ User id
             -> Int -- ^ Sticker id
@@ -136,6 +161,7 @@ sendSticker userId s = do
     let params = "sticker_id" =: s
     sendMessage userId Nothing params "sticker"
 
+-- | Answer to user on \/repeat command.
 repeatCommand :: MethodWithCallStack r
               => Int -- ^ User id
               -> Eff r SendMessageResponse
@@ -164,6 +190,8 @@ repeatCommand userId = do
     greeting :: Text
     greeting = "Choose how many times you want me to repeat your message."
 
+-- | Answer to user after he/she pressed button
+-- of inline keyboard sent after \/repeat command.
 answerRepeatPayload :: MethodWithCallStack r
                     => Int -- ^ User id
                     -> Text -- ^ Payload
@@ -180,6 +208,7 @@ answerRepeatPayload userId pl = do
     confirmationText n = "I will repeat your messages " <+> n <> " time"
         <> if n > 1 then "s." else "."
 
+-- | Send to user helpful information on \/start command.
 startCommand :: MethodWithCallStack r
              => Int -- User id
              -> Eff r SendMessageResponse

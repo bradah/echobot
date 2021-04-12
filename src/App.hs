@@ -1,3 +1,10 @@
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Main application logic.
+-}
+
 module App where
 
 import           AppState
@@ -32,6 +39,7 @@ import qualified Vk.Echo                    as Vk
 import qualified Vk.Methods                 as Vk
 import           Vk.Requests
 
+-- | Run app executing all effects it requires.
 runApp :: IO (Either AppError ((), [Text]))
 runApp = runM
        . runError @AppError
@@ -42,7 +50,7 @@ runApp = runM
        . runPureConfigurator
        $ app
 
-
+-- | Main logic of application.
 app :: ( Members [ Configurator
                  , FileProvider
                  , Error AppError
@@ -62,10 +70,10 @@ app = do
                 r <- runPureTelegram (telegram conf)
                 logWarning $ "Telegram bot has been stopped, last state: " <+> r
             Vk -> do
-                -- r <- runPureVk (vk conf)
-                logWarning $ "Vk bot has been stopped, last state: " -- <+> r
+                r <- runPureVk (vk conf)
+                logWarning $ "Vk bot has been stopped, last state: " <+> r
 
-
+-- | Run telegram bot.
 runPureTelegram :: Members [ Log
                            , Error AppError
                            , Https
@@ -77,7 +85,7 @@ runPureTelegram conf = runReader conf
     . Tg.runPureEcho
     $ echo @Tg.Update
 
-
+-- | Run vk bot.
 runPureVk :: Members [ Log
                      , Error AppError
                      , Https
@@ -103,7 +111,7 @@ runPureVk conf = evalState conf
                 modify (\st -> st {st'offset = getLpsResp'ts resp})
                 echo @Vk.Update
 
-
+-- | Application config.
 data Config = Config
     { telegram :: Tg.Config
     , vk       :: Vk.Config
@@ -118,6 +126,7 @@ instance FromJSON Config where
         <*> o .: "log"
         <*> o .: "platform"
 
+-- | Available platforms
 data Platform
     = Telegram
     | Vk

@@ -112,9 +112,13 @@ format time Message {..} = mconcat
 
 logInfo, logDebug, logWarning, logError
     :: (Member Log r, HasCallStack) => Text -> Eff r ()
+-- | Log message with 'Info' verbosity.
 logInfo = log Info
+-- | Log message with 'Debug' verbosity.
 logDebug = log Debug
+-- | Log message with 'Warning' verbosity.
 logWarning = log Warning
+-- | Log message with 'Error' verbosity.
 logError = log Error
 
 log :: ( Member Log r

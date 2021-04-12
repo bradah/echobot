@@ -1,4 +1,15 @@
-module Telegram.Echo where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Telegram implementation of 'Echo' effect.
+-}
+
+module Telegram.Echo
+    ( -- * Telegram echo
+      -- ** Run
+      runPureEcho
+    ) where
 
 import           Control.Monad.Freer
 
@@ -11,10 +22,10 @@ import           Telegram.Data
 import           Telegram.Methods
 import           Telegram.Parser
 
-runPureEcho
-    :: Method r
-    => Eff (Echo Update : r) a
-    -> Eff r a
+-- | Run 'Echo'for Telegram purely.
+runPureEcho :: Method r
+            => Eff (Echo Update : r) a
+            -> Eff r a
 runPureEcho = interpret $ \case
     Listen -> resp'result <$> getUpdates
     Reply u -> case updateToAction u of
@@ -22,11 +33,11 @@ runPureEcho = interpret $ \case
         Nothing  -> logWarning $ "No matching Action for this Update:" <+> u
 
 
-
-updateToAction
-    :: Method r
-    => Update
-    -> Maybe (Eff r ())
+-- | Choose proper Telegram API method for a given 'Update'.
+-- This makes use of Alternative instance for 'Parser'.
+updateToAction :: Method r
+               => Update
+               -> Maybe (Eff r ())
 updateToAction = runParser . asum $ fmap (fmap void)
     [ startCommand <$ (command "help" <|> command "start") <*> chatId
     , repeatCommand <$ command "repeat" <*> chatId

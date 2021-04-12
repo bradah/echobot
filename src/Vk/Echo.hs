@@ -1,4 +1,15 @@
-module Vk.Echo where
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Vk implementation of 'Echo' effect.
+-}
+
+module Vk.Echo
+    ( -- * Vk echo
+      -- ** Run
+      runPureEcho
+    ) where
 
 import           Control.Monad.Freer (Eff, interpret)
 
@@ -14,6 +25,7 @@ import           Vk.Methods
 import           Vk.Parser
 import           Vk.Requests         (CheckLpsResponse (checkLpsResp'updates))
 
+-- | Run 'Echo'for Telegram purely.
 runPureEcho
     :: Method r
     => Eff (Echo Update : r) a
@@ -24,7 +36,8 @@ runPureEcho = interpret $ \case
         Just act -> act
         Nothing  -> logWarning $ "No matching Action for this Update: " <+> u
 
-
+-- | Choose proper Vk API method for a given 'Update'.
+-- This makes use of Alternative instance for 'Parser'.
 updateToAction
     :: Method r
     => Update

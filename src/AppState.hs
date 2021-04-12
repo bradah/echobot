@@ -7,7 +7,7 @@ Generalized data structure for state maintenance.
 
 module AppState
     ( -- * AppState
-    -- ** Capturing dialogues
+    -- ** Capturing dialogs
       AppState (..)
     , SesMap
     , Session (..)

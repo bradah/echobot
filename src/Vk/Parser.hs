@@ -1,5 +1,13 @@
+{- |
+Copyright:  (c) 2021 wspbr
+Maintainer: wspbr <rtrn.0@ya.ru>
+
+Extract data from Vk API 'Update's.
+-}
+
 module Vk.Parser
-    ( Parser (..)
+    ( -- * Parse updates
+      Parser (..)
     , (<?>)
     , text
     , plainText
@@ -43,18 +51,22 @@ command name = do
     (w:ws) | w == "/" <> name -> return (T.unwords ws)
     _                         -> empty
 
+-- | Get user id from an 'Update'.
 updateUserId :: Parser Update Int
 updateUserId = Parser $
     pure . upd'object >=> obj'message >=> msg'from_id
 
+-- | Get list of 'Attachment's from an 'Update'.
 attachments :: Parser Update [Attachment]
 attachments = Parser $
     pure . upd'object >=> obj'message >=> pure . msg'attachments
 
+-- | Get payload from an 'Update'.
 payload :: Parser Update T.Text
 payload = Parser $
     pure . upd'object >=> obj'message >=> msg'payload
 
+-- | Get sticker id from an 'Update'.
 sticker :: Parser Update Int
 sticker = do
     atts <- attachments
@@ -62,6 +74,7 @@ sticker = do
         [Attachment Sticker Media{..}] -> pure $ fromMaybe 0 media'sticker_id
         _                              -> empty
 
+-- | Check if 'Update' contains audio_message.
 isAudioMessage :: Parser Update ()
 isAudioMessage = do
     atts <- attachments
@@ -69,17 +82,8 @@ isAudioMessage = do
         [Attachment AudioMessage _] -> pure ()
         _                           -> empty
 
+-- | Check if 'Update' contains unsupported 'Attachment' type.
 unsupported :: Parser Update ()
 unsupported = asum
     [ isAudioMessage
     ]
-
-{-
-updateChatId :: Parser Update ChatId
-updateChatId = Parser $
-  updateMessage >=> return . messageChat >=> return . chatId
-
-updateId :: Parser Update UpdateId
-updateId = Parser (return . updateUpdateId) -}
-
-
