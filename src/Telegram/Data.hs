@@ -63,7 +63,7 @@ data Response a = Response
     , resp'description :: Maybe Text
     , resp'result      :: a
     , resp'errorCode   :: Maybe Int
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents an incoming update.
 --   At most one of the optional parameters can be
@@ -73,7 +73,7 @@ data Update = Update
     , upd'message        :: Maybe Message
     , upd'edited_message :: Maybe Message
     , upd'callback_query :: Maybe CallbackQuery
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a message.
 data Message = Message
@@ -93,7 +93,7 @@ data Message = Message
     , msg'video        :: Maybe Video
     , msg'video_note   :: Maybe VideoNote
     , msg'voice        :: Maybe Voice
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- ** User
 
@@ -103,13 +103,13 @@ data User = User
     , usr'is_bot    :: Bool
     , usr'last_name :: Maybe Text
     , usr'username  :: Maybe Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a chat.
 data Chat = Chat
     { chat'id       :: Int
     , chat'username :: Maybe Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents one special entity in a text message.
 --   For example, hashtags, usernames, URLs, etc.
@@ -119,7 +119,7 @@ data MessageEntity = MessageEntity
     , msgent'length :: Int
     , msgent'url    :: Maybe Text
     , msgent'user   :: Maybe User
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | Type of the entity. Can be mention (@username),
 --   hashtag, bot_command, url, email, bold (bold text),
@@ -143,25 +143,25 @@ data MessageEntityType
     | TextMention
     | Cashtag
     | PhoneNumber
-    deriving (Show)
+    deriving (Show, Eq)
 
 -- | This object represents a sticker.
 newtype Sticker = Sticker
     { stk'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents an inline keyboard
 -- that appears right next to the message it belongs to.
 newtype InlineKeyboardMarkup = InlineKeyboardMarkup
     { kbmup'inline_keyboard :: [[InlineKeyboardButton]]
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents one button of an inline
 -- keyboard. You must use exactly one of the optional fields.
 data InlineKeyboardButton = InlineKeyboardButton
     { but'text          :: Text
     , but'callback_data :: Maybe Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents an incoming callback query
 -- from a callback button in an inline keyboard.
@@ -177,47 +177,47 @@ data CallbackQuery = CallbackQuery
     , cq'message           :: Maybe Message
     , cq'inline_message_id :: Maybe Int
     , cq'data              :: Maybe Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents one size of a photo
 -- or a file\/sticker thumbnail.
 newtype PhotoSize = PhotoSize
     { ph'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents an animation
 -- file (GIF or H.264\/MPEG-4 AVC video without sound).
 newtype Animation = Animation
     { anim'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents an audio file to be treated as
 -- music by the Telegram clients.
 newtype Audio = Audio
     { audio'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a general file
 -- (as opposed to photos, voice messages and audio files).
 newtype Document = Document
     { doc'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a video file.
 newtype Video = Video
     { vid'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a video message
 -- (available in Telegram apps as of v.4.0).
 newtype VideoNote = VideoNote
     { vidnote'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | This object represents a voice note.
 newtype Voice = Voice
     { voice'file_id :: Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 deriveJSON' ''InlineKeyboardButton
 deriveJSON' ''InlineKeyboardMarkup

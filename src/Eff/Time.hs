@@ -49,13 +49,13 @@ runIOTime = interpret $ \case
 
 -- | Run purely. You cannot get genuine time of your
 -- system w/o 'IO', so this is just a constant basically.
-runPureTime :: forall r a
-             . Eff (Time : r) a
-            -> Eff r ZonedTime
-runPureTime _ = pure constZonedTime
+runPureTime :: Eff (Time : r) a
+            -> Eff r a
+runPureTime = interpret $ \case
+    GetZonedTime -> pure constZonedTime
   where
     constZonedTime = utcToZonedTime timeZone $ UTCTime day diffTime
-    timeZone = minutesToTimeZone 123456789
+    timeZone = minutesToTimeZone 0
 
     diffTime = picosecondsToDiffTime 123456789
     day = fromOrdinalDate 2048 17

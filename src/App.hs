@@ -32,7 +32,6 @@ import qualified Telegram.Config            as Tg
 import qualified Telegram.Data              as Tg
 import qualified Telegram.Echo              as Tg
 
-import           Data.Text
 import qualified Vk.Config                  as Vk
 import qualified Vk.Data                    as Vk
 import qualified Vk.Echo                    as Vk
@@ -40,17 +39,20 @@ import qualified Vk.Methods                 as Vk
 import           Vk.Requests
 
 -- | Run app executing all effects it requires.
-runApp :: IO (Either AppError ((), [Text]))
+runApp :: IO (Either AppError ())
 runApp = runM
        . runError @AppError
        . runIOFileProvider
        . runIOHttps
        . runIOTime
-       . runPureConsole
+       . runIOConsole
        . runPureConfigurator
        $ app
 
 -- | Main logic of application.
+-- This whole computation is entirely pure since
+-- it doesn't require 'IO'. So implementation is
+-- hidden in the interpreters.
 app :: ( Members [ Configurator
                  , FileProvider
                  , Error AppError
@@ -80,7 +82,8 @@ runPureTelegram :: Members [ Log
                            ] r
                 => Tg.Config
                 -> Eff r Tg.TgState
-runPureTelegram conf = runReader conf
+runPureTelegram conf
+    = runReader conf
     . execState Tg.defaultTgState
     . Tg.runPureEcho
     $ echo @Tg.Update
@@ -92,10 +95,11 @@ runPureVk :: Members [ Log
                      ] r
           => Vk.Config
           -> Eff r Vk.VkState
-runPureVk conf = evalState conf
-               . execState Vk.defaultVkState
-               . runPureRandom 5
-               . Vk.runPureEcho $ do
+runPureVk conf
+    = evalState conf
+    . execState Vk.defaultVkState
+    . runPureRandom 5
+    . Vk.runPureEcho $ do
     result <- Vk.getLps
     case getLpsResult'error result of
         Just e -> throwError . OtherError $ showT e

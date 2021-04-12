@@ -62,9 +62,11 @@ logMessage
     -> Eff r ()
 logMessage = send . LogMessage
 
--- | Run 'Log' effect. This can be done purely
--- since it depends on 'Time', 'Console' and 'FileProvider'
--- effects and not on 'IO' directly.
+{- |
+Run 'Log' effect. This can be done purely
+since it depends on 'Time', 'Console' and 'FileProvider'
+effects and not on 'IO' directly.
+-}
 runPureLog
     :: Members
      [ Console
