@@ -8,7 +8,6 @@ import           Telegram.Parser
 import           Test.Hspec
 import           Test.Hspec.QuickCheck
 
-
 chatIdSpec :: Spec
 chatIdSpec =
   context "when given an Update with Message" $
@@ -81,7 +80,7 @@ textSpec =
 commandSpec :: Spec
 commandSpec =
   context "when given an Update with command" $
-    prop "extracts command's arguments" $
+    prop "returns ()" $
       \arbU arbT -> case upd'message arbU >>= msg'text of
         Nothing -> isNothing (arbU <?> command arbT)
         Just t -> if "/" `T.isPrefixOf` t

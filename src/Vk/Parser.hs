@@ -10,19 +10,16 @@ module Vk.Parser
       Parser (..)
     , (<?>)
     , text
-    , plainText
     , command
     , updateUserId
     , attachments
     , payload
     , sticker
     , isAudioMessage
-    , unsupported
     ) where
 
 import           Control.Applicative
 import           Control.Monad
-import           Data.Foldable       (asum)
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
 import           Parser
@@ -34,22 +31,13 @@ text :: Parser Update T.Text
 text = Parser $
     pure . upd'object >=> obj'message >=> pure . msg'text
 
--- | Same as 'text' but fails if there wasn't
--- plain text (e.g. command).
-plainText :: Parser Update T.Text
-plainText = do
-  t <- text
-  if "/" `T.isPrefixOf` t
-    then empty
-    else return t
-
 -- | Check if bot received specific command.
-command :: T.Text -> Parser Update T.Text
+command :: T.Text -> Parser Update ()
 command name = do
   t <- text
   case T.words t of
-    (w:ws) | w == "/" <> name -> return (T.unwords ws)
-    _                         -> empty
+    (w:_) | w == "/" <> name -> pure ()
+    _                        -> empty
 
 -- | Get user id from an 'Update'.
 updateUserId :: Parser Update Int
@@ -81,9 +69,3 @@ isAudioMessage = do
     case atts of
         [Attachment AudioMessage _] -> pure ()
         _                           -> empty
-
--- | Check if 'Update' contains unsupported 'Attachment' type.
-unsupported :: Parser Update ()
-unsupported = asum
-    [ isAudioMessage
-    ]

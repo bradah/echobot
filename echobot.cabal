@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 462837fa36d87fa5254bbfb4e000631e102595bd231a0308237fd438e7ac07c8
+-- hash: 01e8b81f3355a5d60ef7a07b10f629a70a3a81b363979605a7462bd73996b4c2
 
 name:           echobot
 version:        0.1.0.0
@@ -111,6 +111,8 @@ test-suite echobot-test
   other-modules:
       Telegram.Data.Arbitrary
       Telegram.ParserSpec
+      Vk.Data.Arbitrary
+      Vk.ParserSpec
       Paths_echobot
   hs-source-dirs:
       test

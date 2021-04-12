@@ -111,7 +111,7 @@ data Message = Message
 data Attachment = Attachment
     { attachment'type  :: AttachmentType
     , attachment'media :: Media
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 instance FromJSON Attachment where
     parseJSON = withObject "attachment" $ \o -> do
@@ -157,24 +157,23 @@ data AttachmentType
     | Market
     | Wall
     | Sticker
-    deriving (Show)
+    deriving (Show, Eq)
 
 instance ToHttpApiData AttachmentType where
     toUrlPiece = pack . snakeFieldModifier "" . show
 
--- | Vk API media.
+-- | Generalized Vk API media structure.
 data Media = Media
     { media'id          :: Maybe Int
     , media'from_id     :: Maybe Int
     , media'owner_id    :: Maybe Int
     , media'access_key  :: Maybe Text
-    , media'attachments :: Maybe [Attachment]
     , media'sticker_id  :: Maybe Int
     , media'url         :: Maybe Text
     , media'title       :: Maybe Text
     , media'caption     :: Maybe Text
     , media'description :: Maybe Text
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- | Keyboard.
 data Keyboard = Keyboard

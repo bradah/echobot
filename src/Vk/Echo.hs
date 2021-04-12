@@ -46,10 +46,10 @@ updateToAction = runParser . asum $ fmap (fmap void)
     [ startCommand <$ command "start" <*> updateUserId
     , answerRepeatPayload <$> updateUserId <*> payload
     , repeatCommand <$ command "repeat" <*> updateUserId
-    , sendTextWithAttachments <$> updateUserId <* unsupported <*> pure unsupportedText <*> pure []
+    , sendTextWithAttachments <$> updateUserId <* isAudioMessage <*> pure unsupportedText <*> pure []
     , sendSticker <$> updateUserId <*> sticker
     , sendTextWithAttachments <$> updateUserId <*> text <*> attachments
     ]
 
 unsupportedText :: Text
-unsupportedText = "Sorry, VK API doesn't allow me to send messages of this type"
+unsupportedText = "Sorry, VK API doesn't allow me to resend your voice messages :("
