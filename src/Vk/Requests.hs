@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {- |
 Copyright:  (c) 2021 wspbr
@@ -9,50 +10,70 @@ Vk API responses.
 -}
 
 module Vk.Requests
-    ( -- * Responses.
-      GetLpsResult (..)
-    , GetLpsError (..)
+    ( -- * Responses
+      Result (..)
+    , Error (..)
+    , respOrThrow
     , GetLpsResponse (..)
     , CheckLpsResponse (..)
     , CheckLpsAction (..)
-    , SendMessageResponse (..)
+    , GetMessagesUploadServerResponse (..)
+    , UploadFileResponse (..)
     ) where
 
-import           Data.Text        (Text, split, stripPrefix)
-import           TH               (deriveFromJSON')
+import           Data.Text           (Text)
+import           TH                  (deriveFromJSON')
 import           Vk.Data
 
-import           Data.Aeson
-import           Network.HTTP.Req (Scheme (..), Url, https, (/:))
-import           Web.HttpApiData  (ToHttpApiData (..))
+import           Web.HttpApiData     (ToHttpApiData (..))
 
--- | Result of 'Vk.Methods.getLps'.
-data GetLpsResult = GetLpsResult
-    { getLpsResult'response :: Maybe GetLpsResponse
-    , getLpsResult'error    :: Maybe GetLpsError
+import           Control.Monad.Freer
+import           Eff.Error
+import           Eff.Https           (Url)
+import           Eff.Log
+
+-- | Result of Vk API methods.
+data Result a = Result
+    { result'response :: Maybe a
+    , result'error    :: Maybe VkError
     } deriving Show
 
 -- | Information of error occured in 'Vk.Methods.getLps'.
-data GetLpsError = GetLpsError
-    { error'code :: Int
-    , error'msg  :: Text
+data VkError = VkError
+    { error'error_code     :: Int
+    , error'error_msg      :: Text
+    , error'request_params :: [ErrorRequestParam]
     } deriving (Show)
 
--- | Actual useful information of 'GetLpsResult'.
+data ErrorRequestParam = ErrorRequestParam
+    { erReqParams'key   :: Text
+    , erReqParams'value :: Text
+    } deriving Show
+
+-- | Extract some response from 'Result' or throw an exception.
+respOrThrow :: ( Members [Error AppError, Log] r
+               , Show a
+               )
+            => Result a
+            -> Eff r a
+respOrThrow (result'error -> Just e) = do
+    logError $ "Received error: " <+> e
+    throwError . OtherError $ showT e
+respOrThrow (result'response -> Just r) = do
+    logDebug $ "Received response: " <+> r
+    pure r
+respOrThrow result = do
+    logError $ "Received neither error nor response: " <+> result
+    throwError . OtherError $ showT result
+
+-- | Response of 'Vk.Methods.getLps'.
 data GetLpsResponse = GetLpsResponse
     { getLpsResp'key    :: Text
-    , getLpsResp'server :: Url 'Https
+    , getLpsResp'server :: Url
     , getLpsResp'ts     :: Ts
     } deriving Show
 
-instance FromJSON (Url 'Https) where
-    parseJSON = withText "Url" $ \s -> do
-        case stripPrefix "https://" s of
-            Just t -> let (p:ps) = split (== '/') t
-                      in pure $ foldl (/:) (https p) ps
-            Nothing -> fail "Expected \"https://\" prefix"
-
--- | Response on 'Vk.Methods.checkLps'.
+-- | Response of 'Vk.Methods.checkLps'.
 data CheckLpsResponse = CheckLpsResponse
     { checkLpsResp'ts      :: Maybe Ts
     , checkLpsResp'updates :: [Update]
@@ -66,13 +87,20 @@ data CheckLpsAction
 instance ToHttpApiData CheckLpsAction where
     toQueryParam ACheck = "a_check"
 
--- | Response on 'Vk.Methods.sendMessage'.
-newtype SendMessageResponse = SendMessageResponse
-    { sendMsgResp'message_id :: Maybe Int
-    } deriving (Show)
+-- | Response of 'Vk.Methods.getMessagesUploadServer'
+newtype GetMessagesUploadServerResponse = GetMessagesUploadServerResponse
+    { getMsgUploadServ'upload_url :: Url
+    } deriving Show
+
+newtype UploadFileResponse = UploadFileResponse
+    {uploadFileResp'file :: Text
+    } deriving Show
+
 
 deriveFromJSON' ''CheckLpsResponse
 deriveFromJSON' ''GetLpsResponse
-deriveFromJSON' ''GetLpsError
-deriveFromJSON' ''GetLpsResult
-deriveFromJSON' ''SendMessageResponse
+deriveFromJSON' ''ErrorRequestParam
+deriveFromJSON' ''VkError
+deriveFromJSON' ''Result
+deriveFromJSON' ''GetMessagesUploadServerResponse
+deriveFromJSON' ''UploadFileResponse

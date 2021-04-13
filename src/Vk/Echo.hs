@@ -15,7 +15,6 @@ import           Control.Monad.Freer (Eff, interpret)
 
 import           Control.Monad       (void)
 import           Data.Foldable       (asum)
-import           Data.Text           (Text)
 
 import           Eff.Echo            (Echo (..))
 import           Eff.Log             (logWarning, (<+>))
@@ -46,10 +45,7 @@ updateToAction = runParser . asum $ fmap (fmap void)
     [ startCommand <$ command "start" <*> updateUserId
     , answerRepeatPayload <$> updateUserId <*> payload
     , repeatCommand <$ command "repeat" <*> updateUserId
-    , sendTextWithAttachments <$> updateUserId <* isAudioMessage <*> pure unsupportedText <*> pure []
+    , sendAudioMessage <$> updateUserId <*> audioMessage
     , sendSticker <$> updateUserId <*> sticker
     , sendTextWithAttachments <$> updateUserId <*> text <*> attachments
     ]
-
-unsupportedText :: Text
-unsupportedText = "Sorry, VK API doesn't allow me to resend your voice messages :("

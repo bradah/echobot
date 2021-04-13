@@ -15,13 +15,14 @@ module Vk.Parser
     , attachments
     , payload
     , sticker
-    , isAudioMessage
+    , audioMessage
     ) where
 
 import           Control.Applicative
 import           Control.Monad
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
+import           Eff.Https           (Url)
 import           Parser
 import           Vk.Data
 
@@ -63,9 +64,9 @@ sticker = do
         _                              -> empty
 
 -- | Check if 'Update' contains audio_message.
-isAudioMessage :: Parser Update ()
-isAudioMessage = do
+audioMessage :: Parser Update Url
+audioMessage = do
     atts <- attachments
     case atts of
-        [Attachment AudioMessage _] -> pure ()
-        _                           -> empty
+        [Attachment AudioMessage Media {..}] -> maybe empty pure media'link_ogg
+        _                                    -> empty

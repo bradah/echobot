@@ -100,20 +100,14 @@ runPureVk conf
     . execState Vk.defaultVkState
     . runPureRandom 5
     . Vk.runPureEcho $ do
-    result <- Vk.getLps
-    case getLpsResult'error result of
-        Just e -> throwError . OtherError $ showT e
-        Nothing -> case getLpsResult'response result of
-            Nothing -> do
-                logError $ "No response in " <+> result
-                throwError $ OtherError "No resp"
-            Just resp -> do
-                modify (\c ->
-                    c { Vk.checkLpsServer = pure $ getLpsResp'server resp
-                      , Vk.checkLpsKey = getLpsResp'key resp
-                      })
-                modify (\st -> st {st'offset = getLpsResp'ts resp})
-                echo @Vk.Update
+    resp <- Vk.getLps
+    modify (\vkConf -> vkConf
+            { Vk.checkLpsServer = pure $ getLpsResp'server resp
+            , Vk.checkLpsKey = getLpsResp'key resp
+            }
+           )
+    modify (\st -> st {st'offset = getLpsResp'ts resp})
+    echo @Vk.Update
 
 -- | Application config.
 data Config = Config

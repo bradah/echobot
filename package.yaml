@@ -32,10 +32,13 @@ dependencies:
 - configurator
 - random
 - http-api-data
-- req
+- req 
+- http-client
 - unordered-containers
 - freer-simple
 - bytestring
+
+- modern-uri
 
 default-extensions:
 - OverloadedStrings

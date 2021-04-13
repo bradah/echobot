@@ -42,6 +42,7 @@ import           Data.Text             (Text, intercalate, pack)
 import           Data.Text.Lazy        (toStrict)
 import           Data.Text.Read        (decimal)
 import           Data.Time.Clock.POSIX (POSIXTime)
+import           Eff.Https             (Url)
 import           Eff.Log               (showT)
 import           TH                    (deriveFromJSON', deriveToJSON',
                                         snakeFieldModifier)
@@ -170,6 +171,7 @@ data Media = Media
     , media'access_key  :: Maybe Text
     , media'sticker_id  :: Maybe Int
     , media'url         :: Maybe Text
+    , media'link_ogg    :: Maybe Url
     , media'title       :: Maybe Text
     , media'caption     :: Maybe Text
     , media'description :: Maybe Text

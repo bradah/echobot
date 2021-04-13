@@ -13,6 +13,7 @@ module Vk.Methods
       -- ** Send messages
     , sendTextWithAttachments
     , sendSticker
+    , sendAudioMessage
       -- Answer commands
     , repeatCommand
     , answerRepeatPayload
@@ -23,10 +24,12 @@ import           AppState
 import           Control.Monad
 import           Control.Monad.Freer
 import           Control.Monad.Freer.State
+import           Data.ByteString           (ByteString)
 import           Data.Maybe
-import           Data.Text                 (Text, unpack)
+import           Data.Text                 (Text, splitOn, unpack)
 import           Web.HttpApiData           (toUrlPiece)
 
+import           Eff.Error
 import           Eff.Https                 hiding (get)
 import           Eff.Log                   hiding (Config)
 import           Eff.Random
@@ -42,33 +45,35 @@ type Method r = Members
     , Log
     , State Config
     , State VkState
+    , Error AppError
     , Random
     ] r
 
 type MethodWithCallStack r = (Method r, HasCallStack)
 
+-- | Add group_id, token and api_version to parameters.
+completeParams
+    :: Members [State Config, State VkState] r
+    => FormUrlEncodedParam
+    -> Eff r ReqBodyUrlEnc
+completeParams params = do
+    Config {..} <- get
+    pure . url $ params
+        <>  "group_id" =: groupId
+        <> "access_token" =: token
+        <> "v" =: (5.122 :: Float)
+
 -- | Get Long Poll Server.
-getLps :: MethodWithCallStack r => Eff r GetLpsResult
+getLps :: MethodWithCallStack r => Eff r GetLpsResponse
 getLps = do
-    params <- mkParams
+    params <- completeParams mempty
     logInfo "Requesting Long Poll Server"
-    resp <- post (https "api.vk.com"
+    result <- post (https "api.vk.com"
                      /: "method"
                      /: "groups.getLongPollServer"
                      )
                  params
-    logDebug $ "Response: " <+> resp
-    pure resp
-  where
-    mkParams
-        :: Members [State Config, State VkState] r
-        => Eff r ReqBodyUrlEnc
-    mkParams = do
-        Config {..} <- get
-        pure . url $
-               "group_id" =: groupId
-            <> "access_token" =: token
-            <> "v" =: (5.122 :: Float)
+    respOrThrow result
 
 -- | Check Long Poll Server for 'Update's.
 -- This method also adds new 'Session's for new users.
@@ -78,13 +83,18 @@ checkLps = do
     params <- mkParams
     server <- gets (fromJust . checkLpsServer)
     resp <- post server params
-    let ups = checkLpsResp'updates resp
-    logInfo $ "Updates received: " <+> length ups
-    logDebug $ "Response: " <+> resp
-    putNewTs resp
-    sessions <- putNewSessions ups
-    logDebug $ "Current sessions: " <+> sessions
-    pure resp
+    case checkLpsResp'failed resp of
+        Just e -> do
+            logError $ "CheckLps failed: " <+> e
+            throwError . OtherError $ showT resp
+        Nothing -> do
+            let ups = checkLpsResp'updates resp
+            logDebug $ "Received response: " <+> resp
+            logInfo $ "Updates received: " <+> length ups
+            putNewTs resp
+            sessions <- putNewSessions ups
+            logDebug $ "Current sessions: " <+> sessions
+            pure resp
 
   where
     mkParams :: Members [State Config, State VkState] r => Eff r ReqBodyUrlEnc
@@ -116,37 +126,30 @@ sendMessage :: MethodWithCallStack r
             -> Maybe Int -- ^ Repetition number
             -> FormUrlEncodedParam
             -> Text -- ^ Hint
-            -> Eff r SendMessageResponse
+            -> Eff r Int
 sendMessage userId mRepNum params hint = do
     repNum <- maybe (gets @VkState $ getRepNum userId) pure mRepNum
     logInfo $ "Sending " <> hint <> " to user " <+> userId
         <> " (repeat: " <+> repNum <> ")"
-    resp <- fmap head . replicateM repNum $ do
+    result <- fmap head . replicateM repNum $ do
         rand <- (`mod` 10000000) <$> random
-        fullParams <- mkFullParams rand
+        logDebug $ "random_id: " <+> rand
+        fullParams <- completeParams $ params
+            <> "user_id" =: userId
+            <> "random_id" =: rand
         post (https "api.vk.com"
                  /: "method"
                  /: "messages.send"
              )
              fullParams
-    logDebug $ "Response: " <+> resp
-    pure resp
-  where
-    mkFullParams rand = do
-        Config {..} <- get
-        logDebug $ "random_id: " <+> rand
-        pure . url $ params
-            <> "user_id" =: userId
-            <> "random_id" =: rand
-            <> "access_token" =: token
-            <> "v" =: (5.122 :: Float)
+    respOrThrow result
 
 -- | Send text and list of 'Attachment's
 sendTextWithAttachments :: MethodWithCallStack r
             => Int -- ^ User id
             -> Text
             -> [Attachment]
-            -> Eff r SendMessageResponse
+            -> Eff r Int
 sendTextWithAttachments userId t atts = do
     let params = "message" =: t
               <> "attachment" =: atts
@@ -156,15 +159,70 @@ sendTextWithAttachments userId t atts = do
 sendSticker :: MethodWithCallStack r
             => Int -- ^ User id
             -> Int -- ^ Sticker id
-            -> Eff r SendMessageResponse
+            -> Eff r Int
 sendSticker userId s = do
     let params = "sticker_id" =: s
     sendMessage userId Nothing params "sticker"
 
+sendAudioMessage :: MethodWithCallStack r
+                 => Int -- ^ User id
+                 -> Url -- ^ Link to download audio message
+                 -> Eff r Int
+sendAudioMessage userId link = do
+    logDebug "Downloading audio message"
+    let filePath = unpack . last . splitOn "/" $ renderUrl link
+    ogg <- getBS link
+    server <- getMsgUploadServ'upload_url
+        <$> getMessagesUploadServer userId AudioMessage
+    file <- uploadFileResp'file
+        <$> uploadFile server filePath ogg
+    audio <- saveFile file
+    sendTextWithAttachments
+        userId
+        ""
+        [audio]
+
+-- | Returns the server address for document upload.
+getMessagesUploadServer :: MethodWithCallStack r
+                        => Int -- ^ UserId
+                        -> AttachmentType
+                        -> Eff r GetMessagesUploadServerResponse
+getMessagesUploadServer userId atType = do
+    logDebug $ "Getting upload server for " <+> atType
+    params <- completeParams $ "type" =: atType <> "peer_id" =: userId
+    result <- post (https "api.vk.com"
+                       /: "method"
+                       /: "docs.getMessagesUploadServer"
+                   ) params
+    respOrThrow result
+
+-- | Upload a file to server. Get server via 'getMessagesUploadServer'.
+uploadFile :: MethodWithCallStack r
+           => Url -- ^ Server
+           -> FilePath
+           -> ByteString -- ^ File
+           -> Eff r UploadFileResponse
+uploadFile server filePath file = do
+    logDebug "Uploading audio message"
+    postMultipart server "file" filePath file
+
+-- | Save media after uploading it viq 'uploadFile'.
+saveFile :: MethodWithCallStack r
+         => Text -- ^ File
+         -> Eff r Attachment
+saveFile file = do
+    logDebug "Saving file"
+    params <- completeParams $ "file" =: file
+    result <- post (https "api.vk.com"
+                       /: "method"
+                       /: "docs.save"
+                   ) params
+    respOrThrow result
+
 -- | Answer to user on \/repeat command.
 repeatCommand :: MethodWithCallStack r
               => Int -- ^ User id
-              -> Eff r SendMessageResponse
+              -> Eff r Int
 repeatCommand userId = do
     logInfo "Received /repeat command"
     let params = "message" =: greeting
@@ -195,7 +253,7 @@ repeatCommand userId = do
 answerRepeatPayload :: MethodWithCallStack r
                     => Int -- ^ User id
                     -> Text -- ^ Payload
-                    -> Eff r SendMessageResponse
+                    -> Eff r Int
 answerRepeatPayload userId pl = do
     logInfo $ "Received payload: " <+> pl
     logInfo $ "Changing repetition number for " <+> userId <> " to " <> pl
@@ -211,7 +269,7 @@ answerRepeatPayload userId pl = do
 -- | Send to user helpful information on \/start command.
 startCommand :: MethodWithCallStack r
              => Int -- User id
-             -> Eff r SendMessageResponse
+             -> Eff r Int
 startCommand userId = do
     logInfo "Received /start command"
     t <- gets @Config startMessage

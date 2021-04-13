@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 01e8b81f3355a5d60ef7a07b10f629a70a3a81b363979605a7462bd73996b4c2
+-- hash: 158fa5166f99d7ee6adb7b780ee204807e551b92adc607774eaa257b4843a48d
 
 name:           echobot
 version:        0.1.0.0
@@ -68,6 +68,8 @@ library
     , hspec
     , hspec-discover
     , http-api-data
+    , http-client
+    , modern-uri
     , quickcheck-instances
     , random
     , req
@@ -96,6 +98,8 @@ executable echobot-exe
     , hspec
     , hspec-discover
     , http-api-data
+    , http-client
+    , modern-uri
     , quickcheck-instances
     , random
     , req
@@ -129,6 +133,8 @@ test-suite echobot-test
     , hspec
     , hspec-discover
     , http-api-data
+    , http-client
+    , modern-uri
     , quickcheck-instances
     , random
     , req
