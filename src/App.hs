@@ -66,7 +66,8 @@ app :: ( Members [ Configurator
 app = do
     conf <- load "config.json"
     runReader (log conf) . runPureLog $ do
-        logDebug $ "Loaded config :" <+> conf
+        logDebug $ "Loaded config: " <+> conf
+        logInfo $ "Running platform: " <+> platform conf
         case platform conf of
             Telegram -> do
                 r <- runPureTelegram (telegram conf)

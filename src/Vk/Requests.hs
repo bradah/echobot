@@ -13,7 +13,7 @@ module Vk.Requests
     ( -- * Responses
       Result (..)
     , Error (..)
-    , respOrThrow
+    , tryExtract
     , GetLpsResponse (..)
     , CheckLpsResponse (..)
     , CheckLpsAction (..)
@@ -51,18 +51,18 @@ data ErrorRequestParam = ErrorRequestParam
     } deriving Show
 
 -- | Extract some response from 'Result' or throw an exception.
-respOrThrow :: ( Members [Error AppError, Log] r
+tryExtract :: ( Members [Error AppError, Log] r
                , Show a
                )
             => Result a
             -> Eff r a
-respOrThrow (result'error -> Just e) = do
+tryExtract (result'error -> Just e) = do
     logError $ "Received error: " <+> e
     throwError . OtherError $ showT e
-respOrThrow (result'response -> Just r) = do
+tryExtract (result'response -> Just r) = do
     logDebug $ "Received response: " <+> r
     pure r
-respOrThrow result = do
+tryExtract result = do
     logError $ "Received neither error nor response: " <+> result
     throwError . OtherError $ showT result
 

@@ -40,6 +40,7 @@ import           Control.Monad.Freer.Reader (Reader, asks)
 import           Control.Monad.Freer.State  (State, gets, modify)
 import           Data.Aeson                 (ToJSON)
 import           Data.Text                  (Text, unpack)
+import           Eff.Error
 import           Eff.Https
 import           Eff.Log                    (HasCallStack, Log, logDebug,
                                              logInfo, (<+>))
@@ -55,6 +56,7 @@ type Method r = Members
     , State (AppState (Maybe Int))
     , Https
     , Log
+    , Error AppError
     ] r
 
 
@@ -64,10 +66,11 @@ type MethodWithCallStack r = (Method r, HasCallStack)
 Requires no parameters. Returns basic information about
 the bot in form of a 'User' object.
 -}
-getMe :: MethodWithCallStack r => Eff r (Response User)
+getMe :: MethodWithCallStack r => Eff r User
 getMe = do
     bUrl <- baseUrl
-    get (bUrl /: "getMe")
+    resp <- get (bUrl /: "getMe")
+    tryExtract resp
 
 {- | Use this method to get updates from Telegram server.
 Incoming updates are stored on the server until the bot
@@ -76,19 +79,18 @@ longer than 24 hours.
 
 You will receive JSON-serialized 'Update' objects as a result.
 -}
-getUpdates :: MethodWithCallStack r => Eff r (Response [Update])
+getUpdates :: MethodWithCallStack r => Eff r [Update]
 getUpdates = do
     bUrl <- baseUrl
     body <- mkBody
     logInfo "Waiting for updates..."
     resp <- post (bUrl /: "getUpdates") (json body)
-    let ups = resp'result resp
+    ups <- tryExtract resp
     logInfo $ "Updates received: " <+> length ups
-    logDebug $ "Response: " <+> resp
     putNewOffset ups
     sessions <- putNewSessions ups
     logDebug $ "Current sessions: " <+> sessions
-    pure resp
+    pure ups
   where
     mkBody :: Member (State TgState) r => Eff r GetUpdatesRequest
     mkBody = do
@@ -122,13 +124,12 @@ answerCallbackQuery :: MethodWithCallStack r
                     => Text -- ^ Callback id
                     -> Maybe Text -- Text
                     -> Maybe Bool -- ^ Show alert
-                    -> Eff r (Response Bool)
+                    -> Eff r Bool
 answerCallbackQuery cbId mt mb = do
     logInfo $ "Answering callback " <+> cbId <> " with text " <+> mt
     bUrl <- baseUrl
     resp <- post (bUrl /: "answerCallbackQuery") body
-    logDebug $ "Response: " <+> resp
-    pure resp
+    tryExtract resp
   where body = json $ AnswerCallbackRequest
             { callback'callback_query_id = cbId
             , callback'text = mt
@@ -141,7 +142,7 @@ answerRepeatCallback :: MethodWithCallStack r
                      -> Int -- ^ Message id
                      -> Text -- ^ Callback id
                      -> Text
-                     -> Eff r (Response Bool)
+                     -> Eff r Bool
 answerRepeatCallback cid mid cbid t = do
     resp <- answerCallbackQuery cbid Nothing Nothing
     let n = read $ unpack t
@@ -162,15 +163,14 @@ answerRepeatCallback cid mid cbid t = do
 -- This function will also send inline keyboard to the user.
 repeatCommand :: MethodWithCallStack r
               => Int -- ^ Chat id
-              -> Eff r (Response Message)
+              -> Eff r Message
 repeatCommand cid = do
     logInfo "Received /repeat command"
     logDebug $ "Sending inline keyboard "
         <+> defaultRepeatInlineKeyboard <> " to " <+> cid
     bUrl <- baseUrl
     resp <- post (bUrl /: "sendMessage") body
-    logDebug $ "Response: " <+> resp
-    pure resp
+    tryExtract resp
   where
     body = json $ SendMessageRequest
         { sendMsg'chat_id = cid
@@ -196,7 +196,7 @@ repeatCommand cid = do
 -- | Simple wrapper around 'sendMessage' to answer \/start command.
 startCommand :: MethodWithCallStack r
              => Int -- ^ Chat id
-             -> Eff r (Response Message)
+             -> Eff r Message
 startCommand cid = do
     t <- asks startMessage
     sendMessage cid t Nothing
@@ -210,14 +210,13 @@ editMessageText :: MethodWithCallStack r
                 -> Int -- ^ Message id
                 -> Text -- ^ New text
                 -> Maybe InlineKeyboardMarkup
-                -> Eff r (Response Message)
+                -> Eff r Message
 editMessageText cid mid t mMarkup = do
     logInfo $ "Editing message " <+> mid <> " at chat " <+> cid
         <> " to " <+> t <> " with markup " <+> mMarkup
     bUrl <- baseUrl
     resp <- post (bUrl /: "editMessageText") body
-    logDebug $ "Response: " <+> resp
-    pure resp
+    tryExtract resp
   where body = json $ EditMessageTextRequest
             { editMsgText'chat_id = cid
             , editMsgText'message_id = mid
@@ -235,7 +234,7 @@ methodWithRepNum :: ( MethodWithCallStack r
                  -> Text -- ^ Endopoint (e.g. "sendMessage")
                  -> b -- ^ Request body
                  -> Text -- ^ Hint for logging
-                 -> Eff r (Response Message)
+                 -> Eff r Message
 methodWithRepNum cid endpoint body hint = do
     repeatNum <- (gets @TgState) $ getRepNum cid
     logInfo $ "Sending " <> hint <> " to chat " <+> cid
@@ -243,8 +242,7 @@ methodWithRepNum cid endpoint body hint = do
     logDebug $ "Request body: " <+> body
     bUrl <- baseUrl
     resp <- head <$> replicateM repeatNum (post (bUrl /: endpoint) (json body))
-    logDebug $ "Response: " <+> resp
-    pure resp
+    tryExtract resp
 
 {- | Use this method to send text messages.
 On success, the sent 'Message' is returned.
@@ -253,7 +251,7 @@ sendMessage :: MethodWithCallStack r
             => Int -- ^ Chat id
             -> Text
             -> Maybe InlineKeyboardMarkup
-            -> Eff r (Response Message)
+            -> Eff r Message
 sendMessage cid t mMarkup = methodWithRepNum cid "sendMessage" body "text"
   where body = SendMessageRequest
             { sendMsg'chat_id = cid
@@ -267,7 +265,7 @@ sendMessage cid t mMarkup = methodWithRepNum cid "sendMessage" body "text"
 sendSticker :: MethodWithCallStack r
             => Int -- ^ Chat id
             -> Text -- ^ Sticker id
-            -> Eff r (Response Message)
+            -> Eff r Message
 sendSticker cid fid = methodWithRepNum cid "sendSticker" body "sticker"
   where body = SendStickerRequest
             { sendStk'chat_id = cid
@@ -281,7 +279,7 @@ sendPhoto :: MethodWithCallStack r
           => Int -- ^ Chat id
           -> Text -- ^ Photo id
           -> Maybe Text -- ^ Caption
-          -> Eff r (Response Message)
+          -> Eff r Message
 sendPhoto cid pid cap = methodWithRepNum cid "sendPhoto" body "photo"
   where body = SendPhotoRequest
             { sendPh'chat_id = cid
@@ -296,7 +294,7 @@ sendAnimation :: MethodWithCallStack r
               => Int -- ^ Chat id
               -> Text -- ^ Animation id
               -> Maybe Text -- ^ Caption
-              -> Eff r (Response Message)
+              -> Eff r Message
 sendAnimation cid anId cap = methodWithRepNum cid "sendAnimation" body "animation"
   where body = SendAnimationRequest
             { sendAnim'chat_id = cid
@@ -312,7 +310,7 @@ sendAudio :: MethodWithCallStack r
           => Int -- ^ Chat id
           -> Text -- ^ Audio id
           -> Maybe Text -- ^ Caption
-          -> Eff r (Response Message)
+          -> Eff r Message
 sendAudio cid audId cap = methodWithRepNum cid "sendAudio" body "audio"
   where body = SendAudioRequest
             { sendAudio'chat_id = cid
@@ -326,7 +324,7 @@ sendDocument :: MethodWithCallStack r
              => Int -- ^ Chat id
              -> Text -- ^ Document id
              -> Maybe Text -- ^ Caption
-             -> Eff r (Response Message)
+             -> Eff r Message
 sendDocument cid dId cap = methodWithRepNum cid "sendDocument" body "document"
   where body = SendDocumentRequest
             { sendDoc'chat_id = cid
@@ -342,7 +340,7 @@ sendVideo :: MethodWithCallStack r
           => Int -- ^ Chat id
           -> Text -- ^ Video id
           -> Maybe Text -- ^ Caption
-          -> Eff r (Response Message)
+          -> Eff r Message
 sendVideo cid vid cap = methodWithRepNum cid "sendVideo" body "video"
   where body = SendVideoRequest
             { sendVideo'chat_id = cid
@@ -357,7 +355,7 @@ video messages. On success, the sent 'Telegram.Internal.Types.Message' is return
 sendVideoNote :: MethodWithCallStack r
               => Int -- ^ Chat id
               -> Text -- ^ VideoNote id
-              -> Eff r (Response Message)
+              -> Eff r Message
 sendVideoNote cid vnId = methodWithRepNum cid "sendVideoNote" body "videonote"
   where body = SendVideoNoteRequest
             { sendVideoNote'chat_id = cid
@@ -374,7 +372,7 @@ sendVoice :: MethodWithCallStack r
           => Int -- ^ Chat id
           -> Text -- ^ Photo id
           -> Maybe Text -- ^ Caption
-          -> Eff r (Response Message)
+          -> Eff r Message
 sendVoice cid vid cap = methodWithRepNum cid "sendVoice" body "voice"
   where body = SendVoiceRequest
             { sendVoice'chat_id = cid

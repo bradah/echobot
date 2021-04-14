@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-
+{-# LANGUAGE ViewPatterns    #-}
 {- |
 Copyright:  (c) 2021 wspbr
 Maintainer: wspbr <rtrn.0@ya.ru>
@@ -13,6 +13,7 @@ module Telegram.Data
     , defaultTgState
       -- ** Response
     , Response (..)
+    , tryExtract
       -- ** Update
     , Update (..)
       -- ** Message
@@ -41,6 +42,10 @@ module Telegram.Data
     ) where
 
 
+import           Control.Monad.Freer
+import           Eff.Error
+import           Eff.Log
+
 import           AppState              (AppState (..))
 import           Data.HashMap.Strict   (fromList)
 import           Data.Text             (Text)
@@ -61,9 +66,27 @@ defaultTgState = AppState
 data Response a = Response
     { resp'ok          :: Bool
     , resp'description :: Maybe Text
-    , resp'result      :: a
+    , resp'result      :: Maybe a
     , resp'errorCode   :: Maybe Int
     } deriving (Show, Eq)
+
+-- | Extract some result from 'Response' or throw an exeption.
+tryExtract :: ( Members [Error AppError, Log] r
+              , Show a
+              )
+           => Response a
+           -> Eff r a
+tryExtract resp@(resp'ok -> False) = do
+    logError $ "Received error: " <+> resp
+    throwError . OtherError $ showT resp
+tryExtract (resp'result -> Just r) = do
+    logDebug $ "Received response: " <+> r
+    pure r
+tryExtract resp = do
+    logError $ "This can't be possible! " <+> resp
+    throwError . OtherError $ showT resp
+
+
 
 -- | This object represents an incoming update.
 --   At most one of the optional parameters can be

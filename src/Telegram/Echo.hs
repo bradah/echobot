@@ -27,7 +27,7 @@ runPureEcho :: Method r
             => Eff (Echo Update : r) a
             -> Eff r a
 runPureEcho = interpret $ \case
-    Listen -> resp'result <$> getUpdates
+    Listen -> getUpdates
     Reply u -> case updateToAction u of
         Just act -> act
         Nothing  -> logWarning $ "No matching Action for this Update:" <+> u

@@ -73,11 +73,11 @@ getLps = do
                      /: "groups.getLongPollServer"
                      )
                  params
-    respOrThrow result
+    tryExtract result
 
 -- | Check Long Poll Server for 'Update's.
 -- This method also adds new 'Session's for new users.
-checkLps :: MethodWithCallStack r => Eff r CheckLpsResponse
+checkLps :: MethodWithCallStack r => Eff r [Update]
 checkLps = do
     logInfo "Waiting for updates..."
     params <- mkParams
@@ -94,7 +94,7 @@ checkLps = do
             putNewTs resp
             sessions <- putNewSessions ups
             logDebug $ "Current sessions: " <+> sessions
-            pure resp
+            pure ups
 
   where
     mkParams :: Members [State Config, State VkState] r => Eff r ReqBodyUrlEnc
@@ -142,7 +142,7 @@ sendMessage userId mRepNum params hint = do
                  /: "messages.send"
              )
              fullParams
-    respOrThrow result
+    tryExtract result
 
 -- | Send text and list of 'Attachment's
 sendTextWithAttachments :: MethodWithCallStack r
@@ -194,7 +194,7 @@ getMessagesUploadServer userId atType = do
                        /: "method"
                        /: "docs.getMessagesUploadServer"
                    ) params
-    respOrThrow result
+    tryExtract result
 
 -- | Upload a file to server. Get server via 'getMessagesUploadServer'.
 uploadFile :: MethodWithCallStack r
@@ -217,7 +217,7 @@ saveFile file = do
                        /: "method"
                        /: "docs.save"
                    ) params
-    respOrThrow result
+    tryExtract result
 
 -- | Answer to user on \/repeat command.
 repeatCommand :: MethodWithCallStack r

@@ -22,7 +22,6 @@ import           Eff.Log             (logWarning, (<+>))
 import           Vk.Data             (Update)
 import           Vk.Methods
 import           Vk.Parser
-import           Vk.Requests         (CheckLpsResponse (checkLpsResp'updates))
 
 -- | Run 'Echo'for Telegram purely.
 runPureEcho
@@ -30,7 +29,7 @@ runPureEcho
     => Eff (Echo Update : r) a
     -> Eff r a
 runPureEcho = interpret $ \case
-    Listen -> checkLpsResp'updates <$> checkLps
+    Listen -> checkLps
     Reply u -> case updateToAction u of
         Just act -> act
         Nothing  -> logWarning $ "No matching Action for this Update: " <+> u
