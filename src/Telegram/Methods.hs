@@ -1,6 +1,6 @@
 {- |
-Copyright:  (c) 2021 wspbr
-Maintainer: wspbr <rtrn.0@ya.ru>
+Copyright:  (c) 2021 o-pascal
+Maintainer: o-pascal <rtrn.0@ya.ru>
 
 Telegram API methods.
 -}
