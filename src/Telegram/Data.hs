@@ -70,7 +70,7 @@ data Response a = Response
     , resp'errorCode   :: Maybe Int
     } deriving (Show, Eq)
 
--- | Extract some result from 'Response' or throw an exeption.
+-- | Extract some result from 'Response' or throw an exception.
 tryExtract :: ( Members [Error AppError, Log] r
               , Show a
               )

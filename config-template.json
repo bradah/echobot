@@ -1,0 +1,20 @@
+{
+    "comment": "rename this file to 'config.json'. this line can be deleted.",
+    "telegram": {
+        "token": "put your token here",
+        "initial_repeat_num": 1,
+        "start_message": "Hi! I will simply repeat your messages! Just imagine talking to a mirror :)"
+    },
+    "vk": {
+        "token": "put your token here",
+        "group_id": 111111111,
+        "initial_repeat_num": 1,
+        "start_message": "Hi! I will simply repeat your messages! Just imagine talking to a mirror :)"
+    },
+    "log": {
+        "verbosity": "debug",
+        "file_path": "echobot.log",
+        "where_to_log": "both"
+    },
+    "platform": "telegram"
+}
