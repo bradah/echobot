@@ -1,5 +1,6 @@
 module Vk.ParserSpec where
 
+import           Control.Applicative   (empty)
 import           Control.Monad         ((>=>))
 import           Data.Maybe
 import qualified Data.Text             as T (isPrefixOf, tail, unwords, words)
@@ -64,10 +65,12 @@ stickerSpec =
 isAudioMessageSpec :: Spec
 isAudioMessageSpec =
   context "when given an Update with audio_message" $
-    prop "returns ()" $
+    prop "returns link to ogg file" $
     \arbU -> case pure . upd'object >=> obj'message >=> pure . msg'attachments $ arbU of
-        Just [Attachment AudioMessage _] -> (arbU <?> isAudioMessage) == pure ()
-        _                                -> isNothing (arbU <?> isAudioMessage)
+        Just [Attachment AudioMessage Media{..}]
+            -> (arbU <?> audioMessage) == maybe empty pure media'link_ogg
+        _ ->
+            isNothing (arbU <?> audioMessage)
 
 spec :: Spec
 spec = do

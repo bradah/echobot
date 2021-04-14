@@ -1,5 +1,8 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Vk.Data.Arbitrary where
 
+import           Data.Text                 (pack)
+import           Network.HTTP.Req          (Scheme (..), Url, https, (/:))
 import           Test.QuickCheck           hiding (Negative, Positive)
 import           Test.QuickCheck.Instances ()
 import           Vk.Data
@@ -67,6 +70,7 @@ instance Arbitrary Media where
         <*> arbitrary
         <*> arbitrary
         <*> arbitrary
+        <*> arbitrary
 
 instance Arbitrary Keyboard where
     arbitrary = Keyboard
@@ -98,3 +102,9 @@ instance Arbitrary ButtonActionType where
     arbitrary = oneof $ pure <$>
         [ Text
         ]
+
+instance Arbitrary (Url 'Https) where
+    arbitrary = do
+        host <- pack <$> arbitrary
+        path <- pack <$> arbitrary
+        pure $ https host /: path
