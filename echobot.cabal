@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 158fa5166f99d7ee6adb7b780ee204807e551b92adc607774eaa257b4843a48d
+-- hash: 1043a37d6aca2c0c51dbdd65bdc1249e9525a8a2a6401d62c89a00f91a86272e
 
 name:           echobot
 version:        0.1.0.0
@@ -63,7 +63,6 @@ library
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , configurator
     , freer-simple
     , hspec
     , hspec-discover
@@ -92,7 +91,6 @@ executable echobot-exe
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , configurator
     , echobot
     , freer-simple
     , hspec
@@ -127,7 +125,6 @@ test-suite echobot-test
     , aeson
     , base >=4.7 && <5
     , bytestring
-    , configurator
     , echobot
     , freer-simple
     , hspec

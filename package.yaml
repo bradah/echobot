@@ -29,7 +29,6 @@ dependencies:
 - hspec-discover
 - QuickCheck
 - quickcheck-instances
-- configurator
 - random
 - http-api-data
 - req 
