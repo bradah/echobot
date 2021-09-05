@@ -49,6 +49,7 @@ runApp = runM
        . runPureConfigurator
        $ app
 
+
 -- | Main logic of application.
 -- This whole computation is entirely pure since
 -- it doesn't require 'IO'. So implementation is
